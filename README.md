@@ -1,5 +1,5 @@
-# SWEN661-BudgetWise
-SWEN661 Team 2 project BudgetWise
+# SWEN661-Pace
+SWEN661 Team 2 project Pace
 
 # Team BudgetPros
 Max Stine - MaximumVolts
