@@ -9,7 +9,7 @@ Carolyn Sangi -  carolyn-tech
 # Team Charter
 TBD
 
-# Project: BudgetWise
+# Project: Pace
 Domain: Finance
 User Group: Young professionals
 Technical: External API integration
