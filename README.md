@@ -9,7 +9,7 @@ Logan Humphries-Russ - g3arshift
 Carolyn Sangi -  carolyn-tech 
 
 # Team Charter
-TBD
+[Link](https://docs.google.com/document/d/1n2uISLKm6WkJXohyP-CczqJu6Tqhhx5R2Y6sqGSlnKE/edit?usp=sharing)
 
 # Project: Pace
 Domain: Finance
