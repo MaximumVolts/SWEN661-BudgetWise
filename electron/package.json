@@ -1,0 +1,16 @@
+{
+  "name": "budgetwise-electron",
+  "version": "1.0.0",
+  "description": "Electron version of budgetwise",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "test"
+  },
+  "devDependencies": {
+    "electron": "^44.4.3"
+  }
+}
