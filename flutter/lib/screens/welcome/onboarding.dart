@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 
 class OnBoardingScreen extends StatelessWidget {
+  const OnBoardingScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +30,12 @@ class OnBoardingScreen extends StatelessWidget {
                       width: 24,
                       height: 24,
                       clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(),
+                      decoration: BoxDecoration( image: DecorationImage(
+                                      image: Svg(
+                                        'assets/arrow-left.svg',
+                                      )
+                                      ),
+                                    ),
                       child: Stack(),
                     ),
                     Row(
@@ -182,7 +190,12 @@ class OnBoardingScreen extends StatelessWidget {
                                   width: 16,
                                   height: 16,
                                   clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(),
+                                  decoration: BoxDecoration( image: DecorationImage(
+                                      image: Svg(
+                                        'assets/check.svg',
+                                      )
+                                      ),
+                                    ),
                                   child: Stack(),
                                 ),
                                 Text(
@@ -227,7 +240,11 @@ class OnBoardingScreen extends StatelessWidget {
                                   width: 16,
                                   height: 16,
                                   clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(),
+                                  decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/check.svg',
+                                      )
+                                      ),),
                                   child: Stack(),
                                 ),
                                 Text(
@@ -667,7 +684,11 @@ class OnBoardingScreen extends StatelessWidget {
                                   width: 18,
                                   height: 18,
                                   clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(),
+                                  decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/check.svg',
+                                      )
+                                      ),),
                                   child: Stack(),
                                 ),
                                 Text(

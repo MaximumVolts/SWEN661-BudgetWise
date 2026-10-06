@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 
 class ConnectPlaid extends StatelessWidget {
+  const ConnectPlaid({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,7 +89,11 @@ class ConnectPlaid extends StatelessWidget {
                                                         width: 24,
                                                         height: 24,
                                                         clipBehavior: Clip.antiAlias,
-                                                        decoration: BoxDecoration(),
+                                                        decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/left-arrow.svg',
+                                      )
+                                      ),),
                                                         child: Stack(),
                                                     ),
                                                 ],
@@ -121,7 +128,11 @@ class ConnectPlaid extends StatelessWidget {
                                                         width: 28,
                                                         height: 28,
                                                         clipBehavior: Clip.antiAlias,
-                                                        decoration: BoxDecoration(),
+                                                        decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/pace.svg',
+                                      )
+                                      ),),
                                                         child: Stack(),
                                                     ),
                                                 ],
@@ -139,7 +150,11 @@ class ConnectPlaid extends StatelessWidget {
                                                         width: 24,
                                                         height: 24,
                                                         clipBehavior: Clip.antiAlias,
-                                                        decoration: BoxDecoration(),
+                                                        decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/refresh-ccw.svg',
+                                      )
+                                      ),),
                                                         child: Stack(),
                                                     ),
                                                 ],
@@ -163,7 +178,11 @@ class ConnectPlaid extends StatelessWidget {
                                                         width: 28,
                                                         height: 28,
                                                         clipBehavior: Clip.antiAlias,
-                                                        decoration: BoxDecoration(),
+                                                        decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/lock.svg',
+                                      )
+                                      ),),
                                                         child: Stack(),
                                                     ),
                                                 ],
@@ -181,7 +200,11 @@ class ConnectPlaid extends StatelessWidget {
                                                         width: 24,
                                                         height: 24,
                                                         clipBehavior: Clip.antiAlias,
-                                                        decoration: BoxDecoration(),
+                                                        decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/refresh-ccw.svg',
+                                      )
+                                      ),),
                                                         child: Stack(),
                                                     ),
                                                 ],
@@ -209,7 +232,11 @@ class ConnectPlaid extends StatelessWidget {
                                                         width: 28,
                                                         height: 28,
                                                         clipBehavior: Clip.antiAlias,
-                                                        decoration: BoxDecoration(),
+                                                        decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/user.svg',
+                                      )
+                                      ),),
                                                         child: Stack(),
                                                     ),
                                                 ],
@@ -343,7 +370,11 @@ class ConnectPlaid extends StatelessWidget {
                                                                                 width: 22,
                                                                                 height: 22,
                                                                                 clipBehavior: Clip.antiAlias,
-                                                                                decoration: BoxDecoration(),
+                                                                                decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/circle-x.svg',
+                                      )
+                                      ),),
                                                                                 child: Stack(),
                                                                             ),
                                                                         ],
@@ -412,7 +443,11 @@ class ConnectPlaid extends StatelessWidget {
                                                                                 width: 22,
                                                                                 height: 22,
                                                                                 clipBehavior: Clip.antiAlias,
-                                                                                decoration: BoxDecoration(),
+                                                                                decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/eye.svg',
+                                      )
+                                      ),),
                                                                                 child: Stack(),
                                                                             ),
                                                                         ],
@@ -492,7 +527,11 @@ class ConnectPlaid extends StatelessWidget {
                                                                                 width: 22,
                                                                                 height: 22,
                                                                                 clipBehavior: Clip.antiAlias,
-                                                                                decoration: BoxDecoration(),
+                                                                                decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/lock.svg',
+                                      )
+                                      ),),
                                                                                 child: Stack(),
                                                                             ),
                                                                         ],
@@ -561,7 +600,11 @@ class ConnectPlaid extends StatelessWidget {
                                                                                 width: 22,
                                                                                 height: 22,
                                                                                 clipBehavior: Clip.antiAlias,
-                                                                                decoration: BoxDecoration(),
+                                                                                decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/link-2-off.svg',
+                                      )
+                                      ),),
                                                                                 child: Stack(),
                                                                             ),
                                                                         ],
@@ -636,7 +679,11 @@ class ConnectPlaid extends StatelessWidget {
                                                         width: 14,
                                                         height: 14,
                                                         clipBehavior: Clip.antiAlias,
-                                                        decoration: BoxDecoration(),
+                                                        decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/check.svg',
+                                      )
+                                      ),),
                                                         child: Stack(),
                                                     ),
                                                 ],
@@ -678,7 +725,11 @@ class ConnectPlaid extends StatelessWidget {
                                             width: 22,
                                             height: 22,
                                             clipBehavior: Clip.antiAlias,
-                                            decoration: BoxDecoration(),
+                                            decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/link.svg',
+                                      )
+                                      ),),
                                             child: Stack(),
                                         ),
                                         Text(
@@ -727,7 +778,11 @@ class ConnectPlaid extends StatelessWidget {
                                             width: 16,
                                             height: 16,
                                             clipBehavior: Clip.antiAlias,
-                                            decoration: BoxDecoration(),
+                                            decoration: BoxDecoration(image: DecorationImage(
+                                      image: Svg(
+                                        'assets/atom.svg',
+                                      )
+                                      ),),
                                             child: Stack(),
                                         ),
                                         Text(

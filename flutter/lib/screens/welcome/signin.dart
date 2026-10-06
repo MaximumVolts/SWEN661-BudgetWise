@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -55,7 +56,13 @@ class SignInScreen extends StatelessWidget {
                                   width: 24,
                                   height: 24,
                                   clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(),
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: Svg(
+                                        'assets/pace.svg',
+                                      ),
+                                    ),
+                                  ),
                                   child: Stack(),
                                 ),
                               ],
@@ -234,7 +241,11 @@ class SignInScreen extends StatelessWidget {
                                     width: 24,
                                     height: 24,
                                     clipBehavior: Clip.antiAlias,
-                                    decoration: BoxDecoration(),
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: Svg('assets/eye.svg'),
+                                      ),
+                                    ),
                                     child: Stack(),
                                   ),
                                 ],
