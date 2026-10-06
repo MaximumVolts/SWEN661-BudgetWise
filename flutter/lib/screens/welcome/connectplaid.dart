@@ -4,343 +4,751 @@ class ConnectPlaid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Container(
+    width: 768,
+    height: 1100,
+    clipBehavior: Clip.antiAlias,
+    decoration: BoxDecoration(color: const Color(0xFFFBFAF7)),
+    child: Stack(
         children: [
-          Column(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 190,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(2),
-                      color: Color(0xff1a1a1a),
+            Positioned(
+                left: 0,
+                top: 0,
+                child: Container(
+                    width: 768,
+                    height: 1100,
+                    padding: const EdgeInsets.only(bottom: 48),
+                    child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                            Container(
+                                width: 768,
+                                height: 44,
+                                padding: const EdgeInsets.only(
+                                    top: 12,
+                                    left: 48,
+                                    right: 48,
+                                    bottom: 8,
+                                ),
+                                child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    spacing: 8,
+                                    children: [
+                                        Container(
+                                            width: 190,
+                                            height: 3,
+                                            decoration: ShapeDecoration(
+                                                color: const Color(0xFF1A1A1A),
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                                            ),
+                                        ),
+                                        Container(
+                                            width: 190,
+                                            height: 3,
+                                            decoration: ShapeDecoration(
+                                                color: const Color(0xFF1A1A1A),
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                                            ),
+                                        ),
+                                        Container(
+                                            width: 190,
+                                            height: 3,
+                                            decoration: ShapeDecoration(
+                                                color: const Color(0xFF1A1A1A),
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                            Container(
+                                width: 768,
+                                height: 44,
+                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                        Container(
+                                            width: 48,
+                                            height: 48,
+                                            child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                    Container(
+                                                        width: 24,
+                                                        height: 24,
+                                                        clipBehavior: Clip.antiAlias,
+                                                        decoration: BoxDecoration(),
+                                                        child: Stack(),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                            Container(
+                                width: 768,
+                                padding: const EdgeInsets.only(top: 24),
+                                child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                        Container(
+                                            width: 56,
+                                            height: 56,
+                                            decoration: ShapeDecoration(
+                                                color: const Color(0xFFE4EE6A),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(28),
+                                                ),
+                                            ),
+                                            child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                    Container(
+                                                        width: 28,
+                                                        height: 28,
+                                                        clipBehavior: Clip.antiAlias,
+                                                        decoration: BoxDecoration(),
+                                                        child: Stack(),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                        Container(
+                                            width: 32,
+                                            height: 2,
+                                            child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                    Container(
+                                                        width: 24,
+                                                        height: 24,
+                                                        clipBehavior: Clip.antiAlias,
+                                                        decoration: BoxDecoration(),
+                                                        child: Stack(),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                        Container(
+                                            width: 56,
+                                            height: 56,
+                                            decoration: ShapeDecoration(
+                                                color: const Color(0xFF1A1A1A),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(28),
+                                                ),
+                                            ),
+                                            child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                    Container(
+                                                        width: 28,
+                                                        height: 28,
+                                                        clipBehavior: Clip.antiAlias,
+                                                        decoration: BoxDecoration(),
+                                                        child: Stack(),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                        Container(
+                                            width: 32,
+                                            height: 24,
+                                            child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                    Container(
+                                                        width: 24,
+                                                        height: 24,
+                                                        clipBehavior: Clip.antiAlias,
+                                                        decoration: BoxDecoration(),
+                                                        child: Stack(),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                        Container(
+                                            width: 56,
+                                            height: 56,
+                                            decoration: ShapeDecoration(
+                                                color: const Color(0xFFFBFAF7),
+                                                shape: RoundedRectangleBorder(
+                                                    side: BorderSide(
+                                                        width: 1,
+                                                        color: const Color(0xFFCBC8C1),
+                                                    ),
+                                                    borderRadius: BorderRadius.circular(28),
+                                                ),
+                                            ),
+                                            child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                    Container(
+                                                        width: 28,
+                                                        height: 28,
+                                                        clipBehavior: Clip.antiAlias,
+                                                        decoration: BoxDecoration(),
+                                                        child: Stack(),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                            Container(
+                                width: 768,
+                                padding: const EdgeInsets.only(top: 32, left: 48, right: 48),
+                                child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                        SizedBox(
+                                            width: 672,
+                                            child: Text(
+                                                'STEP 3 OF 3',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: const Color(0xFF4A4843) /* color-text-secondary */,
+                                                    fontSize: 12,
+                                                    fontFamily: 'Roboto',
+                                                    fontWeight: FontWeight.w500,
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                            Container(
+                                width: 768,
+                                padding: const EdgeInsets.only(top: 8, left: 48, right: 48),
+                                child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                        SizedBox(
+                                            width: 672,
+                                            child: Text(
+                                                'Connect your bank with Plaid',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: const Color(0xFF1A1A1A) /* color-text-primary */,
+                                                    fontSize: 36,
+                                                    fontFamily: 'Roboto',
+                                                    fontWeight: FontWeight.w400,
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                            Container(
+                                width: 768,
+                                padding: const EdgeInsets.only(top: 12, left: 80, right: 80),
+                                child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                        SizedBox(
+                                            width: 608,
+                                            child: Text(
+                                                'Pace uses Plaid to securely link your checking, savings and credit accounts. Transactions import automatically, so you never have to type them in.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: const Color(0xFF4A4843) /* color-text-secondary */,
+                                                    fontSize: 16,
+                                                    fontFamily: 'Roboto',
+                                                    fontWeight: FontWeight.w400,
+                                                    height: 1.50,
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                            Container(
+                                width: 660,
+                                padding: const EdgeInsets.all(28),
+                                decoration: ShapeDecoration(
+                                    color: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(
+                                            width: 1,
+                                            color: const Color(0xFFCBC8C1),
+                                        ),
+                                        borderRadius: BorderRadius.circular(16),
+                                    ),
+                                ),
+                                child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    spacing: 24,
+                                    children: [
+                                        Container(
+                                            width: double.infinity,
+                                            child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                spacing: 24,
+                                                children: [
+                                                    Expanded(
+                                                        child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            spacing: 14,
+                                                            children: [
+                                                                Container(
+                                                                    width: 40,
+                                                                    height: 40,
+                                                                    decoration: ShapeDecoration(
+                                                                        color: const Color(0xFFECEAE4),
+                                                                        shape: RoundedRectangleBorder(
+                                                                            borderRadius: BorderRadius.circular(20),
+                                                                        ),
+                                                                    ),
+                                                                    child: Column(
+                                                                        mainAxisSize: MainAxisSize.min,
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                                        children: [
+                                                                            Container(
+                                                                                width: 22,
+                                                                                height: 22,
+                                                                                clipBehavior: Clip.antiAlias,
+                                                                                decoration: BoxDecoration(),
+                                                                                child: Stack(),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                                Expanded(
+                                                                    child: Column(
+                                                                        mainAxisSize: MainAxisSize.min,
+                                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                        spacing: 4,
+                                                                        children: [
+                                                                            SizedBox(
+                                                                                width: 236,
+                                                                                child: Text(
+                                                                                    'Pace never sees your bank login',
+                                                                                    style: TextStyle(
+                                                                                        color: const Color(0xFF1A1A1A) /* color-text-primary */,
+                                                                                        fontSize: 15,
+                                                                                        fontFamily: 'Roboto',
+                                                                                        fontWeight: FontWeight.w700,
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                                width: 236,
+                                                                                child: Text(
+                                                                                    'You sign in through Plaid. Pace never stores your username or password.',
+                                                                                    style: TextStyle(
+                                                                                        color: const Color(0xFF4A4843) /* color-text-secondary */,
+                                                                                        fontSize: 16,
+                                                                                        fontFamily: 'Roboto',
+                                                                                        fontWeight: FontWeight.w400,
+                                                                                        height: 1.50,
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Expanded(
+                                                        child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            spacing: 14,
+                                                            children: [
+                                                                Container(
+                                                                    width: 40,
+                                                                    height: 40,
+                                                                    decoration: ShapeDecoration(
+                                                                        color: const Color(0xFFECEAE4),
+                                                                        shape: RoundedRectangleBorder(
+                                                                            borderRadius: BorderRadius.circular(20),
+                                                                        ),
+                                                                    ),
+                                                                    child: Column(
+                                                                        mainAxisSize: MainAxisSize.min,
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                                        children: [
+                                                                            Container(
+                                                                                width: 22,
+                                                                                height: 22,
+                                                                                clipBehavior: Clip.antiAlias,
+                                                                                decoration: BoxDecoration(),
+                                                                                child: Stack(),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                                Expanded(
+                                                                    child: Column(
+                                                                        mainAxisSize: MainAxisSize.min,
+                                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                        spacing: 4,
+                                                                        children: [
+                                                                            SizedBox(
+                                                                                width: 236,
+                                                                                child: Text(
+                                                                                    'Read-only access',
+                                                                                    style: TextStyle(
+                                                                                        color: const Color(0xFF1A1A1A) /* color-text-primary */,
+                                                                                        fontSize: 15,
+                                                                                        fontFamily: 'Roboto',
+                                                                                        fontWeight: FontWeight.w700,
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                                width: 236,
+                                                                                child: Text(
+                                                                                    'Pace sees balances and transactions. It can\'t move your money.',
+                                                                                    style: TextStyle(
+                                                                                        color: const Color(0xFF4A4843) /* color-text-secondary */,
+                                                                                        fontSize: 16,
+                                                                                        fontFamily: 'Roboto',
+                                                                                        fontWeight: FontWeight.w400,
+                                                                                        height: 1.50,
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                        Container(
+                                            width: double.infinity,
+                                            child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                spacing: 24,
+                                                children: [
+                                                    Expanded(
+                                                        child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            spacing: 14,
+                                                            children: [
+                                                                Container(
+                                                                    width: 40,
+                                                                    height: 40,
+                                                                    decoration: ShapeDecoration(
+                                                                        color: const Color(0xFFECEAE4),
+                                                                        shape: RoundedRectangleBorder(
+                                                                            borderRadius: BorderRadius.circular(20),
+                                                                        ),
+                                                                    ),
+                                                                    child: Column(
+                                                                        mainAxisSize: MainAxisSize.min,
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                                        children: [
+                                                                            Container(
+                                                                                width: 22,
+                                                                                height: 22,
+                                                                                clipBehavior: Clip.antiAlias,
+                                                                                decoration: BoxDecoration(),
+                                                                                child: Stack(),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                                Expanded(
+                                                                    child: Column(
+                                                                        mainAxisSize: MainAxisSize.min,
+                                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                        spacing: 4,
+                                                                        children: [
+                                                                            SizedBox(
+                                                                                width: 236,
+                                                                                child: Text(
+                                                                                    'Encrypted in transit and at rest',
+                                                                                    style: TextStyle(
+                                                                                        color: const Color(0xFF1A1A1A) /* color-text-primary */,
+                                                                                        fontSize: 15,
+                                                                                        fontFamily: 'Roboto',
+                                                                                        fontWeight: FontWeight.w700,
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                                width: 236,
+                                                                                child: Text(
+                                                                                    'Your financial data is protected wherever it\'s sent or stored.',
+                                                                                    style: TextStyle(
+                                                                                        color: const Color(0xFF4A4843) /* color-text-secondary */,
+                                                                                        fontSize: 16,
+                                                                                        fontFamily: 'Roboto',
+                                                                                        fontWeight: FontWeight.w400,
+                                                                                        height: 1.50,
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Expanded(
+                                                        child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            mainAxisAlignment: MainAxisAlignment.start,
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            spacing: 14,
+                                                            children: [
+                                                                Container(
+                                                                    width: 40,
+                                                                    height: 40,
+                                                                    decoration: ShapeDecoration(
+                                                                        color: const Color(0xFFECEAE4),
+                                                                        shape: RoundedRectangleBorder(
+                                                                            borderRadius: BorderRadius.circular(20),
+                                                                        ),
+                                                                    ),
+                                                                    child: Column(
+                                                                        mainAxisSize: MainAxisSize.min,
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                                        children: [
+                                                                            Container(
+                                                                                width: 22,
+                                                                                height: 22,
+                                                                                clipBehavior: Clip.antiAlias,
+                                                                                decoration: BoxDecoration(),
+                                                                                child: Stack(),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                                Expanded(
+                                                                    child: Column(
+                                                                        mainAxisSize: MainAxisSize.min,
+                                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                        spacing: 4,
+                                                                        children: [
+                                                                            SizedBox(
+                                                                                width: 236,
+                                                                                child: Text(
+                                                                                    'Disconnect anytime',
+                                                                                    style: TextStyle(
+                                                                                        color: const Color(0xFF1A1A1A) /* color-text-primary */,
+                                                                                        fontSize: 15,
+                                                                                        fontFamily: 'Roboto',
+                                                                                        fontWeight: FontWeight.w700,
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                                width: 236,
+                                                                                child: Text(
+                                                                                    'Remove an account in Settings and syncing stops right away.',
+                                                                                    style: TextStyle(
+                                                                                        color: const Color(0xFF4A4843) /* color-text-secondary */,
+                                                                                        fontSize: 16,
+                                                                                        fontFamily: 'Roboto',
+                                                                                        fontWeight: FontWeight.w400,
+                                                                                        height: 1.50,
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                            Container(
+                                width: 768,
+                                padding: const EdgeInsets.only(top: 28, left: 54, right: 54),
+                                child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    spacing: 12,
+                                    children: [
+                                        Container(
+                                            width: 20,
+                                            height: 20,
+                                            decoration: ShapeDecoration(
+                                                color: const Color(0xFF1A1A1A),
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
+                                            ),
+                                            child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                    Container(
+                                                        width: 14,
+                                                        height: 14,
+                                                        clipBehavior: Clip.antiAlias,
+                                                        decoration: BoxDecoration(),
+                                                        child: Stack(),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                        SizedBox(
+                                            width: 628,
+                                            child: Text(
+                                                'I agree to let Pace access my account data through Plaid.',
+                                                style: TextStyle(
+                                                    color: const Color(0xFF1A1A1A) /* color-text-primary */,
+                                                    fontSize: 16,
+                                                    fontFamily: 'Roboto',
+                                                    fontWeight: FontWeight.w400,
+                                                    height: 1.50,
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                            Container(
+                                width: 660,
+                                height: 56,
+                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                decoration: ShapeDecoration(
+                                    color: const Color(0xFF1A1A1A),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(28),
+                                    ),
+                                ),
+                                child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    spacing: 10,
+                                    children: [
+                                        Container(
+                                            width: 22,
+                                            height: 22,
+                                            clipBehavior: Clip.antiAlias,
+                                            decoration: BoxDecoration(),
+                                            child: Stack(),
+                                        ),
+                                        Text(
+                                            'Connect with Plaid',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontFamily: 'Roboto',
+                                                fontWeight: FontWeight.w500,
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                            Container(
+                                width: 768,
+                                padding: const EdgeInsets.only(top: 16),
+                                child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                        Text(
+                                            'Not now',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: const Color(0xFF1A1A1A) /* color-text-primary */,
+                                                fontSize: 15,
+                                                fontFamily: 'Roboto',
+                                                fontWeight: FontWeight.w500,
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                            Container(
+                                width: 768,
+                                padding: const EdgeInsets.only(top: 20, left: 48, right: 48),
+                                child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    spacing: 8,
+                                    children: [
+                                        Container(
+                                            width: 16,
+                                            height: 16,
+                                            clipBehavior: Clip.antiAlias,
+                                            decoration: BoxDecoration(),
+                                            child: Stack(),
+                                        ),
+                                        Text(
+                                            'Demo uses the Plaid sandbox. No real bank data.',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: const Color(0xFF4A4843) /* color-text-secondary */,
+                                                fontSize: 13,
+                                                fontFamily: 'Roboto',
+                                                fontWeight: FontWeight.w400,
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                        ],
                     ),
-                  ),
-                  Container(
-                    width: 190,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(2),
-                      color: Color(0xff1a1a1a),
-                    ),
-                  ),
-                  Container(
-                    width: 190,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(2),
-                      color: Color(0xff1a1a1a),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Row(
-                    children: [
-                      Column(
-                        children: [
-                          Container(
-                            width: 14.00160026550293,
-                            height: 14.00160026550293,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      Column(
-                        children: [
-                          Container(
-                            width: 18.66666603088379,
-                            height: 9.333333015441895,
-                          ),
-                          Container(
-                            width: 5.833333492279053,
-                            height: 5.833333492279053,
-                          ),
-                          Container(
-                            width: 3.7333343029022217,
-                            height: 3.7333343029022217,
-                          ),
-                          Container(width: 14, height: 0),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Column(children: [Container(width: 18, height: 18)]),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Column(
-                        children: [
-                          Container(width: 21, height: 23.335201263427734),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Column(children: [Container(width: 18, height: 18)]),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Column(
-                        children: [
-                          Container(width: 16.335201263427734, height: 21),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    "STEP 3 OF 3",
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    "Connect your bank with Plaid",
-                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.w400),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    "Pace uses Plaid to securely link your checking, savings and credit accounts. Transactions import automatically, so you never have to type them in.",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Row(
-                        children: [
-                          Column(
-                            children: [
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 18.334800720214844,
-                                    height: 18.334800720214844,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "Pace never sees your bank login",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                "You sign in through Plaid. Pace never stores your username or password.",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Column(
-                            children: [
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 18.334260940551758,
-                                    height: 12.83220386505127,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "Read-only access",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                "Pace sees balances and transactions. It can't move your money.",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Row(
-                        children: [
-                          Column(
-                            children: [
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 16.5,
-                                    height: 18.334800720214844,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "Encrypted in transit and at rest",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                "Your financial data is protected wherever it's sent or stored.",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Column(
-                            children: [
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 18.334800720214844,
-                                    height: 18.334800720214844,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "Disconnect anytime",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                "Remove an account in Settings and syncing stops right away.",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      Column(
-                        children: [
-                          Container(
-                            width: 9.332399368286133,
-                            height: 6.416199684143066,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Text(
-                    "I agree to let Pace access my account data through Plaid.",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        width: 18.22967529296875,
-                        height: 18.211763381958008,
-                      ),
-                    ],
-                  ),
-                  Text(
-                    "Connect with Plaid",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    "Not now",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        width: 11.993988990783691,
-                        height: 11.993988990783691,
-                      ),
-                    ],
-                  ),
-                  Text(
-                    "Demo uses the Plaid sandbox. No real bank data.",
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                ),
+            ),
         ],
-      ),
-    );
+    ),
+));
   }
 }
