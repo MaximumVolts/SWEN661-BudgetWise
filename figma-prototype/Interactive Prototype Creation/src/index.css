@@ -1,0 +1,643 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Roboto:Regular";
+  src: url("https://static.figma.com/font/Roboto_wdth_wght__3") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Roboto:Medium";
+  src: url("https://static.figma.com/font/Roboto_wdth_wght__3") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+}
+@font-face {
+  font-family: "Roboto:SemiBold";
+  src: url("https://static.figma.com/font/Roboto_wdth_wght__3") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+}
+@font-face {
+  font-family: "Roboto:Bold";
+  src: url("https://static.figma.com/font/Roboto_wdth_wght__3") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+}
+@font-face {
+  font-family: "Roboto:Light";
+  src: url("https://static.figma.com/font/Roboto_wdth_wght__3") format("woff2");
+  font-style: normal;
+  font-weight: 300;
+}
+@font-face {
+  font-family: "Noto Sans Math:Regular";
+  src: url("https://static.figma.com/font/NotoSansMath-Regular_1") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Noto Sans Symbols2:Regular";
+  src: url("https://static.figma.com/font/NotoSansSymbols2-Regular_5") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Noto Sans Symbols:Regular";
+  src: url("https://static.figma.com/font/NotoSansSymbols-VF_2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Noto Sans Symbols:SemiBold";
+  src: url("https://static.figma.com/font/NotoSansSymbols-VF_2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+}
+@font-face {
+  font-family: "Noto Sans:Regular";
+  src: url("https://static.figma.com/font/NotoSans-VF_3") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Noto Sans:SemiBold";
+  src: url("https://static.figma.com/font/NotoSans-VF_3") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+}
+@font-face {
+  font-family: "Inter:Medium";
+  src: url("https://static.figma.com/font/Inter_1") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+}
+@font-face {
+  font-family: "Inter:Bold";
+  src: url("https://static.figma.com/font/Inter_1") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+}
+
+:root {
+  color: #1a1a1a;
+  background: #fbfaf7;
+  font-family: "Roboto:Regular", Arial, sans-serif;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+button,
+[data-name="Navigation destination"],
+[data-name="Transaction card"],
+[data-name="Budget category"],
+[data-name^="tool-"],
+[data-name^="txn-"],
+[data-name^="bill-"],
+[data-name^="account-"] {
+  cursor: pointer;
+}
+
+button {
+  color: inherit;
+  font: inherit;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(
+    button,
+    a,
+    [data-name="Button"],
+    [data-name="AddIncomeButton"],
+    [data-name="fab-add-account"],
+    [data-name="btn-view-bill"],
+    [data-name="Segment"],
+    [data-name="Filter chip"],
+    [data-name="Choice chip"],
+    [data-name="Radio option"],
+    [data-name="search-bar"],
+    [data-name="More options"],
+    [data-name="Transaction card"],
+    [data-name="Budget category"],
+    [data-name="Spending category"],
+    [data-name="Subscription item"],
+    [data-name="Bill"],
+    [data-name="List item"],
+    [data-name="profile-card"],
+    [data-name="Account row"],
+    [data-name^="account-"],
+    [data-name^="acct-row"],
+    [data-name="spending-card"],
+    [data-name="spend-card"],
+    [data-name="accounts-card"],
+    [data-name="recent-transactions-card"],
+    [data-name="budget-card"],
+    [data-name^="budget-cat-"],
+    [data-name="budget-food"],
+    [data-name="budget-transportation"],
+    [data-name="upcoming-bills-card"],
+    [data-name="trend-card"],
+    [data-name="trends-card"],
+    [data-name="review-banner"],
+    [data-name="see-more-txn"],
+    [data-name="see-more-btn"],
+    [data-name="view-txn-btn"],
+    [data-name="btn-mark-paid"],
+    [data-name^="Notification "],
+    [data-name^="notification-"],
+    [data-name="row-connected"],
+    [data-name="row-budget-cat"],
+    [data-name="row-statement"],
+    [data-name="row-theme"],
+    [data-name="row-high-contrast"],
+    [data-name="row-contrast"],
+    [data-name="row-chart-patterns"],
+    [data-name="row-show-values"],
+    [data-name="row-bill"],
+    [data-name="row-budget-alerts"],
+    [data-name="row-password"],
+    [data-name="row-terms"],
+    [data-name="row-privacy"],
+    [data-name="row-signout"],
+    [data-name="patterns-row"],
+    [data-name^="tool-"],
+    [data-name^="tool-card-"],
+    [data-name^="txn-"],
+    [data-name^="tx-"],
+    [data-name^="cat-"],
+    [data-name="card-food"],
+    [data-name="card-ride"],
+    [data-name="card-income"],
+    [data-name="card-subs"],
+    [data-name^="chip-"],
+    [data-name^="seg-"],
+    [data-name="settings"],
+    [data-name="bell"],
+    [data-name="receipt-text"],
+    [data-name="arrow-left"],
+    [data-name="back-btn"],
+    [data-name="BackButton"],
+    [data-name="x-circle"],
+    [data-name="close-btn"],
+    [data-name="Trailing icon"],
+    [data-name="Leading icon"],
+    [data-name="delete-account-row"],
+    [data-name="link"],
+    [data-name="link-2-off"],
+    [data-name^="link-row-"]
+  ):not(.primary):not([disabled]):not([aria-disabled="true"]):hover:not(:active) {
+    background-color: #cbc8c1 !important;
+    cursor: pointer;
+  }
+
+  :where(
+    .primary,
+    [data-name="Button"][class*="bg-[#1a1a1a]"],
+    [data-name="AddIncomeButton"][class*="bg-[#1a1a1a]"]
+  ):not([disabled]):not([aria-disabled="true"]):hover:not(:active) {
+    background-color: #4a4843 !important;
+    cursor: pointer;
+  }
+
+  [data-name="Navigation destination"]:not([aria-disabled="true"]):hover:not(:active) {
+    cursor: pointer;
+  }
+
+  [data-name="Navigation destination"]:not([aria-disabled="true"]):hover:not(:active)
+    [data-name="Active indicator"] {
+    background-color: #e4ee6a !important;
+  }
+}
+
+.prototype {
+  min-height: 100dvh;
+  background: #fbfaf7;
+}
+
+.prototype:has([data-name="Navigation bar"]),
+.prototype:has([data-name="nav-bar"]) {
+  padding-bottom: 80px;
+}
+
+.prototype > * {
+  min-height: 100dvh;
+}
+
+.mobile-canvas [data-name="Navigation bar"],
+.mobile-canvas [data-name="nav-bar"] {
+  position: fixed !important;
+  z-index: 50;
+  top: auto !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+}
+
+.auth-screen,
+.bank-screen {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  background: #fbfaf7;
+}
+
+.auth-screen {
+  padding-top: 32px;
+}
+
+.brand {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  font-family: "Roboto:Bold";
+  font-size: 22px;
+}
+
+.brand-mark {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 12px;
+  background: #e4ee6a;
+}
+
+.brand-mark img {
+  width: 24px;
+  height: 24px;
+}
+
+.auth-copy {
+  padding: 36px 24px 25px;
+}
+
+.auth-copy h1,
+.bank-content h1 {
+  margin: 0;
+  font-family: "Roboto:Bold";
+  font-size: 34px;
+  line-height: 43px;
+}
+
+.auth-copy p,
+.bank-content > div:first-child p {
+  margin: 14px 0 0;
+  color: #4a4843;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 24px;
+}
+
+.auth-form label {
+  position: relative;
+  height: 56px;
+  border: 1px solid #7a7872;
+  border-radius: 4px;
+}
+
+.auth-form label > span {
+  position: absolute;
+  z-index: 1;
+  top: -8px;
+  left: 10px;
+  padding: 0 6px;
+  background: #fbfaf7;
+  color: #4a4843;
+  font-size: 12px;
+}
+
+.auth-form input {
+  width: 100%;
+  height: 54px;
+  border: 0;
+  outline: 0;
+  padding: 0 16px;
+  background: transparent;
+  font-size: 16px;
+}
+
+.password {
+  display: flex;
+  align-items: center;
+}
+
+.password button {
+  width: 48px;
+  height: 54px;
+  border: 0;
+  background: transparent;
+}
+
+.password img {
+  width: 24px;
+  height: 24px;
+}
+
+.auth-form button,
+.bank-actions button {
+  border: 0;
+  background: transparent;
+  font-family: "Roboto:Medium";
+  font-size: 14px;
+}
+
+.auth-form .text-action {
+  align-self: flex-end;
+  padding: 0;
+}
+
+.primary {
+  display: flex;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 100px;
+  background: #1a1a1a !important;
+  color: white !important;
+}
+
+.outline {
+  height: 48px;
+  border: 1px solid #7a7872 !important;
+  border-radius: 100px;
+}
+
+.or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #4a4843;
+  font-size: 12px;
+}
+
+.or i {
+  height: 1px;
+  flex: 1;
+  background: #cbc8c1;
+}
+
+.account-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: auto;
+  padding: 0 24px 24px;
+  color: #4a4843;
+  font-size: 14px;
+}
+
+.account-prompt button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #1a1a1a;
+  font-family: "Roboto:Bold";
+}
+
+.screen-header {
+  display: flex;
+  height: 64px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  font-family: "Roboto:Medium";
+  font-size: 20px;
+}
+
+.screen-header button {
+  width: 24px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 25px;
+  font-weight: 300;
+}
+
+.bank-content {
+  display: flex;
+  min-height: calc(100dvh - 64px);
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 16px 24px 24px;
+}
+
+.bank-content h1 {
+  font-family: "Roboto:Medium";
+  font-size: 28px;
+  line-height: 1.15;
+}
+
+.bank-content > div:first-child p {
+  margin-top: 8px;
+}
+
+.security-card {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 16px 16px 18px;
+  border: 1px solid #cbc8c1;
+  border-radius: 20px;
+  background: white;
+}
+
+.security-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.security-row > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  place-items: center;
+  border-radius: 50%;
+  background: #eceae4;
+}
+
+.security-row img {
+  width: 22px;
+  height: 22px;
+}
+
+.security-row b {
+  font-family: "Roboto:SemiBold";
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.security-row p {
+  margin: 4px 0 0;
+  color: #4a4843;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.bank-actions {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.bank-actions button {
+  height: 48px;
+  font-family: "Roboto:Bold";
+}
+
+.bank-actions img {
+  width: 18px;
+  height: 18px;
+  filter: invert(1);
+}
+
+@media (min-width: 700px) {
+  .prototype > * {
+    width: 100% !important;
+  }
+
+  .tablet-canvas {
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  .tablet-canvas > [data-name] {
+    min-height: max(100dvh, 1024px);
+  }
+
+  .tablet-canvas [data-name="Navigation bar"],
+  .tablet-canvas [data-name="nav-bar"] {
+    position: fixed !important;
+    z-index: 50;
+    top: auto !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+  }
+
+  .tablet-canvas .auth-screen {
+    min-height: 1100px;
+    padding: 120px max(104px, calc((100vw - 560px) / 2)) 80px;
+  }
+
+  .tablet-canvas .brand {
+    height: 48px;
+    gap: 14px;
+    padding: 0;
+    font-family: "Roboto:Medium";
+  }
+
+  .tablet-canvas .brand-mark {
+    width: 48px;
+    height: 48px;
+  }
+
+  .tablet-canvas .auth-copy {
+    padding: 40px 0;
+  }
+
+  .tablet-canvas .auth-copy h1 {
+    font-size: 40px;
+    line-height: 48px;
+  }
+
+  .tablet-canvas .auth-copy p {
+    margin-top: 16px;
+  }
+
+  .tablet-canvas .auth-form {
+    flex-flow: row wrap;
+    gap: 0;
+    padding: 0;
+  }
+
+  .tablet-canvas .auth-form label {
+    width: 100%;
+  }
+
+  .tablet-canvas .auth-form label + label {
+    margin-top: 16px;
+  }
+
+  .tablet-canvas .auth-form .text-action {
+    width: 100%;
+    height: 20px;
+    margin-top: 8px;
+    text-align: right;
+  }
+
+  .tablet-canvas .auth-form .primary,
+  .tablet-canvas .auth-form .or {
+    width: 100%;
+    margin-top: 24px;
+  }
+
+  .tablet-canvas .auth-form .primary,
+  .tablet-canvas .auth-form .outline {
+    height: 52px;
+  }
+
+  .tablet-canvas .auth-form .outline {
+    width: calc(50% - 8px);
+    margin-top: 24px;
+  }
+
+  .tablet-canvas .auth-form .outline + .outline {
+    margin-left: 16px;
+  }
+
+  .tablet-canvas .account-prompt {
+    margin-top: 48px;
+    padding: 0;
+  }
+}
+
+@media (min-width: 900px) {
+  .tablet-canvas
+    > :is(
+      [data-name="02 · Onboarding Priorities"],
+      [data-name="03 · Connect Bank"],
+      [data-name="04 · Accounts"],
+      [data-name="05 · Home Dashboard"],
+      [data-name="06 · Transactions"],
+      [data-name="07 · Transaction Detail"],
+      [data-name="08 · Budgets"],
+      [data-name="13 · Savings Goals"],
+      [data-name="14 · Notifications"],
+      [data-name="15 · Settings"],
+      [data-name="16 · Cash Flow Projection"],
+      [data-name="17 · Plaid TrendScore"]
+    )
+    > :not([data-name="Navigation bar"], [data-name="nav-bar"]) {
+    transform: translateX(calc((100vw - 768px) / 2));
+  }
+}

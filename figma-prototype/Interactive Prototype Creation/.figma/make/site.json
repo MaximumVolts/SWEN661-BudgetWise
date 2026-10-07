@@ -1,0 +1,10 @@
+{
+  "description": "Create fully interactive prototypes from existing mobile screens, enabling seamless user testing of navigation and workflows without altering design elements.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

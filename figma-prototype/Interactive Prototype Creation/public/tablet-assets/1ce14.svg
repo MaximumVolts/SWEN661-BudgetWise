@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="28" height="6" viewBox="0 0 28 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame">
+<g clip-path="url(#clip0_0_59)">
+<rect width="28" height="6" rx="3" fill="#F9DEDC"/>
+<circle id="Ellipse" cx="2.5" cy="3" r="2.5" fill="#B3261E"/>
+<circle id="Ellipse_2" cx="10.5" cy="3" r="2.5" fill="#B3261E"/>
+<circle id="Ellipse_3" cx="18.5" cy="3" r="2.5" fill="#B3261E"/>
+<circle id="Ellipse_4" cx="26.5" cy="3" r="2.5" fill="#B3261E"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_59">
+<rect width="28" height="6" rx="3" fill="white"/>
+</clipPath>
+</defs>
+</svg>

@@ -1,0 +1,8 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="256" height="2" viewBox="0 0 256 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="x-axis">
+<mask id="path-1-inside-1_0_34" fill="white">
+<path d="M0 1H256Z"/>
+</mask>
+<path d="M0 1V2H256V1V0H0V1Z" fill="#1A1A1A" mask="url(#path-1-inside-1_0_34)"/>
+</g>
+</svg>
