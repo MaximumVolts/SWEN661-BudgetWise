@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Bank linking calls Plaid's sandbox API (https://sandbox.plaid.com) in release builds too. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="pace"
         android:name="${applicationName}"

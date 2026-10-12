@@ -2,13 +2,13 @@ import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatf
 import 'package:google_sign_in/google_sign_in.dart'
     show GoogleSignIn, GoogleSignInAccount, GoogleSignInException, GoogleSignInExceptionCode;
 import '../models/google_account.dart' show GoogleAccount;
-import 'app_exception.dart' show AppException;
-import 'google_account_service.dart' show GoogleAccountService;
+import '../models/app_exception.dart' show AppException;
+import 'google_account_repository.dart' show GoogleAccountRepository;
 import 'google_sign_in_config.dart' show GoogleSignInConfig;
 
-/// [GoogleAccountService] on the official google_sign_in plugin (Android Credential Manager,
+/// [GoogleAccountRepository] on the official google_sign_in plugin (Android Credential Manager,
 /// iOS GoogleSignIn SDK).
-class GoogleSignInAccountService implements GoogleAccountService {
+class GoogleSignInAccountRepository implements GoogleAccountRepository {
   static const _notConfigured = "Google sign-in isn't set up for this build yet.";
   /// Debug builds say exactly what's missing, since the fix is a developer step.
   static const _notConfiguredDebug = 'Google sign-in needs OAuth client IDs: add them to config/google_sign_in.json '
@@ -20,7 +20,7 @@ class GoogleSignInAccountService implements GoogleAccountService {
   final String _iosClientId;
   Future<void>? _initialized;
 
-  GoogleSignInAccountService({
+  GoogleSignInAccountRepository({
     GoogleSignIn? plugin,
     String serverClientId = GoogleSignInConfig.serverClientId,
     String iosClientId = GoogleSignInConfig.iosClientId,

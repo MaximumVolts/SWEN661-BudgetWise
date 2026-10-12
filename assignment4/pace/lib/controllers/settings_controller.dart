@@ -1,5 +1,5 @@
 import '../models/settings.dart' show SettingsData;
-import '../services/app_navigator.dart' show AppNavigator, ExternalLink;
+import 'app_navigator.dart' show AppNavigator;
 import '../services/auth_service.dart' show AuthService;
 import '../services/settings_service.dart' show SettingsService;
 import 'base_controller.dart' show ScreenController;
@@ -10,7 +10,11 @@ class SettingsController extends ScreenController {
   SettingsController({required SettingsService settings, required AuthService auth, required AppNavigator navigator})
       : _settings = settings,
         _auth = auth,
-        super(navigator);
+        super(navigator) {
+    // e.g. after editing the profile, the header (name / email / initials) updates on return.
+    refreshOn(_settings.changes);
+  }
+
 
   SettingsData? data;
 
@@ -29,25 +33,24 @@ class SettingsController extends ScreenController {
   }
 
   Future<void> setHighContrast(bool v) => _toggle((d) => d.copyWith(highContrast: v), () => _settings.setHighContrast(v));
-  Future<void> setChartPatterns(bool v) => _toggle((d) => d.copyWith(chartPatterns: v), () => _settings.setChartPatterns(v));
+  Future<void> setColorblindMode(bool v) async {
+    await _toggle((d) => d.copyWith(colorblindMode: v), () => _settings.setColorblindMode(v));
+    if (data?.colorblindMode != v) return; // saving failed: the error is shown instead
+    showNotice(v
+        ? 'Colorblind mode on: status uses blue and orange, with shapes and patterns'
+        : 'Colorblind mode off');
+  }
   Future<void> setShowChartValues(bool v) => _toggle((d) => d.copyWith(showChartValues: v), () => _settings.setShowChartValues(v));
   Future<void> setBudgetAlerts(bool v) => _toggle((d) => d.copyWith(budgetAlerts: v), () => _settings.setBudgetAlerts(v));
 
-  Future<void> pickTheme() async {
-    if (await navigator.openThemePicker()) await refresh();
-  }
+  Future<void> pickTheme() => refreshIf(navigator.openThemePicker());
 
-  Future<void> pickBillReminders() async {
-    if (await navigator.openBillReminderPicker()) await refresh();
-  }
+  Future<void> pickBillReminders() => refreshIf(navigator.openBillReminderPicker());
 
   void openProfile() => navigator.openProfile();
   void openConnectedAccounts() => navigator.openConnectedAccounts();
   void openBudgetCategories() => navigator.openBudgetCategoriesSettings();
   void openStatementExport() => navigator.openStatementExport();
-  void openPasswordSecurity() => navigator.openPasswordSecurity();
-  void openTerms() => navigator.openExternal(ExternalLink.termsOfUse);
-  void openPrivacy() => navigator.openExternal(ExternalLink.privacyPolicy);
 
   Future<void> signOut() async {
     if (await perform(_auth.signOut)) navigator.openSignIn();

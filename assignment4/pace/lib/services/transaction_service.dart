@@ -8,6 +8,8 @@ abstract class TransactionService {
   Future<List<FilterChoice>> getFilterChoices(FilterKind kind);
   Future<TransactionDetailBundle> getDetail(String transactionId);
   Future<List<CategoryInfo>> getCategories();
-  Future<void> setCategory({required String transactionId, required String categoryId});
+  /// Sets the transaction's categories, in order: the first is the primary one that totals use.
+  /// Throws AppException when [categoryIds] is empty.
+  Future<void> setCategories({required String transactionId, required List<String> categoryIds});
   Future<void> setNote({required String transactionId, required String note});
 }

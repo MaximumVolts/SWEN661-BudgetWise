@@ -1,6 +1,6 @@
 import '../models/account.dart' show AccountsData, LinkedAccount;
 import '../services/account_service.dart' show AccountService;
-import '../services/app_navigator.dart' show AppNavigator;
+import 'app_navigator.dart' show AppNavigator;
 import 'base_controller.dart' show ScreenController;
 
 class AccountsController extends ScreenController {
@@ -14,13 +14,9 @@ class AccountsController extends ScreenController {
   @override
   Future<void> fetch() async => data = await _accounts.getAccounts();
 
-  Future<void> reconnect() async {
-    if (await perform(_accounts.reconnect)) await refresh();
-  }
+  Future<void> reconnect() => performAndRefresh(_accounts.reconnect);
 
-  Future<void> dismissBanner() async {
-    if (await perform(_accounts.dismissReconnectBanner)) await refresh();
-  }
+  Future<void> dismissBanner() => performAndRefresh(_accounts.dismissReconnectBanner);
 
   void linkAccount() => navigator.openConnectBank();
   void openAccount(LinkedAccount a) => navigator.openAccountDetail(a.id);

@@ -1,6 +1,6 @@
 import '../models/navigation.dart' show FlowStep;
 import '../models/onboarding.dart' show OnboardingOptions;
-import '../services/app_navigator.dart' show AppNavigator;
+import 'app_navigator.dart' show AppNavigator;
 import '../services/onboarding_service.dart' show OnboardingService;
 import 'base_controller.dart' show ScreenController;
 

@@ -39,7 +39,6 @@ abstract class AppNavigator {
   /// Moves the sign-in / onboarding journey to the step a service decided on.
   void openFlowStep(FlowStep step);
   void openSpendingCategory(String categoryId);
-  void openExternal(ExternalLink link);
 
   // Modals / pickers (return when dismissed so controllers can refresh)
   /// Returns null if dismissed. To clear a filter, return FilterChoice(id: '', label: '').
@@ -50,20 +49,24 @@ abstract class AppNavigator {
   Future<bool> openAddGoal();
   Future<bool> openEditGoal(String goalId);
   Future<bool> openAddContribution(String goalId);
-  Future<bool> openEditBudgetCategory(String categoryId);
-  Future<bool> openAddBudgetCategory();
+  /// Opens the budget form to edit the budget for [categoryId].
+  void openEditBudgetCategory(String categoryId);
+  /// Opens the budget form to create a new budget.
+  void openAddBudgetCategory();
+  /// Asks before deleting a budget. True if the user confirmed.
+  Future<bool> confirmDeleteBudget(String categoryName);
   Future<bool> openAddExpectedIncome();
   Future<bool> openSubscriptionMenu(String subscriptionId);
   Future<bool> openThemePicker();
   Future<bool> openBillReminderPicker();
   Future<bool> confirmDeleteAccount();
+  /// Asks before disconnecting a linked bank. True if the user confirmed.
+  Future<bool> confirmRemoveBankConnection(String institutionName);
   void openProfile();
   void openConnectedAccounts();
+  /// The budgets manager.
   void openBudgetCategoriesSettings();
   void openStatementExport();
-  void openPasswordSecurity();
   void openAccountDetail(String accountId);
   void openMenu(String screenId);
 }
-
-enum ExternalLink { termsOfUse, privacyPolicy }

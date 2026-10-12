@@ -51,9 +51,9 @@ class _OnboardingPrioritiesScreenState extends State<OnboardingPrioritiesScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 12),
-                    const Text('Set your priorities', style: T.h1),
+                    Text('Set your priorities', style: T.h1),
                     const SizedBox(height: 10),
-                    const Text('Choose what you want Pace to focus on first. You can change these later.', style: T.body),
+                    Text('Choose what you want Pace to focus on first. You can change these later.', style: T.body),
                     const SizedBox(height: 22),
                     const Text('What would you like help with?', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                     const SizedBox(height: 12),
@@ -117,7 +117,7 @@ class _OnboardingPrioritiesScreenState extends State<OnboardingPrioritiesScreen>
               height: 24,
               decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: C.ink, width: 2)),
               child: selected
-                  ? Center(child: Container(width: 12, height: 12, decoration: const BoxDecoration(color: C.ink, shape: BoxShape.circle)))
+                  ? Center(child: Container(width: 12, height: 12, decoration: BoxDecoration(color: C.ink, shape: BoxShape.circle)))
                   : null,
             ),
             const SizedBox(width: 16),
@@ -125,8 +125,8 @@ class _OnboardingPrioritiesScreenState extends State<OnboardingPrioritiesScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(o.title, style: const TextStyle(fontSize: 17, color: C.ink)),
-                  Text(o.subtitle, style: const TextStyle(fontSize: 16, color: C.muted)),
+                  Text(o.title, style: TextStyle(fontSize: 17, color: C.ink)),
+                  Text(o.subtitle, style: TextStyle(fontSize: 16, color: C.muted)),
                 ],
               ),
             ),

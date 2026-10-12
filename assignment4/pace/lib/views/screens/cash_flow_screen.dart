@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'
-    show Align, Alignment, Border, BorderRadius, BorderSide, BoxDecoration, BuildContext, Clip, Color, Colors, Column,
+    show Align, Alignment, Border, BorderRadius, BorderSide, BoxDecoration, BuildContext, Clip, Colors, Column,
         Container, CrossAxisAlignment, EdgeInsets, Expanded, FontWeight, Icon, Icons, ListView, MainAxisSize, Padding,
         Row, SafeArea, Scaffold, Semantics, SizedBox, Spacer, StatelessWidget, Text, TextSpan, TextStyle, ValueChanged,
         VoidCallback, Widget;
@@ -51,7 +51,7 @@ class CashFlowScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                const Text('Income', style: TextStyle(fontSize: 14, color: C.muted)),
+                Text('Income', style: TextStyle(fontSize: 14, color: C.muted)),
                 const SizedBox(width: 10),
                 for (var i = 0; i < data.scenarioLabels.length; i++) ...[
                   if (i > 0) const SizedBox(width: 8),
@@ -69,7 +69,7 @@ class CashFlowScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            Text(data.projectedDateLabel, style: const TextStyle(fontSize: 13, color: C.muted)),
+            Text(data.projectedDateLabel, style: TextStyle(fontSize: 13, color: C.muted)),
             Text(Fmt.money(total), style: const TextStyle(fontSize: 40, fontWeight: FontWeight.w400)),
             if (data.lowestAmount != null) ...[
               const SizedBox(height: 8),
@@ -79,7 +79,7 @@ class CashFlowScreen extends StatelessWidget {
                   const Icon(Icons.trending_down, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text.rich(TextSpan(style: const TextStyle(fontSize: 15, height: 1.3, color: C.ink), children: [
+                    child: Text.rich(TextSpan(style: TextStyle(fontSize: 15, height: 1.3, color: C.ink), children: [
                       TextSpan(text: 'Lowest point: ${Fmt.money(data.lowestAmount!)}', style: const TextStyle(fontWeight: FontWeight.w700)),
                       if (data.lowestDescription != null) TextSpan(text: ' ${data.lowestDescription}'),
                     ])),
@@ -114,7 +114,7 @@ class CashFlowScreen extends StatelessWidget {
                   const HairLine(),
                   for (final l in data.breakdown) _Line(l),
                   Container(
-                    color: const Color(0xFFF3F2EC),
+                    color: C.panel,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     child: Row(children: [
                       const Text('Projected cash', style: TextStyle(fontWeight: FontWeight.w700)),
@@ -165,7 +165,7 @@ class _RangeTabs extends StatelessWidget {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: i == selected ? C.lime : Colors.white,
-                      border: i == 0 ? null : const Border(left: BorderSide(color: C.outline)),
+                      border: i == 0 ? null : Border(left: BorderSide(color: C.outline)),
                     ),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
                       if (i == selected) ...[const Icon(Icons.check, size: 18), const SizedBox(width: 6)],
@@ -202,7 +202,7 @@ class _Line extends StatelessWidget {
                   children: [
                     Text(l.title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 2),
-                    Text(l.subtitle, style: const TextStyle(fontSize: 12, color: C.muted)),
+                    Text(l.subtitle, style: TextStyle(fontSize: 12, color: C.muted)),
                   ],
                 ),
               ),

@@ -8,6 +8,7 @@ import 'dashboard_service.dart' show DashboardService;
 import 'goal_service.dart' show GoalService;
 import 'notification_service.dart' show NotificationService;
 import 'onboarding_service.dart' show OnboardingService;
+import 'profile_service.dart' show ProfileService;
 import 'settings_service.dart' show SettingsService;
 import 'spending_service.dart' show SpendingService;
 import 'transaction_service.dart' show TransactionService;
@@ -27,6 +28,7 @@ class AppServices {
   final GoalService goals;
   final NotificationService notifications;
   final SettingsService settings;
+  final ProfileService profile;
   final CashFlowService cashFlow;
   final TrendService trends;
 
@@ -43,6 +45,7 @@ class AppServices {
     required this.goals,
     required this.notifications,
     required this.settings,
+    required this.profile,
     required this.cashFlow,
     required this.trends,
   });

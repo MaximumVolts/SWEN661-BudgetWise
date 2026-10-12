@@ -3,16 +3,16 @@ import 'package:flutter_test/flutter_test.dart'
 import 'package:pace_app/models/google_account.dart' show GoogleAccount;
 import 'package:pace_app/models/navigation.dart' show FlowStep;
 import 'package:pace_app/repositories/user_account_repository.dart' show InMemoryUserAccountRepository;
-import 'package:pace_app/services/app_exception.dart' show AppException;
+import 'package:pace_app/models/app_exception.dart' show AppException;
 import 'package:pace_app/services/demo/demo_services.dart' show demoServices;
-import 'package:pace_app/services/google_account_service.dart' show GoogleAccountService;
-import 'package:pace_app/services/google_sign_in_account_service.dart' show GoogleSignInAccountService;
+import 'package:pace_app/repositories/google_account_repository.dart' show GoogleAccountRepository;
+import 'package:pace_app/repositories/google_sign_in_account_repository.dart' show GoogleSignInAccountRepository;
 import 'package:pace_app/services/repository_auth_service.dart' show RepositoryAuthService;
 import 'package:pace_app/views/navigation/app_route.dart' show AppRoute;
 import 'package:pace_app/views/navigation/app_router.dart' show AppRouter;
 
 /// Stands in for Google: returns [next] (null = user cancelled the chooser).
-class FakeGoogle implements GoogleAccountService {
+class FakeGoogle implements GoogleAccountRepository {
   GoogleAccount? next;
   int signOuts = 0;
   FakeGoogle([this.next]);
@@ -78,7 +78,10 @@ void main() {
     late AppRouter router;
     setUp(() {
       google = FakeGoogle(ada);
-      router = AppRouter.create(services: demoServices(google: google), initialStack: const [AppRoute.signIn]);
+      router = AppRouter.create(
+        services: demoServices(accounts: InMemoryUserAccountRepository(), google: google),
+        initialStack: const [AppRoute.signIn],
+      );
     });
     tearDown(() => router.dispose());
 
@@ -98,7 +101,7 @@ void main() {
 
   test('plugin service refuses to start without client IDs', () {
     expect(
-      GoogleSignInAccountService(serverClientId: '', iosClientId: '').signIn(),
+      GoogleSignInAccountRepository(serverClientId: '', iosClientId: '').signIn(),
       throwsA(isA<AppException>()),
     );
   });

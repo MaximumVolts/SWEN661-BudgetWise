@@ -45,7 +45,7 @@ class TrendsScreen extends StatelessWidget {
             const SizedBox(height: 18),
             Text(headline, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700, height: 1.2)),
             const SizedBox(height: 8),
-            const Text("What's changing in your money, in plain language. Tap any trend to see the transactions behind it.",
+            Text("What's changing in your money, in plain language. Tap any trend to see the transactions behind it.",
                 style: TextStyle(fontSize: 16, color: C.muted, height: 1.35)),
             const SizedBox(height: 16),
             for (final t in trends)
@@ -69,7 +69,7 @@ class TrendsScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       Text(t.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 10),
-                      Text(t.body, style: const TextStyle(fontSize: 16, color: C.muted, height: 1.4)),
+                      Text(t.body, style: TextStyle(fontSize: 16, color: C.muted, height: 1.4)),
                       const SizedBox(height: 12),
                       Tap(
                         onTap: onTrendAction == null ? null : () => onTrendAction!(t),
@@ -98,7 +98,7 @@ class TrendsScreen extends StatelessWidget {
                         children: [
                           const Text('About these insights', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
                           const SizedBox(height: 2),
-                          Text(aboutText!, style: const TextStyle(fontSize: 16, color: C.muted, height: 1.35)),
+                          Text(aboutText!, style: TextStyle(fontSize: 16, color: C.muted, height: 1.35)),
                         ],
                       ),
                     ),

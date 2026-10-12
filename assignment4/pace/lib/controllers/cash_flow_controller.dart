@@ -1,5 +1,5 @@
 import '../models/cash_flow.dart' show CashFlowData;
-import '../services/app_navigator.dart' show AppNavigator;
+import 'app_navigator.dart' show AppNavigator;
 import '../services/cash_flow_service.dart' show CashFlowService;
 import 'base_controller.dart' show ScreenController;
 
@@ -28,7 +28,5 @@ class CashFlowController extends ScreenController {
     await refresh();
   }
 
-  Future<void> addExpectedIncome() async {
-    if (await navigator.openAddExpectedIncome()) await refresh();
-  }
+  Future<void> addExpectedIncome() => refreshIf(navigator.openAddExpectedIncome());
 }

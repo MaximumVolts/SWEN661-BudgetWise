@@ -1,27 +1,48 @@
-import 'package:flutter/material.dart' show SnackBar;
+import 'package:flutter/material.dart' show MaterialApp;
 import 'package:flutter_test/flutter_test.dart'
-    show expect, find, findsOneWidget, group, pumpEventQueue, setUp, tearDown, test, testWidgets;
+    show expect, find, findsNothing, findsOneWidget, group, pumpEventQueue, setUp, tearDown, test, testWidgets;
 import 'package:pace_app/views/pace_app.dart' show PaceApp;
 import 'package:pace_app/views/navigation/app_route.dart' show AppRoute;
 import 'package:pace_app/views/navigation/app_router.dart' show AppRouter;
+import 'package:pace_app/views/screens/reset_password_screen.dart' show ResetPasswordScreen;
+import 'package:pace_app/views/screens/sign_in_screen.dart' show SignInScreen;
 import 'package:pace_app/services/demo/demo_services.dart' show demoServices;
+import 'package:pace_app/repositories/user_account_repository.dart' show InMemoryUserAccountRepository;
+import 'package:pace_app/services/password_hasher.dart' show PasswordHasher;
 
 void main() {
   group('flow', () {
     late AppRouter router;
-    setUp(() => router = AppRouter.create(services: demoServices(), initialStack: const [AppRoute.signIn]));
+    setUp(() => router = AppRouter.create(
+          services: demoServices(accounts: InMemoryUserAccountRepository(), hasher: const PasswordHasher(iterations: 1000)),
+          initialStack: const [AppRoute.signIn],
+        ));
     tearDown(() => router.dispose());
 
-    test('signing in goes straight to Home', () async {
-      await router.dependencies.signIn().signIn('a@b.co', 'pw');
-      await pumpEventQueue();
-      expect(router.delegate.stack, [AppRoute.home]);
+    test('"Create account" opens the create-account form', () {
+      router.dependencies.signIn().createAccount();
+      expect(router.delegate.stack, [AppRoute.signIn, AppRoute.createAccount]);
     });
 
-    test('Create account starts onboarding', () async {
-      await router.dependencies.signIn().createAccount();
+    test('creating an account starts onboarding; signing in later goes straight to Home', () async {
+      await router.dependencies
+          .createAccount()
+          .submitAccount(
+            name: 'Ada',
+            email: 'ada@example.com',
+            password: 'secret123',
+            confirmPassword: 'secret123',
+            securityQuestion: 'What was the name of your first pet?',
+            securityAnswer: 'Rex',
+          );
       await pumpEventQueue();
       expect(router.delegate.stack, [AppRoute.onboarding]);
+
+      await router.dependencies.settingsScreen().signOut();
+      await pumpEventQueue();
+      await router.dependencies.signIn().signIn('ada@example.com', 'secret123');
+      await pumpEventQueue();
+      expect(router.delegate.stack, [AppRoute.home]);
     });
   });
 
@@ -30,25 +51,33 @@ void main() {
     expect(AppRoute.tryParse(Uri.parse('/sign-in')), AppRoute.signIn);
   });
 
-  for (final (button, message) in [
-    // Tests run without client IDs, so the real Google service reports that it isn't configured.
-    ('Continue with Google', 'Google sign-in needs OAuth client IDs: add them to config/google_sign_in.json '
-        'and run with --dart-define-from-file=config/google_sign_in.json (see README).'),
-    ('Continue with Apple', 'Sign in with Apple is not implemented yet.'),
-    ('Forgot password?', 'Password reset is not implemented yet.'),
-  ]) {
-    testWidgets('"$button" shows "$message" and stays on sign-in', (tester) async {
-      final router = AppRouter.create(services: demoServices());
-      await tester.pumpWidget(PaceApp(router: router));
-      await tester.pumpAndSettle();
-      final target = find.textContaining(button.replaceAll('?', ''));
-      await tester.ensureVisible(target);
-      await tester.pumpAndSettle();
-      await tester.tap(target);
-      await tester.pump();
-      expect(find.widgetWithText(SnackBar, message), findsOneWidget);
-      expect(router.delegate.stack, [AppRoute.signIn]);
-      router.dispose();
-    });
-  }
+  testWidgets('Google / Apple buttons are hidden on the sign-in screen', (tester) async {
+    final router = AppRouter.create(services: demoServices());
+    await tester.pumpWidget(PaceApp(router: router));
+    await tester.pumpAndSettle();
+    expect(find.text('Continue with Google'), findsNothing);
+    expect(find.text('Continue with Apple'), findsNothing);
+    expect(find.text('or'), findsNothing);
+    router.dispose();
+  });
+
+  testWidgets('showSocialSignIn brings the Google / Apple buttons back', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: SignInScreen(showSocialSignIn: true)));
+    expect(find.text('Continue with Google'), findsOneWidget);
+    expect(find.text('Continue with Apple'), findsOneWidget);
+  });
+
+  testWidgets('"Forgot password?" opens the reset password page', (tester) async {
+    final router = AppRouter.create(services: demoServices());
+    await tester.pumpWidget(PaceApp(router: router));
+    await tester.pumpAndSettle();
+    final target = find.text('Forgot password?');
+    await tester.ensureVisible(target);
+    await tester.pumpAndSettle();
+    await tester.tap(target);
+    await tester.pumpAndSettle();
+    expect(find.byType(ResetPasswordScreen), findsOneWidget);
+    expect(router.delegate.stack, [AppRoute.signIn, AppRoute.forgotPassword]);
+    router.dispose();
+  });
 }

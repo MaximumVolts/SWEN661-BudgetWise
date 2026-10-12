@@ -3,7 +3,7 @@ import '../models/budget.dart' show BudgetCategory;
 import '../models/dashboard.dart' show DashboardAccount, DashboardData, ToolLink;
 import '../models/transaction.dart' show TransactionItem;
 import '../models/trend.dart' show TrendItem;
-import '../services/app_navigator.dart' show AppNavigator;
+import 'app_navigator.dart' show AppNavigator;
 import '../services/dashboard_service.dart' show DashboardService;
 import 'base_controller.dart' show ScreenController;
 
@@ -18,9 +18,7 @@ class DashboardController extends ScreenController {
   @override
   Future<void> fetch() async => data = await _dashboard.load();
 
-  Future<void> syncNow() async {
-    if (await perform(_dashboard.sync)) await refresh();
-  }
+  Future<void> syncNow() => performAndRefresh(_dashboard.sync);
 
   void openSettings() => navigator.openSettings();
   void openNotifications() => navigator.openNotifications();

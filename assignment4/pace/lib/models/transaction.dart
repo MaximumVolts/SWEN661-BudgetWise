@@ -43,7 +43,9 @@ class TransactionDetailData {
   final String accountLabel;
   final String statusLabel;
   final String merchantLabel;
-  final String? selectedCategoryId;
+  /// The transaction's categories in order. The first is primary: its full amount counts there in
+  /// spending, budgets and trends; the rest are labels for display and filtering.
+  final List<String> selectedCategoryIds;
   const TransactionDetailData({
     required this.id,
     required this.title,
@@ -53,7 +55,7 @@ class TransactionDetailData {
     required this.accountLabel,
     required this.statusLabel,
     required this.merchantLabel,
-    this.selectedCategoryId,
+    this.selectedCategoryIds = const [],
   });
 }
 
@@ -76,11 +78,15 @@ class TransactionQuery {
   final FilterChoice? account;
   final FilterChoice? category;
   final FilterChoice? date;
-  const TransactionQuery({this.account, this.category, this.date});
+  /// What the user typed in the search field ('' = no search).
+  final String search;
+  const TransactionQuery({this.account, this.category, this.date, this.search = ''});
 
   TransactionQuery withFilter(FilterKind kind, FilterChoice? choice) => switch (kind) {
-        FilterKind.account => TransactionQuery(account: choice, category: category, date: date),
-        FilterKind.category => TransactionQuery(account: account, category: choice, date: date),
-        FilterKind.date => TransactionQuery(account: account, category: category, date: choice),
+        FilterKind.account => TransactionQuery(account: choice, category: category, date: date, search: search),
+        FilterKind.category => TransactionQuery(account: account, category: choice, date: date, search: search),
+        FilterKind.date => TransactionQuery(account: account, category: category, date: choice, search: search),
       };
+
+  TransactionQuery withSearch(String text) => TransactionQuery(account: account, category: category, date: date, search: text);
 }

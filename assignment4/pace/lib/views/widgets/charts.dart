@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'
-    show Align, Alignment, Border, BorderRadius, BoxDecoration, BuildContext, Canvas, Center, Color, Colors, Column,
+    show Align, Alignment, Border, BorderRadius, BoxDecoration, BuildContext, Canvas, Center, Clip, Color, Colors, Column,
         Container, CrossAxisAlignment, CustomPaint, CustomPainter, EdgeInsets, ExcludeSemantics, Expanded,
         FractionallySizedBox, MainAxisAlignment, Offset, Padding, Paint, PaintingStyle, Path, Radius, Row, Semantics,
         Size, SizedBox, StatelessWidget, StrokeJoin, Text, TextDirection, TextPainter, TextSpan, TextStyle,
@@ -8,7 +8,8 @@ import '../format.dart' show Fmt;
 import '../../models/cash_flow.dart' show CashFlowChartData;
 import '../../models/dashboard.dart' show SpendChartData;
 import '../../models/spending.dart' show BarDatum;
-import '../theme.dart' show C;
+import '../theme.dart' show C, Palette;
+import 'display_options.dart' show PaceDisplay;
 import 'widgets.dart' show PressFeedback;
 
 /// Area + line chart for "spend so far" with dashed projection and optional previous-period line.
@@ -36,14 +37,17 @@ class SpendAreaChart extends StatelessWidget {
         child: SizedBox(
           height: height,
           width: double.infinity,
-          child: CustomPaint(painter: _SpendAreaPainter(data)),
+          child: CustomPaint(painter: _SpendAreaPainter(data, colorblind: PaceDisplay.colorblindOf(context))),
         ),
       );
 }
 
 class _SpendAreaPainter extends CustomPainter {
   final SpendChartData d;
-  _SpendAreaPainter(this.d);
+  /// Colorblind mode: the previous-period line is dotted, not just a lighter color.
+  final bool colorblind;
+  final Palette palette = C.palette;
+  _SpendAreaPainter(this.d, {required this.colorblind});
 
   @override
   void paint(Canvas canvas, Size s) {
@@ -59,14 +63,21 @@ class _SpendAreaPainter extends CustomPainter {
           pad + (s.height - 2 * pad) * (1 - v / maxY),
         );
 
-    // previous period (light)
+    // previous period (light; dotted in colorblind mode)
     if (d.previous.length > 1) {
-      final p = Path();
-      for (var i = 0; i < d.previous.length; i++) {
-        final o = pt(i, d.previous[i]);
-        i == 0 ? p.moveTo(o.dx, o.dy) : p.lineTo(o.dx, o.dy);
+      final paint = Paint()..color = C.previous..style = PaintingStyle.stroke..strokeWidth = 2;
+      if (colorblind) {
+        for (var i = 1; i < d.previous.length; i++) {
+          _dashed(canvas, pt(i - 1, d.previous[i - 1]), pt(i, d.previous[i]), paint, dash: 2, gap: 3);
+        }
+      } else {
+        final p = Path();
+        for (var i = 0; i < d.previous.length; i++) {
+          final o = pt(i, d.previous[i]);
+          i == 0 ? p.moveTo(o.dx, o.dy) : p.lineTo(o.dx, o.dy);
+        }
+        canvas.drawPath(p, paint);
       }
-      canvas.drawPath(p, Paint()..color = const Color(0xFFC9C7BF)..style = PaintingStyle.stroke..strokeWidth = 2);
     }
 
     // actual area + line
@@ -97,8 +108,7 @@ class _SpendAreaPainter extends CustomPainter {
     }
   }
 
-  void _dashed(Canvas c, Offset a, Offset b, Paint p) {
-    const dash = 6.0, gap = 4.0;
+  void _dashed(Canvas c, Offset a, Offset b, Paint p, {double dash = 6, double gap = 4}) {
     final delta = b - a;
     final len = delta.distance;
     if (len == 0) return;
@@ -112,7 +122,7 @@ class _SpendAreaPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _SpendAreaPainter old) => old.d != d;
+  bool shouldRepaint(covariant _SpendAreaPainter old) => old.d != d || old.colorblind != colorblind || old.palette != palette;
 }
 
 /// Simple bar chart. Bar heights scale to the max value. Tap a bar via [onBarTap].
@@ -136,6 +146,7 @@ class PaceBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (bars.isEmpty) return SizedBox(height: height);
+    final colorblind = PaceDisplay.colorblindOf(context);
     final maxV = bars.map((b) => b.value).reduce((a, b) => a > b ? a : b);
     return Column(
       children: [
@@ -161,11 +172,14 @@ class PaceBarChart extends StatelessWidget {
                           widthFactor: 0.7,
                           child: Container(
                             height: maxV <= 0 ? 2 : (height * bars[i].value / maxV).clamp(2.0, height).toDouble(),
+                            clipBehavior: Clip.antiAlias,
                             decoration: BoxDecoration(
                               color: i == highlighted ? C.lime : C.chip,
                               borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
                               border: Border.all(color: i == highlighted ? C.olive : C.outline, width: i == highlighted ? 1.5 : 1),
                             ),
+                            // Colorblind mode: the selected bar is hatched, not only a different color.
+                            child: i == highlighted && colorblind ? CustomPaint(painter: _HatchPainter(C.olive)) : null,
                           ),
                         ),
                       ),
@@ -180,13 +194,32 @@ class PaceBarChart extends StatelessWidget {
           child: Row(
             children: [
               for (final b in bars)
-                Expanded(child: Center(child: Text(b.label, style: const TextStyle(fontSize: 12, color: C.muted)))),
+                Expanded(child: Center(child: Text(b.label, style: TextStyle(fontSize: 12, color: C.muted)))),
             ],
           ),
         ),
       ],
     );
   }
+}
+
+/// Diagonal hatching, to mark something without relying on color.
+class _HatchPainter extends CustomPainter {
+  final Color color;
+  _HatchPainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size s) {
+    final p = Paint()
+      ..color = color
+      ..strokeWidth = 1.5;
+    for (double x = -s.height; x < s.width; x += 6) {
+      canvas.drawLine(Offset(x, s.height), Offset(x + s.height, 0), p);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _HatchPainter old) => old.color != color;
 }
 
 /// Line chart for projected cash with dashed gridlines, optional low-point + end-point annotations.
@@ -219,7 +252,7 @@ class CashFlowChart extends StatelessWidget {
               padding: const EdgeInsets.only(left: _CashPainter.leftGutter),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [for (final l in data.xLabels) Text(l, style: const TextStyle(fontSize: 11, color: C.muted))],
+                children: [for (final l in data.xLabels) Text(l, style: TextStyle(fontSize: 11, color: C.muted))],
               ),
             ),
           ],
@@ -232,6 +265,7 @@ class CashFlowChart extends StatelessWidget {
 class _CashPainter extends CustomPainter {
   static const leftGutter = 34.0;
   final CashFlowChartData d;
+  final Palette palette = C.palette;
   _CashPainter(this.d);
 
   @override
@@ -256,7 +290,7 @@ class _CashPainter extends CustomPainter {
         x += 9;
       }
       final tp = TextPainter(
-        text: TextSpan(text: Fmt.compact(v), style: const TextStyle(fontSize: 11, color: C.muted)),
+        text: TextSpan(text: Fmt.compact(v), style: TextStyle(fontSize: 11, color: C.muted)),
         textDirection: TextDirection.ltr,
       )..layout();
       tp.paint(canvas, Offset(0, y(v) - tp.height / 2));
@@ -283,9 +317,9 @@ class _CashPainter extends CustomPainter {
   }
 
   TextPainter _tp(String t) =>
-      TextPainter(text: TextSpan(text: t, style: const TextStyle(fontSize: 11, color: C.ink)), textDirection: TextDirection.ltr)..layout();
+      TextPainter(text: TextSpan(text: t, style: TextStyle(fontSize: 11, color: C.ink)), textDirection: TextDirection.ltr)..layout();
   void _label(Canvas c, String t, Offset o) => _tp(t).paint(c, o);
 
   @override
-  bool shouldRepaint(covariant _CashPainter old) => old.d != d;
+  bool shouldRepaint(covariant _CashPainter old) => old.d != d || old.palette != palette;
 }

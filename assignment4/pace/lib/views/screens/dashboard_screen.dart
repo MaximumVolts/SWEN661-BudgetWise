@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart'
-    show Border, BorderRadius, BoxDecoration, BoxShape, BuildContext, Center, Clip, Color, Colors, Column, Container,
-        CrossAxisAlignment, EdgeInsets, Expanded, FontWeight, Icon, Icons, ListView, MainAxisSize, Padding, Positioned,
+    show Border, BorderRadius, BoxDecoration, BoxShape, Builder, BuildContext, Center, Clip, Color, Colors, Column, Container,
+        CrossAxisAlignment, EdgeInsets, Expanded, FontWeight, Icon, Icons, ListView, MainAxisAlignment, MainAxisSize, Padding, Positioned,
         Row, SafeArea, Scaffold, SizedBox, Spacer, Stack, StatelessWidget, Text, TextStyle, ValueChanged, VoidCallback,
         Widget;
 import '../widgets/charts.dart' show SpendAreaChart;
+import '../widgets/display_options.dart' show PaceDisplay;
+import '../widgets/status_mark.dart' show BudgetStatusLook, BudgetStatusMark;
 import '../format.dart' show Fmt;
 import '../../models/bill.dart' show BillItem;
 import '../../models/budget.dart' show BudgetCategory, BudgetStatus, BudgetSummary;
@@ -88,7 +90,7 @@ class DashboardScreen extends StatelessWidget {
                           Positioned(
                             right: 2,
                             top: 0,
-                            child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: C.red, shape: BoxShape.circle)),
+                            child: Container(width: 8, height: 8, decoration: BoxDecoration(color: C.red, shape: BoxShape.circle)),
                           ),
                       ],
                     ),
@@ -137,7 +139,7 @@ class DashboardScreen extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: Text(spend.title, style: const TextStyle(fontSize: 14, color: C.muted))),
+                          Expanded(child: Text(spend.title, style: TextStyle(fontSize: 14, color: C.muted))),
                           if (spend.deltaAmount != null) ...[
                             Icon(spend.deltaIsAbove ? Icons.arrow_upward : Icons.arrow_downward,
                                 size: 15, color: spend.deltaIsAbove ? C.red : C.olive),
@@ -145,7 +147,7 @@ class DashboardScreen extends StatelessWidget {
                                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: spend.deltaIsAbove ? C.red : C.olive)),
                           ],
                           if (spend.deltaPeriodLabel != null)
-                            Text('  ${spend.deltaPeriodLabel}', style: const TextStyle(fontSize: 12, color: C.muted)),
+                            Text('  ${spend.deltaPeriodLabel}', style: TextStyle(fontSize: 12, color: C.muted)),
                         ],
                       ),
                     ),
@@ -154,14 +156,14 @@ class DashboardScreen extends StatelessWidget {
                     if (spend.currentLegend.isNotEmpty)
                       Row(
                         children: [
-                          const _Dot(C.ink),
+                          _LegendKey(C.ink),
                           const SizedBox(width: 6),
-                          Text(spend.currentLegend, style: const TextStyle(fontSize: 12, color: C.muted)),
+                          Text(spend.currentLegend, style: TextStyle(fontSize: 12, color: C.muted)),
                           if (spend.previousLegend != null) ...[
                             const SizedBox(width: 14),
-                            const _Dot(Color(0xFFC9C7BF)),
+                            _LegendKey(C.previous, dotted: true),
                             const SizedBox(width: 6),
-                            Text(spend.previousLegend!, style: const TextStyle(fontSize: 12, color: C.muted)),
+                            Text(spend.previousLegend!, style: TextStyle(fontSize: 12, color: C.muted)),
                           ],
                         ],
                       ),
@@ -178,7 +180,7 @@ class DashboardScreen extends StatelessWidget {
                   decoration: BoxDecoration(color: C.chip, borderRadius: BorderRadius.circular(8)),
                   child: Row(
                     children: [
-                      const Icon(Icons.account_balance_wallet_outlined, size: 20, color: C.olive),
+                      Icon(Icons.account_balance_wallet_outlined, size: 20, color: C.olive),
                       const SizedBox(width: 12),
                       Text(data.paydayLabel!, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                       const Spacer(),
@@ -204,8 +206,8 @@ class DashboardScreen extends StatelessWidget {
                     children: [
                       const Icon(Icons.sync, size: 16),
                       const SizedBox(width: 6),
-                      Text('${data.lastSyncLabel}  ', style: const TextStyle(fontSize: 12, color: C.muted)),
-                      Tap(onTap: onSyncNow, child: const Text('Sync now', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: C.olive))),
+                      Text('${data.lastSyncLabel}  ', style: TextStyle(fontSize: 12, color: C.muted)),
+                      Tap(onTap: onSyncNow, child: Text('Sync now', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: C.olive))),
                     ],
                   ),
                 ),
@@ -306,7 +308,7 @@ class DashboardScreen extends StatelessWidget {
       leading: IconBadge(AppIcons.of(t.iconKey), bg: t.highlight ? C.lime : C.chip, size: 38),
       title: t.title,
       titleStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-      subtitle: Text(t.subtitle, style: const TextStyle(fontSize: 12, color: C.muted)),
+      subtitle: Text(t.subtitle, style: TextStyle(fontSize: 12, color: C.muted)),
       trailing: Text(income ? Fmt.signed(t.amount) : Fmt.money(t.amount.abs()),
           style: TextStyle(fontSize: 15, fontWeight: income ? FontWeight.w700 : FontWeight.w400, color: income ? C.olive : C.ink)),
     );
@@ -320,9 +322,9 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(b.periodLabel, style: const TextStyle(fontSize: 12, color: C.muted)),
+              Text(b.periodLabel, style: TextStyle(fontSize: 12, color: C.muted)),
               const Spacer(),
-              Text('${Fmt.money(b.spent)} of ${Fmt.money(b.limit, decimals: 0)}', style: const TextStyle(fontSize: 12, color: C.muted)),
+              Text('${Fmt.money(b.spent)} of ${Fmt.money(b.limit, decimals: 0)}', style: TextStyle(fontSize: 12, color: C.muted)),
             ],
           ),
           const SizedBox(height: 4),
@@ -333,9 +335,9 @@ class DashboardScreen extends StatelessWidget {
           if (b.statusLabel != null) ...[
             const SizedBox(height: 8),
             Row(children: [
-              const _Dot(C.ink),
+              _Dot(C.ink),
               const SizedBox(width: 6),
-              Text(b.statusLabel!, style: const TextStyle(fontSize: 12, color: C.muted)),
+              Text(b.statusLabel!, style: TextStyle(fontSize: 12, color: C.muted)),
             ]),
           ],
         ],
@@ -345,8 +347,6 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _budgetRow(BudgetCategory c) {
     final over = c.status == BudgetStatus.over;
-    final near = c.status == BudgetStatus.nearLimit;
-    final statusText = over ? 'Over budget' : (near ? 'Near limit' : 'On track');
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
@@ -367,12 +367,20 @@ class DashboardScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 6),
-                StripedBar(value: c.progress, color: over ? C.red : C.ink, height: 5, semanticLabel: '${c.name} budget used'),
+                // Colorblind mode: near / over are also striped.
+                Builder(
+                  builder: (context) => StripedBar(
+                      value: c.progress,
+                      color: over ? C.red : C.ink,
+                      height: 5,
+                      striped: c.status != BudgetStatus.onTrack && PaceDisplay.colorblindOf(context),
+                      semanticLabel: '${c.name} budget used'),
+                ),
                 const SizedBox(height: 6),
                 Row(children: [
-                  _Dot(over ? C.red : C.olive),
+                  BudgetStatusMark(c.status, color: c.status.color, size: 14),
                   const SizedBox(width: 6),
-                  Text(statusText, style: TextStyle(fontSize: 11, color: over ? C.red : C.olive)),
+                  Text(c.status.label, style: TextStyle(fontSize: 11, color: c.status.color)),
                 ]),
               ],
             ),
@@ -414,7 +422,7 @@ class DashboardScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Text(t.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
           const SizedBox(height: 12),
-          Text(t.body, style: const TextStyle(fontSize: 16, color: C.muted, height: 1.35)),
+          Text(t.body, style: TextStyle(fontSize: 16, color: C.muted, height: 1.35)),
           const SizedBox(height: 14),
           Tap(
             onTap: onTrendAction == null ? null : () => onTrendAction!(t),
@@ -429,7 +437,7 @@ class DashboardScreen extends StatelessWidget {
             Row(children: [
               const Icon(Icons.person_outline, size: 14),
               const SizedBox(width: 6),
-              Text(data.featuredTrendSource!, style: const TextStyle(fontSize: 12, color: C.muted)),
+              Text(data.featuredTrendSource!, style: TextStyle(fontSize: 12, color: C.muted)),
             ]),
           ],
         ],
@@ -442,8 +450,28 @@ class DashboardScreen extends StatelessWidget {
       leading: IconBadge(AppIcons.of(t.iconKey), bg: t.accent ? C.lime : C.chip, size: 38, square: true),
       title: t.title,
       titleStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-      subtitle: Text(t.subtitle, style: const TextStyle(fontSize: 12, color: C.muted)),
+      subtitle: Text(t.subtitle, style: TextStyle(fontSize: 12, color: C.muted)),
       trailing: const Icon(Icons.chevron_right),
+    );
+  }
+}
+
+/// Chart legend key. In colorblind mode it's a sample of the line's style
+/// (solid or dotted, as drawn in the chart); otherwise a colored dot.
+class _LegendKey extends StatelessWidget {
+  final Color color;
+  final bool dotted;
+  const _LegendKey(this.color, {this.dotted = false});
+
+  @override
+  Widget build(BuildContext context) {
+    if (!PaceDisplay.colorblindOf(context)) return _Dot(color);
+    Widget seg(double w) => Container(width: w, height: 3, color: color);
+    return SizedBox(
+      width: 16,
+      child: dotted
+          ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [seg(3), seg(3), seg(3)])
+          : seg(16),
     );
   }
 }

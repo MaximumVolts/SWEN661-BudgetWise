@@ -1,5 +1,5 @@
-import '../models/navigation.dart' show FlowStep, LinkOutcome;
-import '../services/app_navigator.dart' show AppNavigator;
+import '../models/navigation.dart' show LinkOutcome;
+import 'app_navigator.dart' show AppNavigator;
 import '../services/bank_link_service.dart' show BankLinkService;
 import 'base_controller.dart' show ScreenController;
 
@@ -22,10 +22,4 @@ class ConnectBankController extends ScreenController {
     if (ok && (outcome?.linked ?? false) && next != null) navigator.openFlowStep(next);
   }
 
-  Future<void> notNow() async {
-    FlowStep? next;
-    final ok = await perform(() async => next = await _link.skipLinking());
-    final step = next;
-    if (ok && step != null) navigator.openFlowStep(step);
-  }
 }

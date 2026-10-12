@@ -1,5 +1,5 @@
 import '../models/bill.dart' show BillItem, BillsUpcomingData, RecurringData, RecurringItem;
-import '../services/app_navigator.dart' show AppNavigator;
+import 'app_navigator.dart' show AppNavigator;
 import '../services/bill_service.dart' show BillService;
 import 'base_controller.dart' show ScreenController;
 
@@ -24,17 +24,11 @@ class BillsController extends ScreenController {
   void selectTab(int index) => navigator.openBills(tab: index);
   void openBill(BillItem b) => navigator.openBill(b.id);
 
-  Future<void> addBill() async {
-    if (await navigator.openAddBill()) await refresh();
-  }
+  Future<void> addBill() => refreshIf(navigator.openAddBill());
 
-  Future<void> openSubscriptionMenu(RecurringItem item) async {
-    if (await navigator.openSubscriptionMenu(item.id)) await refresh();
-  }
+  Future<void> openSubscriptionMenu(RecurringItem item) => refreshIf(navigator.openSubscriptionMenu(item.id));
 
-  Future<void> setPaused(RecurringItem item, bool paused) async {
-    if (await perform(() => _service.setSubscriptionPaused(id: item.id, paused: paused))) await refresh();
-  }
+  Future<void> setPaused(RecurringItem item, bool paused) => performAndRefresh(() => _service.setSubscriptionPaused(id: item.id, paused: paused));
 
   void openSubscription(RecurringItem item) => navigator.openBill(item.id);
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart'
         TextDecoration, TextStyle, ValueChanged, VoidCallback, Widget, WidgetStateProperty;
 import '../../models/settings.dart' show SettingsData;
 import '../theme.dart' show C;
+import '../widgets/colorblind_preview.dart' show ColorblindPreview;
 import '../widgets/widgets.dart' show HairLine, Heading, IconBadge, PaceCard, Tap;
 
 /// 15 - Settings. Toggles are *controlled*: the values come from [data] and changes are
@@ -18,13 +19,10 @@ class SettingsScreen extends StatelessWidget {
   final VoidCallback? onStatementExport;
   final VoidCallback? onTheme;
   final ValueChanged<bool>? onHighContrastChanged;
-  final ValueChanged<bool>? onChartPatternsChanged;
+  final ValueChanged<bool>? onColorblindModeChanged;
   final ValueChanged<bool>? onShowChartValuesChanged;
   final VoidCallback? onBillReminders;
   final ValueChanged<bool>? onBudgetAlertsChanged;
-  final VoidCallback? onPasswordSecurity;
-  final VoidCallback? onTerms;
-  final VoidCallback? onPrivacy;
   final VoidCallback? onSignOut;
   final VoidCallback? onDeleteAccount;
 
@@ -38,13 +36,10 @@ class SettingsScreen extends StatelessWidget {
     this.onStatementExport,
     this.onTheme,
     this.onHighContrastChanged,
-    this.onChartPatternsChanged,
+    this.onColorblindModeChanged,
     this.onShowChartValuesChanged,
     this.onBillReminders,
     this.onBudgetAlertsChanged,
-    this.onPasswordSecurity,
-    this.onTerms,
-    this.onPrivacy,
     this.onSignOut,
     this.onDeleteAccount,
   });
@@ -78,7 +73,7 @@ class SettingsScreen extends StatelessWidget {
                       width: 40,
                       height: 40,
                       alignment: Alignment.center,
-                      decoration: const BoxDecoration(color: C.ink, shape: BoxShape.circle),
+                      decoration: BoxDecoration(color: C.ink, shape: BoxShape.circle),
                       child: Text(data.initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                     ),
                     const SizedBox(width: 12),
@@ -87,7 +82,7 @@ class SettingsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(data.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
-                          Text(data.email, style: const TextStyle(fontSize: 13, color: C.muted)),
+                          Text(data.email, style: TextStyle(fontSize: 13, color: C.muted)),
                         ],
                       ),
                     ),
@@ -109,8 +104,13 @@ class SettingsScreen extends StatelessWidget {
             _group('Accessibility & display', [
               _row(Icons.contrast, 'Theme', value: data.themeLabel, chevron: true, onTap: onTheme),
               _row(Icons.wb_sunny_outlined, 'High contrast', toggle: data.highContrast, onToggle: onHighContrastChanged),
-              _row(Icons.fingerprint, 'Chart patterns and icons',
-                  sub: 'Show status without relying on color', toggle: data.chartPatterns, onToggle: onChartPatternsChanged),
+              Column(children: [
+                _row(Icons.visibility_outlined, 'Colorblind mode',
+                    sub: 'Colorblind-safe colors, with shapes and patterns for status',
+                    toggle: data.colorblindMode,
+                    onToggle: onColorblindModeChanged),
+                const ColorblindPreview(), // shows the effect right here when the switch flips
+              ]),
               _row(Icons.bar_chart, 'Show values on charts', toggle: data.showChartValues, onToggle: onShowChartValuesChanged),
             ]),
             _group('Notifications', [
@@ -118,16 +118,13 @@ class SettingsScreen extends StatelessWidget {
               _row(Icons.alarm, 'Budget alerts', toggle: data.budgetAlerts, onToggle: onBudgetAlertsChanged),
             ]),
             _group('Account', [
-              _row(Icons.lock_outline, 'Password & security', chevron: true, onTap: onPasswordSecurity),
-              _row(Icons.description_outlined, 'Terms of Use', external: true, onTap: onTerms),
-              _row(Icons.shield_outlined, 'Privacy Policy', external: true, onTap: onPrivacy),
               _row(Icons.logout, 'Sign out', red: true, onTap: onSignOut),
             ]),
             const SizedBox(height: 18),
             Center(
               child: Tap(
                 onTap: onDeleteAccount,
-                child: const Text('Delete account', style: TextStyle(color: C.red, fontSize: 14, decoration: TextDecoration.underline)),
+                child: Text('Delete account', style: TextStyle(color: C.red, fontSize: 14, decoration: TextDecoration.underline)),
               ),
             ),
             const SizedBox(height: 14),
@@ -146,7 +143,7 @@ class SettingsScreen extends StatelessWidget {
             ),
             if (data.footerLabel.isNotEmpty) ...[
               const SizedBox(height: 4),
-              Center(child: Text(data.footerLabel, style: const TextStyle(fontSize: 11, letterSpacing: 1, color: C.muted))),
+              Center(child: Text(data.footerLabel, style: TextStyle(fontSize: 11, letterSpacing: 1, color: C.muted))),
             ],
             const SizedBox(height: 24),
           ],
@@ -161,7 +158,7 @@ class SettingsScreen extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 18, bottom: 8),
-          child: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: C.muted)),
+          child: Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: C.muted)),
         ),
         PaceCard(
           radius: 14,
@@ -181,7 +178,6 @@ class SettingsScreen extends StatelessWidget {
     bool subRed = false,
     String? value,
     bool chevron = false,
-    bool external = false,
     bool red = false,
     bool? toggle,
     ValueChanged<bool>? onToggle,
@@ -190,7 +186,6 @@ class SettingsScreen extends StatelessWidget {
     return Tap(
       onTap: onTap,
       isButton: toggle == null && onTap != null,
-      hint: external ? 'Opens in browser' : null,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
@@ -205,7 +200,7 @@ class SettingsScreen extends StatelessWidget {
                   if (sub != null)
                     Row(children: [
                       if (subRed) ...[
-                        Container(width: 6, height: 6, decoration: const BoxDecoration(color: C.red, shape: BoxShape.circle)),
+                        Container(width: 6, height: 6, decoration: BoxDecoration(color: C.red, shape: BoxShape.circle)),
                         const SizedBox(width: 4),
                       ],
                       Flexible(child: Text(sub, style: TextStyle(fontSize: 12, color: subRed ? C.red : C.muted))),
@@ -213,9 +208,8 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            if (value != null && value.isNotEmpty) ...[Text(value, style: const TextStyle(fontSize: 14, color: C.muted)), const SizedBox(width: 6)],
+            if (value != null && value.isNotEmpty) ...[Text(value, style: TextStyle(fontSize: 14, color: C.muted)), const SizedBox(width: 6)],
             if (chevron) const Icon(Icons.chevron_right),
-            if (external) const Icon(Icons.open_in_new, size: 22),
             if (toggle != null)
               Switch(
                 value: toggle,

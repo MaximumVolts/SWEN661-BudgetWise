@@ -64,13 +64,16 @@ class _ControllerScopeState<Ctl extends BaseController> extends State<Controller
   }
 
   void _onChanged() {
-    final msg = widget.controller.actionErrorMessage;
-    if (msg != null && mounted) {
-      widget.controller.clearActionError();
-      ScaffoldMessenger.maybeOf(context)
-        ?..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(msg)));
-    }
+    if (!mounted) return;
+    final c = widget.controller;
+    final msg = c.actionErrorMessage ?? c.notice;
+    if (msg == null) return;
+    c
+      ..clearActionError()
+      ..clearNotice();
+    ScaffoldMessenger.maybeOf(context)
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
@@ -82,7 +85,7 @@ class _ControllerScopeState<Ctl extends BaseController> extends State<Controller
         final pending = widget.autoLoad && c.status == ViewStatus.idle;
         if (c.status == ViewStatus.loading || pending) {
           return widget.loadingBuilder?.call(context) ??
-              const Scaffold(body: Center(child: CircularProgressIndicator(color: C.ink, semanticsLabel: 'Loading')));
+              Scaffold(body: Center(child: CircularProgressIndicator(color: C.ink, semanticsLabel: 'Loading')));
         }
         if (c.status == ViewStatus.error) {
           final retry = c.load;
@@ -99,7 +102,7 @@ class _ControllerScopeState<Ctl extends BaseController> extends State<Controller
                           const SizedBox(height: 12),
                           Text(c.errorMessage ?? 'Something went wrong.', textAlign: TextAlign.center, style: T.body),
                           const SizedBox(height: 20),
-                          SizedBox(width: 160, child: PillButton('Try again', onPressed: retry)),
+                          SizedBox(width: 200, child: PillButton('Try again', onPressed: retry)),
                         ],
                       ),
                     ),

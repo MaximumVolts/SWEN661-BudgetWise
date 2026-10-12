@@ -13,6 +13,7 @@ class AccountsView extends StatelessWidget {
         builder: (context, c) => AccountsScreen(
           groups: c.data!.groups,
           banner: c.data!.banner,
+          emptyMessage: c.data!.emptyMessage,
           onReconnect: c.reconnect,
           onDismissBanner: c.dismissBanner,
           onLinkAccount: c.linkAccount,

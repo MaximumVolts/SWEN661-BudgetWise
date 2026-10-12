@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'
-    show BuildContext, Color, Column, Container, CrossAxisAlignment, EdgeInsets, Expanded, FontWeight, Icon, Icons,
+    show BuildContext, Column, Container, CrossAxisAlignment, EdgeInsets, Expanded, FontWeight, Icon, Icons,
         ListView, Padding, Row, SafeArea, Scaffold, SizedBox, Spacer, StatelessWidget, Text, TextBaseline, TextSpan,
         TextStyle, ValueChanged, VoidCallback, Widget;
 import '../format.dart' show Fmt;
@@ -47,22 +47,22 @@ class SavingsGoalsScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            const Text('Saved toward goals', style: TextStyle(fontSize: 14, color: C.muted)),
+            Text('Saved toward goals', style: TextStyle(fontSize: 14, color: C.muted)),
             const SizedBox(height: 4),
             Text(Fmt.moneyOrMissing(data.totalSaved), style: const TextStyle(fontSize: 44, fontWeight: FontWeight.w400)),
             const SizedBox(height: 4),
-            Text(data.subtitle ?? 'No savings goal data found', style: const TextStyle(fontSize: 14, color: C.muted)),
+            Text(data.subtitle ?? 'No savings goal data found', style: TextStyle(fontSize: 14, color: C.muted)),
             const SizedBox(height: 18),
             PaceCard(
               radius: 20,
               padding: data.isEmpty ? const EdgeInsets.all(20) : EdgeInsets.zero,
               clip: true,
               child: data.isEmpty
-                  ? const Column(
+                  ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('No savings goals yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-                        SizedBox(height: 4),
+                        const Text('No savings goals yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 4),
                         Text('Tap + to add your first goal.', style: TextStyle(fontSize: 14, color: C.muted)),
                       ],
                     )
@@ -116,7 +116,7 @@ class _GoalBlock extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-                        Text(goal.subtitle ?? 'No details available', style: const TextStyle(fontSize: 12.5, color: C.muted)),
+                        Text(goal.subtitle ?? 'No details available', style: TextStyle(fontSize: 12.5, color: C.muted)),
                       ],
                     ),
                   ),
@@ -130,17 +130,17 @@ class _GoalBlock extends StatelessWidget {
                 children: [
                   Text(Fmt.moneyOrMissing(goal.saved), style: const TextStyle(fontSize: 30)),
                   const SizedBox(width: 6),
-                  Text('of ${Fmt.moneyOrMissing(goal.target, decimals: 0)}', style: const TextStyle(fontSize: 14, color: C.muted)),
+                  Text('of ${Fmt.moneyOrMissing(goal.target, decimals: 0)}', style: TextStyle(fontSize: 14, color: C.muted)),
                 ],
               ),
               const SizedBox(height: 8),
-              StripedBar(value: goal.progress, height: 6, track: const Color(0xFFD3D1C9), semanticLabel: '$name progress'),
+              StripedBar(value: goal.progress, height: 6, track: C.line, semanticLabel: '$name progress'),
               const SizedBox(height: 6),
               Row(
                 children: [
-                  Text('$pct saved', style: const TextStyle(fontSize: 12, color: C.muted)),
+                  Text('$pct saved', style: TextStyle(fontSize: 12, color: C.muted)),
                   const Spacer(),
-                  Text('${Fmt.moneyOrMissing(remaining == null || remaining >= 0 ? remaining : 0)} to go', style: const TextStyle(fontSize: 12, color: C.muted)),
+                  Text('${Fmt.moneyOrMissing(remaining == null || remaining >= 0 ? remaining : 0)} to go', style: TextStyle(fontSize: 12, color: C.muted)),
                 ],
               ),
             ],
@@ -196,7 +196,7 @@ class _GoalBlock extends StatelessWidget {
   }
 
   Widget _tip(String text, String? highlight) {
-    const base = TextStyle(fontSize: 16, height: 1.3, color: C.ink);
+    final base = TextStyle(fontSize: 16, height: 1.3, color: C.ink);
     final i = highlight == null ? -1 : text.indexOf(highlight);
     if (i < 0) return Text(text, style: base);
     return Text.rich(TextSpan(style: base, children: [

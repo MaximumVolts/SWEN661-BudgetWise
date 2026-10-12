@@ -1,5 +1,5 @@
 import '../models/transaction.dart' show CategoryInfo, TransactionDetailBundle;
-import '../services/app_navigator.dart' show AppNavigator;
+import 'app_navigator.dart' show AppNavigator;
 import '../services/transaction_service.dart' show TransactionService;
 import 'base_controller.dart' show ScreenController;
 
@@ -11,33 +11,32 @@ class TransactionDetailController extends ScreenController {
         super(navigator);
 
   TransactionDetailBundle? bundle;
-  String? selectedCategoryId;
+  /// The transaction's categories in order; the first is primary (counts toward totals).
+  List<String> selectedCategoryIds = const [];
 
   @override
   Future<void> fetch() async {
     bundle = await _service.getDetail(transactionId);
-    selectedCategoryId = bundle!.transaction.selectedCategoryId;
+    selectedCategoryIds = bundle!.transaction.selectedCategoryIds;
   }
 
-  /// Optimistic update; reverts if the service fails.
-  Future<void> selectCategory(CategoryInfo c) async {
-    final previous = selectedCategoryId;
-    selectedCategoryId = c.id;
+  /// Adds [c], or removes it if already chosen. The last category can't be removed (a transaction
+  /// always has one). Removing the primary makes the next one primary. Optimistic; reverts on failure.
+  Future<void> toggleCategory(CategoryInfo c) async {
+    final previous = selectedCategoryIds;
+    final next = previous.contains(c.id) ? [for (final id in previous) if (id != c.id) id] : [...previous, c.id];
+    if (next.isEmpty) return;
+    selectedCategoryIds = next;
     notifyListeners();
-    final ok = await perform(() => _service.setCategory(transactionId: transactionId, categoryId: c.id));
+    final ok = await perform(() => _service.setCategories(transactionId: transactionId, categoryIds: next));
     if (!ok) {
-      selectedCategoryId = previous;
+      selectedCategoryIds = previous;
       notifyListeners();
     }
   }
 
-  Future<void> newCategory() async {
-    if (await navigator.openNewCategory()) await refresh();
-  }
+  Future<void> newCategory() => refreshIf(navigator.openNewCategory());
 
-  Future<void> addNote() async {
-    if (await navigator.openAddNote(transactionId)) await refresh();
-  }
+  Future<void> addNote() => refreshIf(navigator.openAddNote(transactionId));
 
-  void openMenu() => navigator.openMenu('transaction_detail');
 }

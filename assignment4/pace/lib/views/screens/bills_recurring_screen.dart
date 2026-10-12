@@ -60,7 +60,7 @@ class BillsRecurringScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            const Heading('RECURRING & SUBSCRIPTIONS', style: T.label),
+            Heading('RECURRING & SUBSCRIPTIONS', style: T.label),
             const SizedBox(height: 8),
             PaceCard(
               radius: 16,
@@ -84,7 +84,7 @@ class BillsRecurringScreen extends StatelessWidget {
                   children: [
                     const Text('Subscription insight', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 6),
-                    Text(insight!, style: const TextStyle(fontSize: 17, color: C.muted, height: 1.35)),
+                    Text(insight!, style: TextStyle(fontSize: 17, color: C.muted, height: 1.35)),
                   ],
                 ),
               ),
@@ -107,7 +107,7 @@ class _Stat extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 14, color: C.muted)),
+            Text(label, style: TextStyle(fontSize: 14, color: C.muted)),
             const SizedBox(height: 6),
             Text(value, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w500)),
           ],
@@ -135,8 +135,8 @@ class _Sub extends StatelessWidget {
               children: [
                 Text(item.name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 2),
-                Text(item.detailLine, style: const TextStyle(fontSize: 14, color: C.muted)),
-                Text(item.yearlyLine, style: const TextStyle(fontSize: 14, color: C.muted)),
+                Text(item.detailLine, style: TextStyle(fontSize: 14, color: C.muted)),
+                Text(item.yearlyLine, style: TextStyle(fontSize: 14, color: C.muted)),
               ],
             ),
           ),

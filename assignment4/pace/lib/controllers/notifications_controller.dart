@@ -1,6 +1,6 @@
 import '../models/navigation.dart' show DeepLinkTarget;
 import '../models/notification.dart' show NotificationItem, NotificationsData;
-import '../services/app_navigator.dart' show AppNavigator;
+import 'app_navigator.dart' show AppNavigator;
 import '../services/notification_service.dart' show NotificationService;
 import 'base_controller.dart' show ScreenController;
 
@@ -24,13 +24,9 @@ class NotificationsController extends ScreenController {
     await refresh();
   }
 
-  Future<void> markAllRead() async {
-    if (await perform(_service.markAllRead)) await refresh();
-  }
+  Future<void> markAllRead() => performAndRefresh(_service.markAllRead);
 
-  Future<void> runPrimaryAction(NotificationItem n) async {
-    if (await perform(() => _service.runPrimaryAction(n.id))) await refresh();
-  }
+  Future<void> runPrimaryAction(NotificationItem n) => performAndRefresh(() => _service.runPrimaryAction(n.id));
 
   /// Secondary action and plain taps: the service marks it read and says where it leads.
   Future<void> openTarget(NotificationItem n) async {

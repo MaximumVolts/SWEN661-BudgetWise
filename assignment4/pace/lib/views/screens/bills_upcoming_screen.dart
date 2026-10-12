@@ -57,11 +57,11 @@ class BillsUpcomingScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(summaryLabel, style: const TextStyle(fontSize: 14, color: C.muted)),
+                  Text(summaryLabel, style: TextStyle(fontSize: 14, color: C.muted)),
                   const SizedBox(height: 4),
                   Text(Fmt.money(summaryAmount), style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w500)),
                   const SizedBox(height: 4),
-                  Text(summaryDetail, style: const TextStyle(fontSize: 14, color: C.muted)),
+                  Text(summaryDetail, style: TextStyle(fontSize: 14, color: C.muted)),
                 ],
               ),
             ),

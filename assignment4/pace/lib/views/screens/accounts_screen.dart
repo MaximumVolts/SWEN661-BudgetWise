@@ -5,7 +5,7 @@ import 'package:flutter/material.dart'
         VoidCallback, Widget;
 import '../format.dart' show Fmt;
 import '../../models/account.dart' show AccountGroup, LinkedAccount, ReconnectBanner;
-import '../theme.dart' show C;
+import '../theme.dart' show C, T;
 import '../widgets/widgets.dart' show AppIcons, HairLine, Heading, IconBadge, PaceCard, PillButton, PressFeedback, Tap;
 
 /// 04 - Accounts
@@ -17,6 +17,8 @@ class AccountsScreen extends StatelessWidget {
   final VoidCallback? onLinkAccount;
   final VoidCallback? onMenu;
   final ValueChanged<LinkedAccount>? onAccountTap;
+  /// Shown instead of the list when [groups] is empty.
+  final String? emptyMessage;
 
   const AccountsScreen({
     super.key,
@@ -27,6 +29,7 @@ class AccountsScreen extends StatelessWidget {
     this.onLinkAccount,
     this.onMenu,
     this.onAccountTap,
+    this.emptyMessage,
   });
 
   @override
@@ -48,12 +51,16 @@ class AccountsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               if (banner != null) ...[_banner(banner!), const SizedBox(height: 24)],
+              if (groups.isEmpty && emptyMessage != null) ...[
+                PaceCard(child: Text(emptyMessage!, style: T.body)),
+                const SizedBox(height: 24),
+              ],
               for (final g in groups) ...[
                 Row(
                   children: [
                     Text(g.title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
                     const Spacer(),
-                    Text(g.institution, style: const TextStyle(fontSize: 15, color: C.muted)),
+                    Text(g.institution, style: TextStyle(fontSize: 15, color: C.muted)),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -90,7 +97,7 @@ class AccountsScreen extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.event_repeat_outlined, color: C.red, size: 26),
+              Icon(Icons.event_repeat_outlined, color: C.red, size: 26),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -98,7 +105,7 @@ class AccountsScreen extends StatelessWidget {
                   children: [
                     Text(b.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                     const SizedBox(height: 4),
-                    Text(b.message, style: const TextStyle(fontSize: 17, color: C.muted, height: 1.3)),
+                    Text(b.message, style: TextStyle(fontSize: 17, color: C.muted, height: 1.3)),
                   ],
                 ),
               ),
@@ -150,7 +157,7 @@ class _AccountRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(a.name, style: const TextStyle(fontSize: 18)),
-                Text(a.subtitle, style: const TextStyle(fontSize: 14, color: C.muted)),
+                Text(a.subtitle, style: TextStyle(fontSize: 14, color: C.muted)),
                 const SizedBox(height: 2),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,

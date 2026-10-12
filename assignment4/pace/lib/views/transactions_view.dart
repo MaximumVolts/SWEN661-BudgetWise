@@ -22,8 +22,11 @@ class TransactionsView extends StatelessWidget {
           onAccountFilter: () => c.pickFilter(FilterKind.account),
           onCategoryFilter: () => c.pickFilter(FilterKind.category),
           onDateFilter: () => c.pickFilter(FilterKind.date),
-          onHeaderAction: c.headerAction,
           onTransactionTap: c.openTransaction,
+          searchText: c.query.search,
+          onSearchChanged: c.search,
+          onClearSearch: c.clearSearch,
+          emptyMessage: c.emptyMessage,
           onNavTap: c.openTab,
         ),
       );

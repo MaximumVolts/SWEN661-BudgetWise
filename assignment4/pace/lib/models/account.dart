@@ -34,5 +34,7 @@ class ReconnectBanner {
 class AccountsData {
   final ReconnectBanner? banner;
   final List<AccountGroup> groups;
-  const AccountsData({required this.groups, this.banner});
+  /// Shown instead of the list when [groups] is empty (e.g. "No bank connected yet…").
+  final String? emptyMessage;
+  const AccountsData({required this.groups, this.banner, this.emptyMessage});
 }

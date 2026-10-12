@@ -20,6 +20,8 @@ enum AppRouteName {
   // details
   transactionDetail('/transactions/:id'),
   spendingCategory('/spending/category/:id'),
+  budgetNew('/budgets/new'),
+  budgetEdit('/budgets/edit/:id'),
   budgetCategory('/budgets/category/:id'),
   billDetail('/bills/:id'),
   accounts('/accounts'),
@@ -34,8 +36,7 @@ enum AppRouteName {
   settings('/settings'),
   profile('/settings/profile'),
   budgetCategoriesSettings('/settings/budget-categories'),
-  statementExport('/settings/statements'),
-  passwordSecurity('/settings/security');
+  statementExport('/settings/statements');
 
   final String pattern;
   const AppRouteName(this.pattern);
@@ -62,6 +63,7 @@ class AppRoute {
   static const transactions = AppRoute(AppRouteName.transactions);
   static const spending = AppRoute(AppRouteName.spending);
   static const budgets = AppRoute(AppRouteName.budgets);
+  static const budgetNew = AppRoute(AppRouteName.budgetNew);
   static const bills = AppRoute(AppRouteName.bills);
   static const billsRecurring = AppRoute(AppRouteName.billsRecurring);
   static const accounts = AppRoute(AppRouteName.accounts);
@@ -73,11 +75,11 @@ class AppRoute {
   static const profile = AppRoute(AppRouteName.profile);
   static const budgetCategoriesSettings = AppRoute(AppRouteName.budgetCategoriesSettings);
   static const statementExport = AppRoute(AppRouteName.statementExport);
-  static const passwordSecurity = AppRoute(AppRouteName.passwordSecurity);
 
   // Parameterised routes
   factory AppRoute.transactionDetail(String id) => AppRoute(AppRouteName.transactionDetail, params: {'id': id});
   factory AppRoute.spendingCategory(String id) => AppRoute(AppRouteName.spendingCategory, params: {'id': id});
+  factory AppRoute.budgetEdit(String categoryId) => AppRoute(AppRouteName.budgetEdit, params: {'id': categoryId});
   factory AppRoute.budgetCategory(String id, {String? periodId}) =>
       AppRoute(AppRouteName.budgetCategory, params: {'id': id}, query: {if (periodId != null) 'period': periodId});
   factory AppRoute.billDetail(String id) => AppRoute(AppRouteName.billDetail, params: {'id': id});
@@ -113,7 +115,8 @@ class AppRoute {
     final segs = [
       for (final s in name.segments) s.startsWith(':') ? (params[s.substring(1)] ?? '') : s,
     ];
-    return Uri(pathSegments: segs, queryParameters: query.isEmpty ? null : query);
+    // An absolute path ("/transactions/7"), as the browser URL bar and deep links expect.
+    return Uri(path: '/${segs.map(Uri.encodeComponent).join('/')}', queryParameters: query.isEmpty ? null : query);
   }
 
   /// Matches a URI against the route table. Returns null if nothing matches.

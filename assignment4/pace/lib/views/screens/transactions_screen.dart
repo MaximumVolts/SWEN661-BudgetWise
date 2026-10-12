@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart'
-    show Axis, Border, BorderRadius, BoxDecoration, BoxShape, BuildContext, Center, Colors, Column, Container,
-        CrossAxisAlignment, EdgeInsets, Expanded, FontWeight, Icon, Icons, ListView, MainAxisSize, Padding, Row,
-        SafeArea, Scaffold, SingleChildScrollView, SizedBox, Spacer, StatelessWidget, Text, TextStyle, ValueChanged,
-        VoidCallback, Widget;
+    show Axis, Border, BorderRadius, BoxDecoration, BuildContext, Center, Colors, Column, Container,
+        CrossAxisAlignment, EdgeInsets, Expanded, FontWeight, Icon, IconButton, Icons, ListView,
+        MainAxisSize, Padding, Row, SafeArea, Scaffold, SingleChildScrollView, SizedBox, Spacer,
+        State, StatefulWidget, StatelessWidget, Text, TextEditingController, TextField, TextInputAction, TextStyle,
+        ValueChanged, VoidCallback, Widget;
 import '../format.dart' show Fmt;
 import '../../models/transaction.dart' show TransactionGroup, TransactionItem;
 import '../theme.dart' show C, T;
-import '../widgets/widgets.dart' show AppIcons, Heading, IconBadge, PaceCard, PaceNavBar, Tap;
+import '../widgets/widgets.dart' show AppIcons, Heading, IconBadge, PaceCard, paceInputDecoration, PaceNavBar, Tap;
 
 /// 06 - Transactions
 class TransactionsScreen extends StatelessWidget {
@@ -22,8 +23,11 @@ class TransactionsScreen extends StatelessWidget {
   final VoidCallback? onAccountFilter;
   final VoidCallback? onCategoryFilter;
   final VoidCallback? onDateFilter;
-  final VoidCallback? onHeaderAction;
   final ValueChanged<TransactionItem>? onTransactionTap;
+  /// The current search text, and callbacks as the user types / clears it.
+  final String searchText;
+  final ValueChanged<String>? onSearchChanged;
+  final VoidCallback? onClearSearch;
   final ValueChanged<int>? onNavTap;
   /// Shown when [groups] is empty.
   final String emptyMessage;
@@ -40,8 +44,10 @@ class TransactionsScreen extends StatelessWidget {
     this.onAccountFilter,
     this.onCategoryFilter,
     this.onDateFilter,
-    this.onHeaderAction,
     this.onTransactionTap,
+    this.searchText = '',
+    this.onSearchChanged,
+    this.onClearSearch,
     this.onNavTap,
     this.emptyMessage = 'No transactions to show.',
   });
@@ -56,22 +62,10 @@ class TransactionsScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           children: [
             const SizedBox(height: 16),
-            Row(
-              children: [
-                const Heading('Transactions', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
-                const Spacer(),
-                Tap(
-                  onTap: onHeaderAction,
-                  semanticLabel: 'Transaction actions',
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: C.ink, width: 1.5)),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
+            const Heading('Transactions', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+            const SizedBox(height: 14),
+            _SearchField(text: searchText, onChanged: onSearchChanged, onClear: onClearSearch),
+            const SizedBox(height: 12),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -97,7 +91,7 @@ class TransactionsScreen extends StatelessWidget {
                   children: [
                     Text(g.dayLabel, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
                     const Spacer(),
-                    Text(Fmt.signed(g.total), style: const TextStyle(fontSize: 14, color: C.muted)),
+                    Text(Fmt.signed(g.total), style: TextStyle(fontSize: 14, color: C.muted)),
                   ],
                 ),
               ),
@@ -110,6 +104,53 @@ class TransactionsScreen extends StatelessWidget {
             const SizedBox(height: 24),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Search box: searches merchant, category, account, note and amount as you type.
+class _SearchField extends StatefulWidget {
+  final String text;
+  final ValueChanged<String>? onChanged;
+  final VoidCallback? onClear;
+  const _SearchField({required this.text, this.onChanged, this.onClear});
+
+  @override
+  State<_SearchField> createState() => _SearchFieldState();
+}
+
+class _SearchFieldState extends State<_SearchField> {
+  late final _controller = TextEditingController(text: widget.text);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _clear() {
+    _controller.clear();
+    widget.onClear?.call();
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _controller,
+      onChanged: (v) {
+        widget.onChanged?.call(v);
+        setState(() {}); // show / hide the clear button
+      },
+      textInputAction: TextInputAction.search,
+      decoration: paceInputDecoration(
+        hint: 'Search merchant, category, note or amount',
+        prefixIcon: Icon(Icons.search, color: C.ink),
+        suffix: _controller.text.isEmpty
+            ? null
+            : IconButton(icon: Icon(Icons.close, color: C.ink), tooltip: 'Clear search', onPressed: _clear),
+        fillColor: Colors.white,
       ),
     );
   }
@@ -160,7 +201,7 @@ class _TxnCard extends StatelessWidget {
               children: [
                 Text(t.title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 2),
-                Text(t.subtitle, style: const TextStyle(fontSize: 13, color: C.muted)),
+                Text(t.subtitle, style: TextStyle(fontSize: 13, color: C.muted)),
               ],
             ),
           ),

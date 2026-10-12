@@ -13,12 +13,11 @@ class TransactionDetailView extends StatelessWidget {
         builder: (context, c) => TransactionDetailScreen(
           transaction: c.bundle!.transaction,
           categories: c.bundle!.categories,
-          selectedCategoryId: c.selectedCategoryId,
-          onCategorySelected: c.selectCategory,
+          selectedCategoryIds: c.selectedCategoryIds,
+          onCategoryToggled: c.toggleCategory,
           onNewCategory: c.newCategory,
           onAddNote: c.addNote,
           onBack: c.back,
-          onMenu: c.openMenu,
         ),
       );
 }

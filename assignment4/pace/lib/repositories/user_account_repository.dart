@@ -11,7 +11,14 @@ abstract class UserAccountRepository {
   /// null when no account is linked to that Google user.
   Future<UserAccount?> fetchByGoogleId(String googleId);
   /// Stores a new account and returns it with its assigned id.
-  Future<UserAccount> create({String? email, String? displayName, String? googleId});
+  Future<UserAccount> create({
+    String? email,
+    String? displayName,
+    String? googleId,
+    String? passwordHash,
+    String? securityQuestion,
+    String? securityAnswerHash,
+  });
   /// Replaces the stored account with the same id.
   Future<void> save(UserAccount account);
   Future<void> delete(String id);
@@ -41,11 +48,26 @@ class InMemoryUserAccountRepository implements UserAccountRepository {
   Future<UserAccount?> fetchByGoogleId(String googleId) => _first((a) => a.googleId == googleId);
 
   @override
-  Future<UserAccount> create({String? email, String? displayName, String? googleId}) async {
+  Future<UserAccount> create({
+    String? email,
+    String? displayName,
+    String? googleId,
+    String? passwordHash,
+    String? securityQuestion,
+    String? securityAnswerHash,
+  }) async {
     while (_accounts.any((a) => a.id == 'u$_nextId')) {
       _nextId++;
     }
-    final account = UserAccount(id: 'u${_nextId++}', email: email?.trim(), displayName: displayName, googleId: googleId);
+    final account = UserAccount(
+      id: 'u${_nextId++}',
+      email: email?.trim(),
+      displayName: displayName,
+      googleId: googleId,
+      passwordHash: passwordHash,
+      securityQuestion: securityQuestion,
+      securityAnswerHash: securityAnswerHash,
+    );
     _accounts.add(account);
     return account;
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart' show BuildContext;
 import '../../models/navigation.dart' show DeepLinkTarget, FlowStep, TargetKind;
 import '../../models/transaction.dart' show FilterChoice, FilterKind;
-import '../../services/app_navigator.dart' show AppNavigator, ExternalLink;
+import '../../controllers/app_navigator.dart' show AppNavigator;
 import 'app_modals.dart' show AppModals;
 import 'app_pages.dart' show AppPages;
 import 'app_route.dart' show AppRoute;
@@ -87,8 +87,6 @@ class RouterAppNavigator implements AppNavigator {
   void openBudgetCategoriesSettings() => _push(AppRoute.budgetCategoriesSettings);
   @override
   void openStatementExport() => _push(AppRoute.statementExport);
-  @override
-  void openPasswordSecurity() => _push(AppRoute.passwordSecurity);
 
   /// "More tools" ids used by the dashboard; unknown ids open the generic tool route.
   @override
@@ -162,9 +160,11 @@ class RouterAppNavigator implements AppNavigator {
   @override
   Future<bool> openAddContribution(String id) => _modals.addContribution(_ctx, id);
   @override
-  Future<bool> openEditBudgetCategory(String id) => _modals.editBudgetCategory(_ctx, id);
+  void openEditBudgetCategory(String id) => _push(AppRoute.budgetEdit(id));
   @override
-  Future<bool> openAddBudgetCategory() => _modals.addBudgetCategory(_ctx);
+  void openAddBudgetCategory() => _push(AppRoute.budgetNew);
+  @override
+  Future<bool> confirmDeleteBudget(String categoryName) => _modals.confirmDeleteBudget(_ctx, categoryName);
   @override
   Future<bool> openAddExpectedIncome() => _modals.addExpectedIncome(_ctx);
   @override
@@ -176,7 +176,8 @@ class RouterAppNavigator implements AppNavigator {
   @override
   Future<bool> confirmDeleteAccount() => _modals.confirmDeleteAccount(_ctx);
   @override
-  void openExternal(ExternalLink link) => _modals.openExternal(_ctx, link);
+  Future<bool> confirmRemoveBankConnection(String institutionName) =>
+      _modals.confirmRemoveBankConnection(_ctx, institutionName);
   @override
   void openMenu(String screenId) => _modals.menu(_ctx, screenId);
 }

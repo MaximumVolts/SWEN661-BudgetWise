@@ -15,14 +15,39 @@ abstract class AuthService {
   Stream<bool> get signedInChanges;
 
   Future<FlowStep> signIn({required String email, required String password});
-  /// Starts a new account and returns the first step of sign-up (onboarding).
-  /// No credentials form is designed yet; add parameters here when one is.
-  Future<FlowStep> createAccount();
+  /// Questions offered at sign-up; one is asked before a password reset.
+  List<String> get securityQuestions;
+
+  /// Creates a Pace account with a password and security question, signs the user in, and
+  /// returns the first step of sign-up (onboarding). Throws [FieldValidationException] with
+  /// 'name' / 'email' / 'password' / 'confirmPassword' / 'securityQuestion' / 'securityAnswer'
+  /// messages when the input breaks a rule (including an email already in use).
+  Future<FlowStep> createAccount({
+    required String name,
+    required String email,
+    required String password,
+    required String confirmPassword,
+    required String securityQuestion,
+    required String securityAnswer,
+  });
+
+  /// Step 1 of a password reset: the security question for [email]. Throws
+  /// [FieldValidationException] ('email') when there's no account, or it can't be reset.
+  Future<String> securityQuestionFor(String email);
+
+  /// Step 2: checks the security answer, sets the new password, signs the user in and returns
+  /// where to go (home). Throws [FieldValidationException] with 'securityAnswer' / 'password' /
+  /// 'confirmPassword' messages, or AppException after too many wrong answers.
+  Future<FlowStep> resetPassword({
+    required String email,
+    required String securityAnswer,
+    required String newPassword,
+    required String confirmPassword,
+  });
   /// Signs in with Google, creating the Pace account the first time that Google user signs in.
   /// New account → onboarding; existing account → home. Returns null if the user cancelled.
   Future<FlowStep?> signInWithGoogle();
   Future<FlowStep> signInWithApple();
-  Future<void> sendPasswordReset(String email);
   Future<void> signOut();
   Future<void> deleteAccount();
 }

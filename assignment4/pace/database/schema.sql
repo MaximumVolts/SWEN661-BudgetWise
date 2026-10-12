@@ -1,8 +1,8 @@
 -- Pace prototype database schema (SQLite).
 --
--- Stores the app user's account and preferences. The bank_* tables are prepared for a
--- bank-linking provider (e.g. Plaid) but stay empty: the prototype is not connected to
--- real banks.
+-- Stores the app user's account and preferences. Bank linking uses Plaid's **Sandbox** only:
+-- bank_connections can only hold sandbox Items, created with one of Plaid's published test
+-- credentials (plaid_sandbox_test_credentials). The prototype is never connected to real banks.
 --
 -- Conventions:
 --   * dates/times are ISO-8601 UTC text, e.g. '2026-10-09T14:30:00Z'
@@ -10,21 +10,36 @@
 --   * money is INTEGER cents (never REAL) to avoid rounding errors
 --   * foreign keys require `PRAGMA foreign_keys = ON;` on every connection
 --
--- Build:  sqlite3 pace.db < schema.sql
+-- This file is the one and only schema: the complete, current one. Create a database with:
+--   sqlite3 new.db < schema.sql
+-- The app does the same on first launch, then keeps that database. To change the schema, edit
+-- this file and bump user_version below: on next launch the app rebuilds an older database from
+-- this file and copies its data back into the tables / columns that still exist (new columns get
+-- their DEFAULT, so give new NOT NULL columns one; renamed or removed ones lose their data).
+-- Statements must end with ';' (trigger bodies end with 'END;'); PRAGMA / BEGIN / COMMIT
+-- lines are for the sqlite3 CLI and are skipped by the app.
 
 PRAGMA foreign_keys = ON;
-PRAGMA user_version = 1;  -- bump when the schema changes
+PRAGMA user_version = 7;
 
 BEGIN;
 
 -- ── The app user ─────────────────────────────────────────────────────────────
 
+-- Pace accounts. Secrets are only ever stored as salted PBKDF2-SHA256 hashes
+-- ('pbkdf2-sha256$<iterations>$<salt>$<hash>'); password_hash is NULL for Google-only accounts.
 CREATE TABLE users (
-    id           INTEGER PRIMARY KEY AUTOINCREMENT,
-    email        TEXT    UNIQUE COLLATE NOCASE,
-    display_name TEXT,
-    created_at   TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+    id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+    email                TEXT    UNIQUE COLLATE NOCASE,
+    display_name         TEXT,
+    created_at           TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    password_hash        TEXT,
+    security_question    TEXT,                     -- asked before a password reset
+    security_answer_hash TEXT,                     -- hash of the normalised answer
+    google_id            TEXT                      -- Google's stable user id, if linked
 );
+
+CREATE UNIQUE INDEX idx_users_google_id ON users(google_id) WHERE google_id IS NOT NULL;
 
 -- One row per user. Columns match the toggles/pickers on the Settings screen.
 CREATE TABLE user_preferences (
@@ -32,7 +47,8 @@ CREATE TABLE user_preferences (
     theme                TEXT    NOT NULL DEFAULT 'light'
                                  CHECK (theme IN ('light', 'dark', 'system')),
     high_contrast        INTEGER NOT NULL DEFAULT 0 CHECK (high_contrast IN (0, 1)),
-    chart_patterns       INTEGER NOT NULL DEFAULT 1 CHECK (chart_patterns IN (0, 1)),
+    -- Colorblind mode: status shown with shapes / patterns too, and a colorblind-safe palette.
+    colorblind_mode      INTEGER NOT NULL DEFAULT 0 CHECK (colorblind_mode IN (0, 1)),
     show_chart_values    INTEGER NOT NULL DEFAULT 1 CHECK (show_chart_values IN (0, 1)),
     budget_alerts        INTEGER NOT NULL DEFAULT 1 CHECK (budget_alerts IN (0, 1)),
     bill_reminder_days   INTEGER NOT NULL DEFAULT 3 CHECK (bill_reminder_days >= 0),
@@ -65,22 +81,63 @@ BEGIN
     WHERE user_id = NEW.user_id;
 END;
 
--- ── Bank data (prepared for a linking provider; empty in the prototype) ──────
+-- ── Budgets ──────────────────────────────────────────────────────────────────
+
+-- A monthly spending limit for one category (Pace category ids, e.g. 'food'); at most one budget
+-- per category per user. The limit applies to every month; the spending measured against it is
+-- each month's own, from the linked bank's transactions.
+CREATE TABLE budgets (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id             INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    category_id         TEXT    NOT NULL,
+    monthly_limit_cents INTEGER NOT NULL CHECK (monthly_limit_cents > 0),
+    created_at          TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    updated_at          TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    UNIQUE (user_id, category_id)
+);
+
+CREATE INDEX idx_budgets_user ON budgets(user_id);
+
+-- ── Plaid Sandbox test credentials ───────────────────────────────────────────
+
+-- Plaid's *published* sandbox test users (https://plaid.com/docs/sandbox/test-credentials/).
+-- These are public, documentation-provided values that only work against sandbox.plaid.com;
+-- they are not secrets and give no access to any real bank. Real bank credentials must never
+-- be stored anywhere in Pace.
+CREATE TABLE plaid_sandbox_test_credentials (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    label       TEXT    NOT NULL UNIQUE,            -- short key used by the app, e.g. 'simple'
+    username    TEXT    NOT NULL,                   -- sent as options.override_username
+    password    TEXT    NOT NULL,                   -- sent as options.override_password
+    description TEXT    NOT NULL,
+    source_url  TEXT    NOT NULL DEFAULT 'https://plaid.com/docs/sandbox/test-credentials/',
+    UNIQUE (username, password)
+);
+
+-- Sandbox simple test credentials: "basic account access to most Plaid products".
+INSERT INTO plaid_sandbox_test_credentials (label, username, password, description) VALUES
+    ('simple', 'user_good', 'pass_good', 'Sandbox simple test credentials: basic account access to most Plaid products.');
+
+-- ── Bank data (Plaid Sandbox only) ───────────────────────────────────────────
 
 -- One login at one institution (a Plaid "Item"). The provider's access token is NOT stored
 -- here; credential_ref is the key it is kept under in the device's secure storage.
+-- environment is pinned to 'sandbox': the database refuses any non-sandbox connection.
 CREATE TABLE bank_connections (
-    id               INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id          INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    provider         TEXT    NOT NULL,              -- e.g. 'plaid'
-    provider_item_id TEXT    NOT NULL,
-    institution_id   TEXT,
-    institution_name TEXT    NOT NULL,
-    credential_ref   TEXT,
-    status           TEXT    NOT NULL DEFAULT 'active'
-                             CHECK (status IN ('active', 'expired', 'revoked')),
-    last_synced_at   TEXT,
-    created_at       TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    id                       INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id                  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    provider                 TEXT    NOT NULL CHECK (provider = 'plaid'),
+    environment              TEXT    NOT NULL DEFAULT 'sandbox' CHECK (environment = 'sandbox'),
+    provider_item_id         TEXT    NOT NULL,
+    institution_id           TEXT,                  -- e.g. 'ins_109508' (First Platypus Bank, sandbox)
+    institution_name         TEXT    NOT NULL,
+    -- Which published test user created the Item.
+    sandbox_test_credentials_id INTEGER NOT NULL REFERENCES plaid_sandbox_test_credentials(id),
+    credential_ref           TEXT,
+    status                   TEXT    NOT NULL DEFAULT 'active'
+                                     CHECK (status IN ('active', 'expired', 'revoked')),
+    last_synced_at           TEXT,
+    created_at               TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
     UNIQUE (provider, provider_item_id)
 );
 

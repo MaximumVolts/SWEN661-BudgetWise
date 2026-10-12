@@ -10,7 +10,7 @@ class SettingsData {
   final String themeLabel;
   final String billReminderLabel;
   final bool highContrast;
-  final bool chartPatterns;
+  final bool colorblindMode;
   final bool showChartValues;
   final bool budgetAlerts;
   final String footerLabel;
@@ -23,13 +23,13 @@ class SettingsData {
     this.themeLabel = 'Light',
     this.billReminderLabel = '',
     this.highContrast = false,
-    this.chartPatterns = true,
+    this.colorblindMode = false,
     this.showChartValues = true,
     this.budgetAlerts = true,
     this.footerLabel = '',
   });
 
-  SettingsData copyWith({bool? highContrast, bool? chartPatterns, bool? showChartValues, bool? budgetAlerts}) => SettingsData(
+  SettingsData copyWith({bool? highContrast, bool? colorblindMode, bool? showChartValues, bool? budgetAlerts}) => SettingsData(
         name: name,
         email: email,
         initials: initials,
@@ -38,7 +38,7 @@ class SettingsData {
         themeLabel: themeLabel,
         billReminderLabel: billReminderLabel,
         highContrast: highContrast ?? this.highContrast,
-        chartPatterns: chartPatterns ?? this.chartPatterns,
+        colorblindMode: colorblindMode ?? this.colorblindMode,
         showChartValues: showChartValues ?? this.showChartValues,
         budgetAlerts: budgetAlerts ?? this.budgetAlerts,
         footerLabel: footerLabel,

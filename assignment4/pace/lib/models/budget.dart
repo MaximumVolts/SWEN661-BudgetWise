@@ -3,13 +3,32 @@ library;
 
 import 'transaction.dart' show TransactionItem;
 
-enum BudgetStatus { onTrack, nearLimit, over }
+/// Where a budget stands; [label] is how it's named everywhere it's shown.
+enum BudgetStatus {
+  onTrack('On track'),
+  nearLimit('Near limit'),
+  over('Over budget');
 
-class BudgetCategory {
+  const BudgetStatus(this.label);
+  final String label;
+}
+
+/// Spent against a limit: what's left (negative when over) and how full the bar is (0–1).
+mixin BudgetProgress {
+  double get spent;
+  double get limit;
+  double get remaining => limit - spent;
+  bool get isOver => remaining < 0;
+  double get progress => limit <= 0 ? 0 : (spent / limit).clamp(0.0, 1.0).toDouble();
+}
+
+class BudgetCategory with BudgetProgress {
   final String id;
   final String name;
   final String iconKey;
+  @override
   final double spent;
+  @override
   final double limit;
   final BudgetStatus status;
   const BudgetCategory({
@@ -20,13 +39,13 @@ class BudgetCategory {
     required this.limit,
     required this.status,
   });
-  double get remaining => limit - spent;
-  double get progress => limit <= 0 ? 0 : (spent / limit).clamp(0.0, 1.0).toDouble();
 }
 
-class BudgetSummary {
+class BudgetSummary with BudgetProgress {
   final String periodLabel;
+  @override
   final double spent;
+  @override
   final double limit;
   final BudgetStatus status;
   /// Optional text like "Under budget · 77% used".
@@ -38,14 +57,14 @@ class BudgetSummary {
     required this.status,
     this.statusLabel,
   });
-  double get remaining => limit - spent;
-  double get progress => limit <= 0 ? 0 : (spent / limit).clamp(0.0, 1.0).toDouble();
 }
 
-class BudgetCategoryDetailData {
+class BudgetCategoryDetailData with BudgetProgress {
   final String name;
   final String periodLabel; // "Spent in October"
+  @override
   final double spent;
+  @override
   final double limit;
   final BudgetStatus status;
   final String? paceHeadline;
@@ -61,8 +80,6 @@ class BudgetCategoryDetailData {
     this.paceBody,
     this.recent = const [],
   });
-  double get remaining => limit - spent;
-  double get progress => limit <= 0 ? 0 : (spent / limit).clamp(0.0, 1.0).toDouble();
 }
 
 class BudgetPeriod {
@@ -77,4 +94,13 @@ class BudgetOverview {
   final BudgetSummary summary;
   final List<BudgetCategory> categories;
   const BudgetOverview({required this.summary, required this.categories});
+}
+
+/// A saved budget: the monthly limit for one spending category.
+class BudgetSetting {
+  final String categoryId;
+  final String name;
+  final String iconKey;
+  final double monthlyLimit;
+  const BudgetSetting({required this.categoryId, required this.name, required this.iconKey, required this.monthlyLimit});
 }

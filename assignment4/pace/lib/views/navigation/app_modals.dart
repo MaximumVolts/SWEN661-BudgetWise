@@ -2,7 +2,6 @@ import 'package:flutter/material.dart'
     show AlertDialog, BuildContext, EdgeInsets, Icon, Icons, ListTile, ListView, Navigator, Padding, SafeArea,
         ScaffoldMessenger, Semantics, SnackBar, Text, TextButton, showDialog, showModalBottomSheet;
 import '../../models/transaction.dart' show FilterChoice, FilterKind;
-import '../../services/app_navigator.dart' show ExternalLink;
 import '../theme.dart' show C, T;
 
 /// Dialogs, sheets and pickers that are not pages in the route stack.
@@ -18,14 +17,13 @@ abstract class AppModals {
   Future<bool> addGoal(BuildContext context);
   Future<bool> editGoal(BuildContext context, String goalId);
   Future<bool> addContribution(BuildContext context, String goalId);
-  Future<bool> editBudgetCategory(BuildContext context, String categoryId);
-  Future<bool> addBudgetCategory(BuildContext context);
   Future<bool> addExpectedIncome(BuildContext context);
   Future<bool> subscriptionMenu(BuildContext context, String subscriptionId);
   Future<bool> themePicker(BuildContext context);
   Future<bool> billReminderPicker(BuildContext context);
   Future<bool> confirmDeleteAccount(BuildContext context);
-  void openExternal(BuildContext context, ExternalLink link);
+  Future<bool> confirmRemoveBankConnection(BuildContext context, String institutionName);
+  Future<bool> confirmDeleteBudget(BuildContext context, String categoryName);
   void menu(BuildContext context, String screenId);
   /// Tells the user [what] isn't built yet (used instead of opening a placeholder page).
   void notImplemented(BuildContext context, String what);
@@ -101,6 +99,49 @@ class DefaultAppModals implements AppModals {
   }
 
   @override
+  Future<bool> confirmRemoveBankConnection(BuildContext context, String institutionName) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Remove $institutionName?'),
+        content: const Text(
+          'Pace will disconnect this Plaid test connection and delete its accounts from this phone. '
+          'You can connect the test bank again any time.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: C.red),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+    return ok ?? false;
+  }
+
+  @override
+  Future<bool> confirmDeleteBudget(BuildContext context, String categoryName) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Delete the $categoryName budget?'),
+        content: const Text('Its monthly limit will be removed. Your transactions aren’t affected.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: C.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    return ok ?? false;
+  }
+
+  @override
   Future<bool> newCategory(BuildContext c) => _todo(c, 'New category');
   @override
   Future<bool> addNote(BuildContext c, String id) => _todo(c, 'Add note');
@@ -113,10 +154,6 @@ class DefaultAppModals implements AppModals {
   @override
   Future<bool> addContribution(BuildContext c, String id) => _todo(c, 'Add contribution');
   @override
-  Future<bool> editBudgetCategory(BuildContext c, String id) => _todo(c, 'Edit budget category');
-  @override
-  Future<bool> addBudgetCategory(BuildContext c) => _todo(c, 'Add budget category');
-  @override
   Future<bool> addExpectedIncome(BuildContext c) => _todo(c, 'Add expected income');
   @override
   Future<bool> subscriptionMenu(BuildContext c, String id) => _todo(c, 'Subscription options');
@@ -124,8 +161,6 @@ class DefaultAppModals implements AppModals {
   Future<bool> themePicker(BuildContext c) => _todo(c, 'Theme picker');
   @override
   Future<bool> billReminderPicker(BuildContext c) => _todo(c, 'Bill reminder picker');
-  @override
-  void openExternal(BuildContext c, ExternalLink link) => _todo(c, 'Opening ${link.name}');
   @override
   void menu(BuildContext c, String screenId) => _todo(c, 'Menu "$screenId"');
   @override

@@ -54,7 +54,7 @@ class SpendingScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(data.periodTitle, style: const TextStyle(fontSize: 13, color: C.muted)),
+                  Text(data.periodTitle, style: TextStyle(fontSize: 13, color: C.muted)),
                   Row(
                     children: [
                       Text(Fmt.money(data.total), style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w500)),
@@ -123,7 +123,7 @@ class _CatRow extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: c.changePercent == null
-                      ? const Text('No change', style: TextStyle(fontSize: 13, color: C.muted))
+                      ? Text('No change', style: TextStyle(fontSize: 13, color: C.muted))
                       : _Change(c.changePercent!),
                 ),
               ),

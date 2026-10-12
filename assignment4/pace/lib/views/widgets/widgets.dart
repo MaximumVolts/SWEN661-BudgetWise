@@ -3,10 +3,10 @@ import 'package:flutter/material.dart'
     show Align, Alignment, AnimatedContainer, AnimatedScale, Border, BorderRadius, BorderSide, BoxConstraints,
         BoxDecoration, BoxShape, BuildContext, Canvas, Clip, Color, Colors, Column, ConstrainedBox, Container,
         CrossAxisAlignment, Curves, CustomPaint, CustomPainter, Divider, EdgeInsets, EdgeInsetsGeometry, ElevatedButton,
-        ExcludeSemantics, Expanded, FontWeight, GestureDetector, HitTestBehavior, Icon, IconData, Icons, Listener,
-        MainAxisAlignment, MainAxisSize, MediaQuery, MergeSemantics, MouseCursor, MouseRegion, Offset, OutlinedButton,
+        ExcludeSemantics, Expanded, Flexible, FontWeight, GestureDetector, HitTestBehavior, Icon, IconButton, IconData, Icons, InputDecoration, Listener,
+        MainAxisAlignment, MainAxisSize, MediaQuery, MergeSemantics, MouseCursor, MouseRegion, Offset, OutlineInputBorder, OutlinedButton,
         Padding, Paint, RRect, Radius, Rect, Row, SafeArea, Semantics, Size, SizedBox, Spacer, StadiumBorder, State,
-        StatefulWidget, StatelessWidget, SystemMouseCursors, Text, TextStyle, ValueChanged, VoidCallback, Widget;
+        StatefulWidget, StatelessWidget, SystemMouseCursors, Text, TextOverflow, TextStyle, ValueChanged, VoidCallback, Widget;
 import '../theme.dart' show C, T;
 
 /// White rounded card with a hairline border.
@@ -46,15 +46,16 @@ class PaceCard extends StatelessWidget {
 /// Circular (or rounded-square) icon badge.
 class IconBadge extends StatelessWidget {
   final IconData icon;
-  final Color bg;
-  final Color fg;
+  /// Defaults to the palette's chip / ink colors.
+  final Color? bg;
+  final Color? fg;
   final double size;
   final bool square;
   const IconBadge(
     this.icon, {
     super.key,
-    this.bg = C.chip,
-    this.fg = C.ink,
+    this.bg,
+    this.fg,
     this.size = 44,
     this.square = false,
   });
@@ -65,11 +66,11 @@ class IconBadge extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: bg,
+        color: bg ?? C.chip,
         shape: square ? BoxShape.rectangle : BoxShape.circle,
         borderRadius: square ? BorderRadius.circular(8) : null,
       ),
-      child: Icon(icon, size: size * 0.48, color: fg),
+      child: Icon(icon, size: size * 0.48, color: fg ?? C.ink),
     );
   }
 }
@@ -102,7 +103,10 @@ class PillButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (icon != null) ...[Icon(icon, size: 20, color: fg), const SizedBox(width: 8)],
-        Text(label, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: fg)),
+        Flexible(
+          child: Text(label,
+              overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: fg)),
+        ),
       ],
     );
     const shape = StadiumBorder();
@@ -128,7 +132,7 @@ class PillButton extends StatelessWidget {
                 onPressed: onPressed ?? () {},
                 style: OutlinedButton.styleFrom(
                   backgroundColor: background,
-                  side: const BorderSide(color: C.outline),
+                  side: BorderSide(color: C.outline),
                   shape: shape,
                   overlayColor: fg,
                 ),
@@ -144,8 +148,9 @@ class PaceChip extends StatelessWidget {
   final String label;
   final IconData? icon;
   final bool selected;
-  final Color selectedBg;
-  final Color selectedFg;
+  /// Default to the palette's chip / ink colors.
+  final Color? selectedBg;
+  final Color? selectedFg;
   final bool showCheck;
   final EdgeInsetsGeometry padding;
   const PaceChip(
@@ -153,23 +158,24 @@ class PaceChip extends StatelessWidget {
     super.key,
     this.icon,
     this.selected = false,
-    this.selectedBg = C.chip,
-    this.selectedFg = C.ink,
+    this.selectedBg,
+    this.selectedFg,
     this.showCheck = false,
     this.padding = const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
   });
 
   @override
   Widget build(BuildContext context) {
-    final fg = selected ? selectedFg : C.ink;
+    final fg = selected ? (selectedFg ?? C.ink) : C.ink;
+    final selectedFill = selectedBg ?? C.chip;
     return Semantics(
       selected: selected,
       child: Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: selected ? selectedBg : Colors.white,
+        color: selected ? selectedFill : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: selected ? selectedBg : C.outline),
+        border: Border.all(color: selected ? selectedFill : C.outline),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -288,7 +294,7 @@ class _SegTabsState extends State<SegTabs> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: _i == k ? C.chip : Colors.white,
-                    border: k == 0 ? null : const Border(left: BorderSide(color: C.outline)),
+                    border: k == 0 ? null : Border(left: BorderSide(color: C.outline)),
                   ),
                   child: Text(widget.labels[k],
                       style: TextStyle(fontSize: 15, fontWeight: _i == k ? FontWeight.w700 : FontWeight.w500)),
@@ -305,8 +311,9 @@ class _SegTabsState extends State<SegTabs> {
 /// Progress bar: solid, or diagonal-striped (used for near-limit / over-budget).
 class StripedBar extends StatelessWidget {
   final double value;
-  final Color color;
-  final Color track;
+  /// Default to the palette's ink / chip colors.
+  final Color? color;
+  final Color? track;
   final bool striped;
   final double height;
   /// Describes what the bar measures (e.g. "Food budget used"). If null the bar is treated as
@@ -315,8 +322,8 @@ class StripedBar extends StatelessWidget {
   const StripedBar({
     super.key,
     required this.value,
-    this.color = C.ink,
-    this.track = C.chip,
+    this.color,
+    this.track,
     this.striped = false,
     this.height = 8,
     this.semanticLabel,
@@ -327,7 +334,7 @@ class StripedBar extends StatelessWidget {
     final bar = SizedBox(
       height: height,
       width: double.infinity,
-      child: CustomPaint(painter: _BarPainter(value, color, track, striped)),
+      child: CustomPaint(painter: _BarPainter(value, color ?? C.ink, track ?? C.chip, striped)),
     );
     if (semanticLabel == null) return ExcludeSemantics(child: bar);
     return Semantics(label: semanticLabel, value: '${(value.clamp(0, 1) * 100).round()} percent', child: bar);
@@ -397,7 +404,7 @@ class PaceNavBar extends StatelessWidget {
       explicitChildNodes: true,
       label: 'Main navigation',
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: C.navBar,
           border: Border(top: BorderSide(color: C.line)),
         ),
@@ -453,7 +460,7 @@ class HairLine extends StatelessWidget {
   const HairLine({super.key, this.indent = 0});
   @override
   Widget build(BuildContext context) =>
-      Padding(padding: EdgeInsets.only(left: indent), child: const Divider(height: 1, thickness: 1, color: C.line));
+      Padding(padding: EdgeInsets.only(left: indent), child: Divider(height: 1, thickness: 1, color: C.line));
 }
 
 /// Generic list row: leading badge, title + subtitle, trailing text/widget.
@@ -485,7 +492,7 @@ class ListRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: titleStyle ?? const TextStyle(fontSize: 16.5, color: C.ink)),
+                Text(title, style: titleStyle ?? TextStyle(fontSize: 16.5, color: C.ink)),
                 if (subtitle != null) ...[const SizedBox(height: 2), subtitle!],
               ],
             ),
@@ -510,7 +517,8 @@ class PressFeedback extends StatefulWidget {
   final VoidCallback? onTap;
   final bool enabled;
   final BorderRadius borderRadius;
-  final Color overlayColor;
+  /// Defaults to the palette's ink color.
+  final Color? overlayColor;
   final bool showOverlay;
   final double pressedScale;
   const PressFeedback({
@@ -519,7 +527,7 @@ class PressFeedback extends StatefulWidget {
     this.onTap,
     bool? enabled,
     this.borderRadius = const BorderRadius.all(Radius.circular(8)),
-    this.overlayColor = C.ink,
+    this.overlayColor,
     this.showOverlay = true,
     this.pressedScale = 0.97,
   }) : enabled = enabled ?? onTap != null;
@@ -558,7 +566,7 @@ class _PressFeedbackState extends State<PressFeedback> {
       content = AnimatedContainer(
         duration: _duration,
         foregroundDecoration: BoxDecoration(
-          color: widget.overlayColor.withValues(alpha: alpha),
+          color: (widget.overlayColor ?? C.ink).withValues(alpha: alpha),
           borderRadius: widget.borderRadius,
         ),
         child: content,
@@ -703,4 +711,52 @@ class AppIcons {
   };
 
   static IconData of(String key) => _map[key] ?? Icons.category_outlined;
+}
+
+/// The app's outlined text-field look: label (or hint), inline error and helper text, and optional
+/// leading / trailing widgets. Every form uses it so fields look the same everywhere.
+InputDecoration paceInputDecoration({
+  String? label,
+  String? hint,
+  String? error,
+  String? helper,
+  String? prefixText,
+  Widget? prefixIcon,
+  Widget? suffix,
+  Color? fillColor,
+}) {
+  OutlineInputBorder outline(Color color, [double width = 1]) =>
+      OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: BorderSide(color: color, width: width));
+  return InputDecoration(
+    labelText: label,
+    hintText: hint,
+    hintStyle: hint == null ? null : TextStyle(color: C.muted, fontSize: 15),
+    errorText: error,
+    errorMaxLines: 2,
+    helperText: helper,
+    helperMaxLines: 2,
+    prefixText: prefixText,
+    prefixIcon: prefixIcon,
+    suffixIcon: suffix,
+    filled: fillColor != null,
+    fillColor: fillColor,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+    border: outline(C.outline),
+    enabledBorder: outline(C.outline),
+    focusedBorder: outline(C.ink, 2),
+  );
+}
+
+/// The show / hide button for a password field (use as its decoration's suffix).
+class PasswordVisibilityToggle extends StatelessWidget {
+  final bool obscured;
+  final VoidCallback onToggle;
+  const PasswordVisibilityToggle({super.key, required this.obscured, required this.onToggle});
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+        tooltip: obscured ? 'Show password' : 'Hide password',
+        icon: Icon(obscured ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+        onPressed: onToggle,
+      );
 }

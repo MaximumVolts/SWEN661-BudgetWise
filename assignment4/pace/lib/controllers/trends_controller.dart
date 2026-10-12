@@ -1,5 +1,5 @@
 import '../models/trend.dart' show TrendItem, TrendsData;
-import '../services/app_navigator.dart' show AppNavigator;
+import 'app_navigator.dart' show AppNavigator;
 import '../services/trend_service.dart' show TrendService;
 import 'base_controller.dart' show ScreenController;
 

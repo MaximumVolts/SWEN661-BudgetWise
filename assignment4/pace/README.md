@@ -5,13 +5,21 @@ lib/
   main.dart     Entry point: picks the AppServices and starts the app.
   models/       Pure-Dart data classes (no Flutter), one file per feature (no barrel file:
                 import the feature file and `show` the classes you use). Icons are string keys (`iconKey`).
-  repositories/ Data access behind services.
-  services/     Abstract interfaces: data, auth, Plaid… plus AppNavigator (navigation contract).
+    app_exception.dart    Errors every layer can throw / show (AppException, FieldValidationException).
+    money.dart            Money text, shared by services' labels and views' Fmt.
+  repositories/ Data access behind services: an interface + in-memory version per store, SQLite
+                versions (extend SqliteRepository), and the external sources (Plaid sandbox API,
+                Google sign-in, device storage).
+  services/     Business logic: abstract interfaces + implementations. Bank-data services extend
+                BankDataService / AnnotatedBankDataService and depend on each other only through
+                interfaces.
     app_services.dart     The service implementations the app runs with.
-    app_exception.dart    Errors services throw for controllers to show.
     validators.dart / date_labels.dart   Business-rule and label helpers.
-    demo/                 DEV ONLY in-memory services.
-  controllers/  ChangeNotifier state + logic. Talk to services; never import views.
+    demo/                 Composition of the services the app runs with (demoServices()).
+  controllers/  ChangeNotifier screen state. Talk to services; never import views or repositories.
+    base_controller.dart  BaseController / ScreenController / FormController (shared load, refresh,
+                          action, stream and form-submission handling).
+    app_navigator.dart    The navigation contract controllers call (views implement it).
     app_dependencies.dart Builds each controller from the services + navigator.
   views/
     *_view.dart       Controller-bound view (loading / error / retry via ControllerScope).
@@ -31,7 +39,7 @@ lib/
 | Rules & derived figures (budget status thresholds, projections, "current" period, unread rules) | Service – return finished models |
 | Multi-step operations (reconnect + resync, sync, link + initial import, mark-read + resolve target) | Service – one method per use case |
 | "What next?" decisions (`FlowStep` after sign-in/onboarding/linking, `DeepLinkTarget` for notifications) | Service returns the decision; controller passes it to `AppNavigator` |
-| Persistence, API, Plaid, caching, auth tokens | Service implementations |
+| Persistence, API, Plaid, caching, auth tokens | Repositories (services call them) |
 | Loading/error status, selected tab/filter, submitting flags, optimistic UI + rollback | Controller |
 | Calling `navigator.openX()` | Controller (never decides *what*, only *when*) |
 | Formatting for display, icons, layout, semantics | View / `views/format.dart` |
@@ -67,6 +75,11 @@ Behaviours
 - Loading spinner is labelled; errors render as text + "Try again"; action failures use a snackbar.
 - Password visibility toggle has a tooltip; text fields use `labelText`/`errorText`.
 
+## Display preferences (Settings → Accessibility & display)
+Saved per user in the `user_preferences` table; signed out, the defaults apply. `DisplayController` follows `SettingsService.preferenceChanges` and `PaceApp` applies them app-wide, immediately.
+- **High contrast**: switches `C` (via `C.use`) to `Palette.highContrast` (black text on white, darker secondary text, status colors, outlines, dividers and chart lines). Colors are read from `C` when widgets build, so `PaceApp` rebuilds every screen on a switch, keeping their state.
+- **Colorblind mode** (off by default; `user_preferences.colorblind_mode`): nothing depends on telling colors apart. The palette becomes colorblind-safe (`Palette.colorblindSafe()`: the olive-vs-red status pair, which red-green color blindness confuses, becomes blue vs orange; also applied on top of high contrast), and status gets shapes and patterns too: budget statuses on Home use distinct shapes (`BudgetStatusMark`: ✓ on track, ⚠ near limit, ⓧ over) and striped bars when near / over, the selected bar in bar charts is hatched, and the previous-period line (and its legend key) is dotted. Off, the app keeps its standard design. Widgets read it with `PaceDisplay.colorblindOf(context)`. On Settings, a live preview under the switch (`ColorblindPreview`) shows the budget statuses in the current mode, and toggling it shows a confirmation message (`BaseController.showNotice`).
+
 ## Navigation map (screens are linked)
 Every arrow is a controller calling `AppNavigator`; routes are in `app_route.dart`.
 
@@ -74,17 +87,18 @@ Every arrow is a controller calling `AppNavigator`; routes are in `app_route.dar
 |---|---|
 | Sign in | success → `FlowStep` from the service (onboarding → connect bank → home); Forgot password / Create account → placeholders |
 | Onboarding | Continue → Connect bank (pushed, Back works) |
-| Connect bank | Connect / Not now → next `FlowStep` (home) |
+| Connect bank | Connect → next `FlowStep` (home); linking is required after creating an account (no skip) |
 | **Dashboard** | gear → Settings · bell → Notifications · review banner / See more → Transactions tab · account row → Account detail* · Add account → Connect bank · See budget → Budgets tab · budget row → Budget category · See all bills → Bills tab · bill row → Bill detail* · See all trends → Trends · trend button → Trend detail* · tools → Recurring / Savings goals / Cash flow |
-| Transactions | row → Transaction detail · filters → picker sheet |
+| Transactions | search (merchant, category, account, note, amount; as you type) · row → Transaction detail · filters → picker sheet |
 | Transaction detail | Back · category chips (saved) · New category / Add a note → sheets |
-| Budgets | category → Budget category · Add category → sheet |
-| Budget category | Back · Edit → sheet · transaction → Transaction detail |
+| Budgets | month tabs (limits apply to every month; spending is that month's) · category → Budget category · New budget → budget form · ⋮ → Manage budgets |
+| Budget category | Back · Edit → budget form · transaction → Transaction detail |
+| Manage budgets | edit → budget form · delete → confirm · New budget → budget form |
 | Spending | category → Spending category* · bars highlight |
 | Bills (Upcoming ⇄ Recurring) | tab switch swaps pages · row → Bill detail* · + → sheet · ⋮ → subscription menu |
 | Savings goals / Cash flow / Trends | Back · actions open sheets / detail* |
 | Notifications | tap / "View bill" → closes, then opens the service-provided target (bill, budget category, bills…) · Mark as paid → service |
-| Settings | Connected accounts → Accounts · Profile, Statement export, Security, Budget categories → pages* · Terms/Privacy → external · Sign out → Sign in · Delete → confirm → Sign in |
+| Settings | Connected accounts → Accounts · Profile, Statement export → pages* · Budget categories → Manage budgets · Sign out → Sign in · Delete → confirm → Sign in |
 | Accounts | Link another account → Connect bank · row → Account detail* |
 | Bottom nav (any screen with one) | Home / Transactions / Spending / Budgets / Bills |
 
@@ -93,31 +107,9 @@ Every arrow is a controller calling `AppNavigator`; routes are in `app_route.dar
 Auth: the default `AppRouter.sessionGuard` keeps signed-out users on public routes and skips sign-in when already signed in; it re-runs when `AuthService.signedInChanges` emits.
 
 ## Running it
-`lib/main.dart` currently starts with `demoServices()` (`lib/services/demo/`, in-memory sample data) so you can click through the whole graph: sign in → home → every tab and detail, or create account / first-time Google sign-in → onboarding → connect bank → home. Replace it with your real `AppServices(...)` and delete `lib/services/demo/`.
+`lib/main.dart` currently starts with `demoServices()` (`lib/services/demo/`, in-memory sample data) so you can click through the whole graph: sign in → home → every tab and detail, or create account → onboarding → connect bank → home. Replace it with your real `AppServices(...)` and delete `lib/services/demo/`.
 
 `flutter test` runs `test/navigation_test.dart` (route parsing, deep links, tab/stack behaviour, guard redirects, target/flow mapping).
-
-Run with the Google client IDs: `flutter run --dart-define-from-file=config/google_sign_in.json` (the VS Code launch config in `.vscode/launch.json` already passes it).
-
-## Google Sign-In setup
-"Continue with Google" uses the official `google_sign_in` plugin (Android and iOS). The first time a Google user signs in, `RepositoryAuthService` creates their Pace account (→ onboarding); after that they go straight home. If a Pace account already uses the same email, Google is linked to it.
-
-| Layer | File |
-|---|---|
-| Models | `models/google_account.dart` (what Google returns), `models/user_account.dart` (the Pace account) |
-| Repository | `repositories/user_account_repository.dart` (`InMemoryUserAccountRepository` until real storage exists) |
-| Services | `services/google_account_service.dart` (interface), `services/google_sign_in_account_service.dart` (plugin), `services/repository_auth_service.dart` (account rules) |
-| Controller | `SignInController.signInWithGoogle` → `navigator.openFlowStep(...)` |
-
-Without client IDs the button shows "Google sign-in isn't set up for this build yet." To enable it, in [Google Cloud Console](https://console.cloud.google.com/apis/credentials) (one project, OAuth consent screen configured), create three OAuth client IDs:
-
-1. **Web application** – no settings needed. Put its ID in `config/google_sign_in.json` as `GOOGLE_SERVER_CLIENT_ID` (Android requires it).
-2. **Android** – package name `com.example.pace` (`android/app/build.gradle.kts`) and the SHA-1 of your signing key (`cd android && ./gradlew signingReport`; use the debug key for development, and add the release key's SHA-1 too before releasing).
-3. **iOS** – bundle ID `com.example.pace`. Put its ID in `config/google_sign_in.json` as `GOOGLE_IOS_CLIENT_ID`, and its *reversed* form (`com.googleusercontent.apps.<id-prefix>`) in `ios/Flutter/GoogleSignIn.xcconfig` as `GOOGLE_REVERSED_CLIENT_ID` (used as the URL scheme in `ios/Runner/Info.plist`).
-
-`com.example.*` IDs work for development, but change the package / bundle ID before publishing (and update the OAuth clients to match).
-
-Prototype limits: accounts live in memory (lost on restart), and there is no backend verifying Google's ID token (`GoogleAccount.idToken`); a real backend must verify it before trusting the account.
 
 ## What you implement
 1. Services in `lib/services/` (REST/Plaid/Firebase/fakes).

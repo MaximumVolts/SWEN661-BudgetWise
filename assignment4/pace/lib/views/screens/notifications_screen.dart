@@ -43,7 +43,7 @@ class NotificationsScreen extends StatelessWidget {
             Expanded(
               child: Container(
                 width: double.infinity,
-                decoration: const BoxDecoration(color: C.bg, borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+                decoration: BoxDecoration(color: C.bg, borderRadius: const BorderRadius.vertical(top: Radius.circular(28))),
                 child: Stack(
                   children: [
                     Column(
@@ -63,7 +63,7 @@ class NotificationsScreen extends StatelessWidget {
                             children: [
                               const Heading('Notifications', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
                               const Spacer(),
-                              Tap(onTap: onMarkAllRead, child: const Text('Mark all read', style: T.link)),
+                              Tap(onTap: onMarkAllRead, child: Text('Mark all read', style: T.link)),
                               const SizedBox(width: 16),
                               Tap(onTap: onClose, semanticLabel: 'Close notifications', child: const Icon(Icons.cancel_outlined, size: 26)),
                             ],
@@ -119,7 +119,7 @@ class NotificationsScreen extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Row(children: [
-                                const Icon(Icons.sync, color: C.lime, size: 22),
+                                Icon(Icons.sync, color: C.lime, size: 22),
                                 const SizedBox(width: 12),
                                 Text(data.sync!.label, style: const TextStyle(color: Colors.white, fontSize: 15)),
                               ]),
@@ -160,10 +160,10 @@ class NotificationsScreen extends StatelessWidget {
               children: [
                 Row(children: [
                   if (n.isNew) ...[
-                    Container(width: 8, height: 8, decoration: const BoxDecoration(color: C.ink, shape: BoxShape.circle)),
+                    Container(width: 8, height: 8, decoration: BoxDecoration(color: C.ink, shape: BoxShape.circle)),
                     const SizedBox(width: 6),
                   ],
-                  Flexible(child: Text('${n.isNew ? 'New · ' : ''}${n.metaLabel}', style: const TextStyle(fontSize: 12, color: C.muted))),
+                  Flexible(child: Text('${n.isNew ? 'New · ' : ''}${n.metaLabel}', style: TextStyle(fontSize: 12, color: C.muted))),
                 ]),
                 const SizedBox(height: 4),
                 Text(n.title,
@@ -173,7 +173,7 @@ class NotificationsScreen extends StatelessWidget {
                       decoration: underline ? TextDecoration.underline : null,
                     )),
                 const SizedBox(height: 2),
-                Text(n.body, style: const TextStyle(fontSize: 14, color: C.muted)),
+                Text(n.body, style: TextStyle(fontSize: 14, color: C.muted)),
                 if (hasActions) ...[
                   const SizedBox(height: 12),
                   Row(children: [
@@ -200,7 +200,7 @@ class NotificationsScreen extends StatelessWidget {
                           onPressed: onSecondaryAction == null ? () {} : () => onSecondaryAction!(n),
                           style: OutlinedButton.styleFrom(
                               foregroundColor: C.ink,
-                              side: const BorderSide(color: C.outline),
+                              side: BorderSide(color: C.outline),
                               shape: const StadiumBorder(),
                               padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12)),
                           child: Text(n.secondaryActionLabel!, style: const TextStyle(fontWeight: FontWeight.w600)),

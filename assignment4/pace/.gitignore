@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Machine-local settings and secrets (e.g. Plaid sandbox keys in android/local.properties). Never commit.
+local.properties

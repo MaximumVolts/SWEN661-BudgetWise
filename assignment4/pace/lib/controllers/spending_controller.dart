@@ -1,5 +1,5 @@
 import '../models/spending.dart' show SpendingCategory, SpendingData;
-import '../services/app_navigator.dart' show AppNavigator;
+import 'app_navigator.dart' show AppNavigator;
 import '../services/spending_service.dart' show SpendingService;
 import 'base_controller.dart' show ScreenController;
 

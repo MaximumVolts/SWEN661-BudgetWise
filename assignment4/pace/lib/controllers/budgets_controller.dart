@@ -1,5 +1,5 @@
 import '../models/budget.dart' show BudgetCategory, BudgetOverview, BudgetPeriod;
-import '../services/app_navigator.dart' show AppNavigator;
+import 'app_navigator.dart' show AppNavigator;
 import '../services/budget_service.dart' show BudgetService;
 import 'base_controller.dart' show ScreenController;
 
@@ -7,7 +7,11 @@ class BudgetsController extends ScreenController {
   final BudgetService _service;
   BudgetsController({required BudgetService service, required AppNavigator navigator})
       : _service = service,
-        super(navigator);
+        super(navigator) {
+    // Budgets created, edited or deleted elsewhere (form, manager) show up here.
+    refreshOn(_service.changes);
+  }
+
 
   List<BudgetPeriod> periods = const [];
   int selectedPeriod = 0;
@@ -36,9 +40,8 @@ class BudgetsController extends ScreenController {
 
   void openCategory(BudgetCategory c) => navigator.openBudgetCategory(categoryId: c.id, periodId: selectedPeriodId);
 
-  Future<void> addCategory() async {
-    if (await navigator.openAddBudgetCategory()) await refresh();
-  }
+  void addCategory() => navigator.openAddBudgetCategory();
 
-  void openMenu() => navigator.openMenu('budgets');
+  /// ⋮ opens the budgets manager (create, edit, delete).
+  void openMenu() => navigator.openBudgetCategoriesSettings();
 }

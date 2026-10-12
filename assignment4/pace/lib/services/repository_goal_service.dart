@@ -1,4 +1,4 @@
-import 'app_exception.dart' show AppException;
+import '../models/app_exception.dart' show AppException;
 import 'date_labels.dart' show DateLabels;
 import '../models/goal.dart' show GoalContribution, SavingsGoalsData;
 import '../repositories/goal_repository.dart' show GoalRepository;

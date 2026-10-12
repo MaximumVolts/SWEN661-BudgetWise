@@ -14,7 +14,6 @@ class ConnectBankView extends StatelessWidget {
         builder: (context, c) => ConnectBankScreen(
           isLoading: c.isConnecting,
           onConnect: c.connect,
-          onNotNow: c.notNow,
           onBack: c.back,
         ),
       );
