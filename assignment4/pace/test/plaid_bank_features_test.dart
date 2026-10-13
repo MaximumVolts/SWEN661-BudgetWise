@@ -176,6 +176,39 @@ void main() {
       await sub.cancel();
     });
 
+    test('right after linking, each stage is announced as it arrives (Home\'s chart fills in first)', () async {
+      plaid.transactionsReady = false;
+      plaid.historyReady = false;
+      final home = PlaidDashboardService(data, notes,
+          budgets: budgetService(now),
+          bills: PlaidBillService(data, notes, now: now),
+          trends: PlaidTrendService(data, notes, now: now),
+          cashFlow: PlaidCashFlowService(data, notes, now: now),
+          now: now);
+      var updates = 0;
+      final sub = data.updates.listen((_) => updates++);
+
+      // Home opens before Plaid has any transactions: the chart is empty.
+      expect((await home.load()).spend.amount, 0);
+      await Future<void>.delayed(const Duration(milliseconds: 70));
+      expect(updates, 0); // nothing new yet: no reload
+
+      // Stage 1: the recent transactions. Announced now, not when the full history is done.
+      plaid.transactionsReady = true;
+      await Future<void>.delayed(const Duration(milliseconds: 70));
+      expect(updates, 1);
+      expect((await home.load()).spend.amount, greaterThan(0)); // this month's spending is on the chart
+
+      // Stage 2: the full history. Announced again, then it stops checking.
+      plaid.historyReady = true;
+      await Future<void>.delayed(const Duration(milliseconds: 70));
+      expect(updates, 2);
+      final syncs = plaid.calls('/transactions/sync');
+      await Future<void>.delayed(const Duration(milliseconds: 70));
+      expect(plaid.calls('/transactions/sync'), syncs);
+      await sub.cancel();
+    });
+
     test('while Plaid prepares data it re-checks, then announces the update and stops', () async {
       plaid.transactionsReady = false;
       var updates = 0;

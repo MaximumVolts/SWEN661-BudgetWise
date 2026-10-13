@@ -19,10 +19,11 @@ abstract class BankDataRepository {
 /// [BankDataRepository] that reads everything live from Plaid (**sandbox only**: the [PlaidApi]
 /// implementation is SandboxPlaidApi) using the access tokens of the user's linked Items.
 ///
-/// Right after a bank is linked, Plaid needs a few seconds to prepare transactions (recent ones
-/// first, then the full history) and recurring streams. Such an incomplete snapshot is never cached as fresh: while it's incomplete this
-/// re-checks Plaid every [retryEvery] (up to [maxRetries] times) and emits on [updates] once the
-/// data has arrived.
+/// Right after a bank is linked, Plaid prepares the data in stages: recent transactions first (about
+/// a month), then the full history, then recurring streams. An incomplete snapshot is never cached
+/// as fresh: while it's incomplete this re-checks Plaid every [retryEvery] (up to [maxRetries]
+/// times), and emits on [updates] each time a fetch brings different data (each stage as it
+/// arrives), so screens such as Home's spending chart fill in without waiting for the last stage.
 class PlaidBankDataRepository implements BankDataRepository {
   final PlaidApi _plaid;
   final LinkedBankRepository _banks;
@@ -59,6 +60,8 @@ class PlaidBankDataRepository implements BankDataRepository {
   DateTime? _cachedAt;
   /// Whether the cached snapshot had everything (full transaction history and recurring streams).
   bool _cachedComplete = false;
+  /// What the last fetch for [_cacheKey] returned, to tell when new data has arrived.
+  String? _lastShape;
 
   Timer? _retry;
   int _retries = 0;
@@ -78,6 +81,7 @@ class PlaidBankDataRepository implements BankDataRepository {
     if (key != _cacheKey) {
       _retry?.cancel();
       _retries = 0;
+      _lastShape = null;
     }
 
     _cacheKey = key;
@@ -89,6 +93,7 @@ class PlaidBankDataRepository implements BankDataRepository {
       if (identical(_cached, pending)) {
         _cachedAt = _now();
         _cachedComplete = fetched.complete;
+        _announceIfChanged(fetched);
         _scheduleRetry(key, fetched.complete);
       }
       return fetched.snapshot;
@@ -102,11 +107,27 @@ class PlaidBankDataRepository implements BankDataRepository {
     }
   }
 
-  /// While Plaid is still preparing data, fetch again shortly; announce when it has arrived.
+  /// Tells screens to reload when this fetch brought different data than the previous one for the
+  /// same user and banks (a new stage from Plaid). The first fetch isn't announced: whoever asked
+  /// for it gets the data directly.
+  void _announceIfChanged(_Fetched fetched) {
+    final s = fetched.snapshot;
+    final shape = [
+      s.accounts.length,
+      s.transactions.length,
+      s.recurring.length,
+      s.transactionsReady,
+      fetched.complete,
+    ].join('|');
+    final changed = _lastShape != null && shape != _lastShape;
+    _lastShape = shape;
+    if (changed) _updates.add(null);
+  }
+
+  /// While Plaid is still preparing data, fetch again shortly.
   void _scheduleRetry(String key, bool complete) {
     _retry?.cancel();
     if (complete) {
-      if (_retries > 0) _updates.add(null); // data arrived since the screens last loaded
       _retries = 0;
       return;
     }

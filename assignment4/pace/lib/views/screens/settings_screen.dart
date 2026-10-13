@@ -82,7 +82,7 @@ class SettingsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(data.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
-                          Text(data.email, style: TextStyle(fontSize: 13, color: C.muted)),
+                          Text(data.username, style: TextStyle(fontSize: 13, color: C.muted)),
                         ],
                       ),
                     ),

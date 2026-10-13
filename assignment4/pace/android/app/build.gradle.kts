@@ -1,20 +1,8 @@
-import java.util.Properties
-
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
-
-// Machine-local secrets from android/local.properties (git-ignored), e.g. Plaid sandbox keys.
-val localProperties = Properties().apply {
-    val file = rootProject.file("local.properties")
-    if (file.exists()) file.inputStream().use { load(it) }
-}
-
-/** A local.properties value as a Java string literal for buildConfigField ("" when missing). */
-fun localString(key: String): String =
-    "\"" + (localProperties.getProperty(key) ?: "").replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 
 android {
     namespace = "com.example.pace"
@@ -39,14 +27,6 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-
-        // Plaid SANDBOX API keys, read by MainActivity and handed to Dart (PlaidConfig).
-        buildConfigField("String", "PLAID_CLIENT_ID", localString("plaid.clientId"))
-        buildConfigField("String", "PLAID_SANDBOX_SECRET", localString("plaid.sandboxSecret"))
-    }
-
-    buildFeatures {
-        buildConfig = true
     }
 
     buildTypes {

@@ -8,14 +8,17 @@ import '../../models/linked_bank.dart' show BankConnection;
 import '../../models/profile.dart' show ProfileData;
 import '../theme.dart' show C, T;
 import '../widgets/sandbox_notices.dart' show ConnectingToTestEndpoint, TestModeBanner;
-import '../widgets/widgets.dart' show Heading, IconBadge, PaceCard, paceInputDecoration, PaceTopBar, PillButton;
+import '../widgets/widgets.dart' show Heading, IconBadge, PaceCard, paceInputDecoration, PaceTopBar, PasswordVisibilityToggle, PillButton;
 
-typedef ProfileSave = void Function(String name);
+/// Called with the name and the Plaid sandbox keys (an empty secret keeps the stored one).
+typedef ProfileSave = void Function(String name, String plaidClientId, String plaidSecret);
 
-/// 16 - Profile: edit the signed-in user's name; the email is shown read-only.
+/// 16 - Profile: edit the signed-in user's name and Plaid sandbox keys; the username is shown read-only.
 class ProfileScreen extends StatefulWidget {
   final ProfileData data;
   final String? nameError;
+  final String? plaidClientIdError;
+  final String? plaidSecretError;
   final bool isSaving;
   final bool justSaved;
   final ProfileSave? onSave;
@@ -33,6 +36,8 @@ class ProfileScreen extends StatefulWidget {
     super.key,
     required this.data,
     this.nameError,
+    this.plaidClientIdError,
+    this.plaidSecretError,
     this.isSaving = false,
     this.justSaved = false,
     this.onSave,
@@ -51,16 +56,21 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late final _name = TextEditingController(text: widget.data.name);
-  late final _email = TextEditingController(text: widget.data.email);
+  late final _username = TextEditingController(text: widget.data.username);
+  late final _plaidClientId = TextEditingController(text: widget.data.plaidClientId);
+  final _plaidSecret = TextEditingController();
+  bool _obscureSecret = true;
 
   @override
   void dispose() {
     _name.dispose();
-    _email.dispose();
+    _username.dispose();
+    _plaidClientId.dispose();
+    _plaidSecret.dispose();
     super.dispose();
   }
 
-  void _save() => widget.onSave?.call(_name.text);
+  void _save() => widget.onSave?.call(_name.text, _plaidClientId.text, _plaidSecret.text);
 
   @override
   Widget build(BuildContext context) {
@@ -104,13 +114,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: field,
                     ),
                     const SizedBox(height: 18),
-                    // Read-only: the email is the account's sign-in and can't be changed here.
+                    // Read-only: the username is the account's sign-in and can't be changed here.
                     TextField(
-                      controller: _email,
+                      controller: _username,
                       enabled: false,
                       readOnly: true,
-                      decoration: paceInputDecoration(label: 'Email').copyWith(
-                        helperText: 'Your email is how you sign in, so it can’t be changed.',
+                      decoration: paceInputDecoration(label: 'Username').copyWith(
+                        helperText: 'Your username is how you sign in, so it can’t be changed.',
                         helperMaxLines: 2,
                         suffixIcon: const Icon(Icons.lock_outline, size: 20),
                         disabledBorder: OutlineInputBorder(
@@ -138,6 +148,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ],
                       ),
+                    ),
+                    const SizedBox(height: 28),
+                    const Text('Plaid sandbox keys', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 4),
+                    Text(
+                      data.hasPlaidKeys
+                          ? "Used to connect Plaid's test bank. Leave the secret blank to keep the one you saved."
+                          : 'Add your free sandbox keys from dashboard.plaid.com → Developers → Keys to connect a bank.',
+                      style: T.body,
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: _plaidClientId,
+                      textInputAction: TextInputAction.next,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      onChanged: (_) => widget.onEdited?.call(),
+                      decoration: paceInputDecoration(label: 'Client ID', error: widget.plaidClientIdError),
+                      style: field,
+                    ),
+                    const SizedBox(height: 18),
+                    TextField(
+                      controller: _plaidSecret,
+                      obscureText: _obscureSecret,
+                      textInputAction: TextInputAction.done,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      onChanged: (_) => widget.onEdited?.call(),
+                      onSubmitted: (_) => widget.isSaving ? null : _save(),
+                      decoration: paceInputDecoration(
+                        label: 'Sandbox secret',
+                        hint: data.hasPlaidSecret ? 'Saved · enter a new one to replace it' : null,
+                        error: widget.plaidSecretError,
+                        suffix: PasswordVisibilityToggle(
+                            obscured: _obscureSecret, onToggle: () => setState(() => _obscureSecret = !_obscureSecret)),
+                      ),
+                      style: field,
                     ),
                     const SizedBox(height: 28),
                     PillButton(widget.isSaving ? 'Saving…' : 'Save changes', onPressed: widget.isSaving ? null : _save),

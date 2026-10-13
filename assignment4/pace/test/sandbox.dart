@@ -113,7 +113,7 @@ Future<SandboxApp> openSandboxApp(
     now: () => today ?? SandboxReplay.today,
   );
   await tester.runAsync(() => createAda(services.auth));
-  final ada = (await tester.runAsync(() => users.fetchByEmail('ada@example.com')))!;
+  final ada = (await tester.runAsync(() => users.fetchByUsername('ada')))!;
   if (linkBank) {
     await banks.saveItem(
       LinkedItem(

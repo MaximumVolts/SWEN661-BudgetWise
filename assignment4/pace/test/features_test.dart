@@ -1,6 +1,6 @@
 // End-to-end tests of the app's major features: each opens the real app (services, controllers,
 // views, navigation) on the Plaid sandbox replay and uses a feature the way a person would.
-import 'package:flutter/material.dart' show AxisDirection, Element, Icons, Scrollable, SnackBar, Switch, Text, TextField;
+import 'package:flutter/material.dart' show AxisDirection, Element, FocusManager, Icons, Scrollable, SnackBar, Switch, Text, TextField;
 import 'package:flutter_test/flutter_test.dart' show Finder;
 import 'package:flutter_test/flutter_test.dart'
     show
@@ -50,6 +50,8 @@ Finder _onPage(Finder target) => _OffNavBar(target);
 
 /// Finds [target] on the current page (scrolling down, then up, as needed) and taps it.
 Future<void> tapOn(WidgetTester tester, Finder target) async {
+  FocusManager.instance.primaryFocus?.unfocus(); // close the keyboard, so a focused field doesn't scroll back into view
+  await tester.pump();
   final f = _onPage(target);
   if (f.evaluate().isEmpty) {
     try {

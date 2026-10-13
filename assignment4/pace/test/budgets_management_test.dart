@@ -61,7 +61,7 @@ Future<({AppRouter router, InMemoryBudgetRepository store, String adaId})> _open
     budgetStore: store,
   );
   await tester.runAsync(() => createAda(services.auth));
-  final adaId = (await tester.runAsync(() => users.fetchByEmail('ada@example.com')))!.id;
+  final adaId = (await tester.runAsync(() => users.fetchByUsername('ada')))!.id;
   final router = AppRouter.create(services: services, initialStack: const [AppRoute.home, AppRoute.budgets]);
   await tester.pumpWidget(PaceApp(router: router));
   await tester.pumpAndSettle();
@@ -189,7 +189,7 @@ void main() {
     test('save, update, move, delete; deleting the user removes their budgets', () async {
       final users = SqliteUserAccountRepository(db);
       final budgets = SqliteBudgetRepository(db);
-      final ada = await users.create(email: 'ada@example.com');
+      final ada = await users.create(username: 'ada');
       await budgets.save(ada.id, 'food', 400);
       await budgets.save(ada.id, 'food', 425.5); // same category: updated, not duplicated
       await budgets.save(ada.id, 'travel', 600);

@@ -1,11 +1,10 @@
 import 'dart:convert' show jsonDecode, jsonEncode;
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' as http show Client, ClientException, Response;
 import '../models/bank_data.dart' show BankTransaction, RecurringStream;
 import '../models/linked_bank.dart' show LinkedBankAccount, SandboxTestCredentials;
 import '../models/app_exception.dart' show AppException;
 import 'plaid_api.dart' show PlaidApi;
-import 'plaid_config.dart' show PlaidConfig, PlaidKeys;
+import '../models/plaid_keys.dart' show PlaidKeys;
 
 /// [PlaidApi] against Plaid's **Sandbox** environment only (https://plaid.com/docs/api/sandbox/).
 ///
@@ -17,20 +16,21 @@ class SandboxPlaidApi implements PlaidApi {
 
   static const _unreachable = "Couldn't reach Plaid's test service. Check your internet connection and try again.";
   static const _failed = "Plaid's test service couldn't link the account. Please try again.";
-  static const _notConfigured = "Bank linking isn't set up for this build yet.";
-  static const _notConfiguredDebug = 'Plaid sandbox keys are missing: add plaid.clientId and plaid.sandboxSecret to '
-      'android/local.properties, then stop and re-run the app (Android only).';
+  static const _notConfigured = 'Add your Plaid sandbox keys in Profile to connect a bank.';
+  static const _keysRejected = "Plaid didn't accept your sandbox keys. Check the client ID and sandbox secret in Profile.";
 
   final http.Client _http;
   final Future<PlaidKeys> Function() _keys;
 
-  /// Keys come from Android's BuildConfig ([PlaidConfig.load]) unless [clientId] / [secret] are
-  /// given (tests).
-  SandboxPlaidApi({http.Client? client, String? clientId, String? secret})
+  /// [keys] supplies the signed-in user's Plaid sandbox keys for each request (stored with their
+  /// account). [clientId] / [secret] are a fixed pair instead (tests). With neither, every request
+  /// fails asking for keys.
+  SandboxPlaidApi({http.Client? client, Future<PlaidKeys> Function()? keys, String? clientId, String? secret})
       : _http = client ?? http.Client(),
-        _keys = (clientId == null && secret == null)
-            ? PlaidConfig.load
-            : (() async => PlaidKeys(clientId: clientId ?? '', sandboxSecret: secret ?? ''));
+        _keys = keys ??
+            (clientId == null && secret == null
+                ? (() async => PlaidKeys.none)
+                : (() async => PlaidKeys(clientId: clientId ?? '', sandboxSecret: secret ?? '')));
 
   @override
   Future<String> createSandboxPublicToken({
@@ -142,7 +142,7 @@ class SandboxPlaidApi implements PlaidApi {
   Future<Map<String, dynamic>> _post(String path, Map<String, Object?> body,
       {Set<String> alreadyDoneCodes = const {}}) async {
     final keys = await _keys();
-    if (!keys.isComplete) throw const AppException(kDebugMode ? _notConfiguredDebug : _notConfigured);
+    if (!keys.isComplete) throw const AppException(_notConfigured);
     final uri = Uri.https(sandboxHost, path);
     // Defence in depth: nothing may ever leave for a non-sandbox Plaid host.
     if (uri.host != sandboxHost || uri.scheme != 'https') throw StateError('Refusing non-sandbox Plaid request: $uri');
@@ -170,7 +170,7 @@ class SandboxPlaidApi implements PlaidApi {
       final code = json['error_code'] as String?;
       if (alreadyDoneCodes.contains(code)) return const {};
       final message = display ??
-          (code == 'INVALID_API_KEYS' ? (kDebugMode ? 'Plaid rejected the sandbox keys (INVALID_API_KEYS).' : _notConfigured) : _failed);
+          (code == 'INVALID_API_KEYS' ? _keysRejected : _failed);
       throw AppException(message, cause: '$path → ${response.statusCode} $code: ${json['error_message']}');
     }
     return json;

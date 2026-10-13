@@ -12,7 +12,7 @@ class SignInView extends StatelessWidget {
         controller: controller,
         autoLoad: false,
         builder: (context, c) => SignInScreen(
-          emailError: c.emailError,
+          usernameError: c.usernameError,
           passwordError: c.passwordError,
           isLoading: c.isSubmitting,
           onSignIn: c.signIn,

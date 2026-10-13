@@ -3,7 +3,7 @@ library;
 
 class SettingsData {
   final String name;
-  final String email;
+  final String username;
   final String initials;
   final int connectedAccountCount;
   final int accountsNeedingAttention;
@@ -16,7 +16,7 @@ class SettingsData {
   final String footerLabel;
   const SettingsData({
     required this.name,
-    required this.email,
+    required this.username,
     required this.initials,
     this.connectedAccountCount = 0,
     this.accountsNeedingAttention = 0,
@@ -31,7 +31,7 @@ class SettingsData {
 
   SettingsData copyWith({bool? highContrast, bool? colorblindMode, bool? showChartValues, bool? budgetAlerts}) => SettingsData(
         name: name,
-        email: email,
+        username: username,
         initials: initials,
         connectedAccountCount: connectedAccountCount,
         accountsNeedingAttention: accountsNeedingAttention,

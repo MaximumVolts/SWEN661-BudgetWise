@@ -51,7 +51,7 @@ class RepositorySettingsService implements SettingsService {
     final linkedAccounts = userId == null ? 0 : (await _banks.accountsFor(userId)).length;
     return SettingsData(
       name: me.name,
-      email: me.email,
+      username: me.username,
       initials: me.initials,
       connectedAccountCount: linkedAccounts,
       billReminderLabel: '3 days before',

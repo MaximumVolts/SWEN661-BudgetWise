@@ -10,10 +10,10 @@ class SignInScreen extends StatefulWidget {
   /// Optional: supply your own controllers (e.g. from a form/bloc). Otherwise internal ones are used.
   final TextEditingController? emailController;
   final TextEditingController? passwordController;
-  final String? emailError;
+  final String? usernameError;
   final String? passwordError;
   final bool isLoading;
-  final void Function(String email, String password)? onSignIn;
+  final void Function(String username, String password)? onSignIn;
   final VoidCallback? onForgotPassword;
   final VoidCallback? onContinueWithGoogle;
   final VoidCallback? onContinueWithApple;
@@ -26,7 +26,7 @@ class SignInScreen extends StatefulWidget {
     super.key,
     this.emailController,
     this.passwordController,
-    this.emailError,
+    this.usernameError,
     this.passwordError,
     this.isLoading = false,
     this.onSignIn,
@@ -43,12 +43,12 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   bool _obscure = true;
-  late final TextEditingController _email = widget.emailController ?? TextEditingController();
+  late final TextEditingController _username = widget.emailController ?? TextEditingController();
   late final TextEditingController _password = widget.passwordController ?? TextEditingController();
 
   @override
   void dispose() {
-    if (widget.emailController == null) _email.dispose();
+    if (widget.emailController == null) _username.dispose();
     if (widget.passwordController == null) _password.dispose();
     super.dispose();
   }
@@ -87,10 +87,12 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                     const SizedBox(height: 28),
                     TextField(
-                      controller: _email,
-                      keyboardType: TextInputType.emailAddress,
-                      autofillHints: const [AutofillHints.email],
-                      decoration: paceInputDecoration(label: 'Email', error: widget.emailError),
+                      controller: _username,
+                      keyboardType: TextInputType.text,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      autofillHints: const [AutofillHints.username],
+                      decoration: paceInputDecoration(label: 'Username', error: widget.usernameError),
                       style: const TextStyle(fontSize: 18),
                     ),
                     const SizedBox(height: 18),
@@ -116,7 +118,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     const SizedBox(height: 20),
                     PillButton(
                       widget.isLoading ? 'Signing in…' : 'Sign in',
-                      onPressed: widget.isLoading ? null : () => widget.onSignIn?.call(_email.text, _password.text),
+                      onPressed: widget.isLoading ? null : () => widget.onSignIn?.call(_username.text, _password.text),
                     ),
                     if (widget.showSocialSignIn) ...[
                       const SizedBox(height: 22),

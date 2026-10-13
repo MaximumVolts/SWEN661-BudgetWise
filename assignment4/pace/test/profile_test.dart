@@ -1,5 +1,5 @@
 import 'dart:convert' show jsonEncode;
-import 'package:flutter/material.dart' show TextField;
+import 'package:flutter/material.dart' show FocusManager, TextField;
 import 'package:flutter_test/flutter_test.dart'
     show expect, expectLater, fail, find, findsNothing, findsOneWidget, group, isA, isEmpty, setUp, test, testWidgets, throwsA;
 import 'package:http/http.dart' as http show Response;
@@ -18,7 +18,7 @@ import 'package:pace_app/views/pace_app.dart' show PaceApp;
 import 'package:pace_app/views/screens/profile_screen.dart' show ProfileScreen;
 
 
-import 'helpers.dart' show NoGoogle;
+import 'helpers.dart' show NoGoogle, testPlaidClientId, testPlaidSecret;
 void main() {
   group('RepositoryProfileService', () {
     late InMemoryUserAccountRepository accounts;
@@ -27,7 +27,7 @@ void main() {
     late RepositoryProfileService profile;
     setUp(() async {
       accounts = InMemoryUserAccountRepository();
-      ada = await accounts.create(email: 'ada@example.com', displayName: 'Ada Lovelace', passwordHash: 'h');
+      ada = await accounts.create(username: 'ada', displayName: 'Ada Lovelace', passwordHash: 'h');
       current = ada.id;
       profile = RepositoryProfileService(accounts: accounts, currentUserId: () => current);
     });
@@ -35,22 +35,22 @@ void main() {
     test('loads the signed-in account', () async {
       final data = await profile.load();
       expect(data.name, 'Ada Lovelace');
-      expect(data.email, 'ada@example.com');
+      expect(data.username, 'ada');
       expect(data.initials, 'AL');
-      expect(data.signInMethod, 'Email & password');
+      expect(data.signInMethod, 'Username & password');
     });
 
-    test('saves a new name (never the email) and announces the change', () async {
+    test('saves a new name (never the username) and announces the change', () async {
       var announced = 0;
       final sub = profile.changes.listen((_) => announced++);
-      final saved = await profile.update(name: '  Ada King ');
+      final saved = await profile.update(name: '  Ada King ', plaidClientId: testPlaidClientId, plaidSecret: testPlaidSecret);
       await Future<void>.delayed(Duration.zero);
       expect(saved.name, 'Ada King');
       expect(saved.initials, 'AK');
-      expect(saved.email, 'ada@example.com');
+      expect(saved.username, 'ada');
       final stored = (await accounts.fetchById(ada.id))!;
       expect(stored.displayName, 'Ada King');
-      expect(stored.email, 'ada@example.com'); // unchanged
+      expect(stored.username, 'ada'); // unchanged
       expect(stored.passwordHash, 'h'); // credentials untouched
       expect(announced, 1);
       await sub.cancel();
@@ -58,7 +58,7 @@ void main() {
 
     test('requires a name', () async {
       try {
-        await profile.update(name: ' ');
+        await profile.update(name: ' ', plaidClientId: testPlaidClientId, plaidSecret: testPlaidSecret);
         fail('Expected a FieldValidationException');
       } on FieldValidationException catch (e) {
         expect(e.fieldErrors, {'name': 'Enter your name'});
@@ -71,9 +71,9 @@ void main() {
       await expectLater(profile.load(), throwsA(isA<AppException>()));
     });
 
-    test('initials fall back to the email, then "?"', () {
+    test('initials fall back to the username, then "?"', () {
       expect(RepositoryProfileService.initialsFor('Cher', null), 'C');
-      expect(RepositoryProfileService.initialsFor(null, 'zed@example.com'), 'Z');
+      expect(RepositoryProfileService.initialsFor(null, 'zed'), 'Z');
       expect(RepositoryProfileService.initialsFor(' ', ''), '?');
     });
   });
@@ -89,11 +89,13 @@ void main() {
     // Sign up first (hashing runs on a real isolate), then open the app already on Settings.
     await tester.runAsync(() => services.auth.createAccount(
           name: 'Ada Lovelace',
-          email: 'ada@example.com',
+          username: 'ada',
           password: 'secret123',
           confirmPassword: 'secret123',
           securityQuestion: 'What was the name of your first pet?',
           securityAnswer: 'Rex',
+          plaidClientId: testPlaidClientId,
+          plaidSecret: testPlaidSecret,
         ));
     final router = AppRouter.create(services: services, initialStack: const [AppRoute.home, AppRoute.settings]);
     await tester.pumpWidget(PaceApp(router: router));
@@ -105,19 +107,23 @@ void main() {
     expect(find.byType(ProfileScreen), findsOneWidget);
     expect(find.text('AL'), findsOneWidget);
 
-    // The email is shown but can't be edited.
-    final email = tester.widget<TextField>(find.widgetWithText(TextField, 'Email'));
-    expect(email.enabled, false);
-    expect(email.readOnly, true);
-    expect(email.controller!.text, 'ada@example.com');
+    // The username is shown but can't be edited.
+    final username = tester.widget<TextField>(find.widgetWithText(TextField, 'Username'));
+    expect(username.enabled, false);
+    expect(username.readOnly, true);
+    expect(username.controller!.text, 'ada');
 
     await tester.enterText(find.widgetWithText(TextField, 'Name'), 'Ada King');
+    FocusManager.instance.primaryFocus?.unfocus(); // close the keyboard, as a person would before scrolling
+    await tester.pump();
+    await tester.ensureVisible(find.text('Save changes'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Save changes'));
     await tester.pumpAndSettle();
     expect(find.text('Profile saved'), findsOneWidget);
-    final stored = (await tester.runAsync(() => accounts.fetchByEmail('ada@example.com')))!;
+    final stored = (await tester.runAsync(() => accounts.fetchByUsername('ada')))!;
     expect(stored.displayName, 'Ada King');
-    expect(stored.email, 'ada@example.com');
+    expect(stored.username, 'ada');
 
     await tester.tap(find.bySemanticsLabel('Back'));
     await tester.pumpAndSettle();
@@ -154,11 +160,13 @@ void main() {
     );
     await tester.runAsync(() => services.auth.createAccount(
           name: 'Ada Lovelace',
-          email: 'ada@example.com',
+          username: 'ada',
           password: 'secret123',
           confirmPassword: 'secret123',
           securityQuestion: 'What was the name of your first pet?',
           securityAnswer: 'Rex',
+          plaidClientId: testPlaidClientId,
+          plaidSecret: testPlaidSecret,
         ));
     final router = AppRouter.create(services: services, initialStack: const [AppRoute.home, AppRoute.profile]);
     await tester.pumpWidget(PaceApp(router: router));
@@ -187,7 +195,7 @@ void main() {
 
     expect(find.text('First Platypus Bank'), findsNothing);
     expect(find.text('Connect test bank with Plaid'), findsOneWidget);
-    final ada = (await tester.runAsync(() => users.fetchByEmail('ada@example.com')))!;
+    final ada = (await tester.runAsync(() => users.fetchByUsername('ada')))!;
     expect(await tester.runAsync(() => banks.itemsFor(ada.id)), isEmpty);
     router.dispose();
   });

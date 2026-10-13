@@ -13,7 +13,7 @@ class ResetPasswordView extends StatelessWidget {
         autoLoad: false,
         builder: (context, c) => ResetPasswordScreen(
           question: c.question,
-          emailError: c.errorFor('email'),
+          usernameError: c.errorFor('username'),
           answerError: c.errorFor('securityAnswer'),
           passwordError: c.errorFor('password'),
           confirmPasswordError: c.errorFor('confirmPassword'),

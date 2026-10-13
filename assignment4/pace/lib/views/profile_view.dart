@@ -13,9 +13,11 @@ class ProfileView extends StatelessWidget {
         builder: (context, c) => ProfileScreen(
           data: c.data!,
           nameError: c.errorFor('name'),
+          plaidClientIdError: c.errorFor('plaidClientId'),
+          plaidSecretError: c.errorFor('plaidSecret'),
           isSaving: c.isSubmitting,
           justSaved: c.justSaved,
-          onSave: (name) => c.save(name: name),
+          onSave: (name, clientId, secret) => c.save(name: name, plaidClientId: clientId, plaidSecret: secret),
           onEdited: c.edited,
           onBack: c.back,
           banks: c.banks,

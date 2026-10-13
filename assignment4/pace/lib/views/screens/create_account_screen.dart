@@ -7,17 +7,19 @@ import '../theme.dart' show C, T;
 import '../widgets/widgets.dart' show paceInputDecoration, PaceTopBar, PasswordVisibilityToggle, PillButton, Tap;
 
 /// Called with the raw form values; the service validates them.
-typedef CreateAccountSubmit = void Function(
-    String name, String email, String password, String confirmPassword, String securityQuestion, String securityAnswer);
+typedef CreateAccountSubmit = void Function(String name, String username, String password, String confirmPassword,
+    String securityQuestion, String securityAnswer, String plaidClientId, String plaidSecret);
 
 /// 01b - Create Account
 class CreateAccountScreen extends StatefulWidget {
   final String? nameError;
-  final String? emailError;
+  final String? usernameError;
   final String? passwordError;
   final String? confirmPasswordError;
   final String? securityQuestionError;
   final String? securityAnswerError;
+  final String? plaidClientIdError;
+  final String? plaidSecretError;
   /// Choices for the security question picker.
   final List<String> securityQuestions;
   final bool isLoading;
@@ -28,11 +30,13 @@ class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({
     super.key,
     this.nameError,
-    this.emailError,
+    this.usernameError,
     this.passwordError,
     this.confirmPasswordError,
     this.securityQuestionError,
     this.securityAnswerError,
+    this.plaidClientIdError,
+    this.plaidSecretError,
     this.securityQuestions = const [],
     this.isLoading = false,
     this.onSubmit,
@@ -46,25 +50,30 @@ class CreateAccountScreen extends StatefulWidget {
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final _name = TextEditingController();
-  final _email = TextEditingController();
+  final _username = TextEditingController();
   final _password = TextEditingController();
   final _confirm = TextEditingController();
   final _answer = TextEditingController();
+  final _plaidClientId = TextEditingController();
+  final _plaidSecret = TextEditingController();
   String? _question;
   bool _obscure = true;
+  bool _obscureSecret = true;
 
   @override
   void dispose() {
     _name.dispose();
-    _email.dispose();
+    _username.dispose();
     _password.dispose();
     _confirm.dispose();
     _answer.dispose();
+    _plaidClientId.dispose();
+    _plaidSecret.dispose();
     super.dispose();
   }
 
-  void _submit() =>
-      widget.onSubmit?.call(_name.text, _email.text, _password.text, _confirm.text, _question ?? '', _answer.text);
+  void _submit() => widget.onSubmit?.call(_name.text, _username.text, _password.text, _confirm.text, _question ?? '',
+      _answer.text, _plaidClientId.text, _plaidSecret.text);
 
   @override
   Widget build(BuildContext context) {
@@ -96,11 +105,13 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       ),
                       const SizedBox(height: 18),
                       TextField(
-                        controller: _email,
-                        keyboardType: TextInputType.emailAddress,
+                        controller: _username,
+                        keyboardType: TextInputType.text,
+                        autocorrect: false,
+                        enableSuggestions: false,
                         textInputAction: TextInputAction.next,
-                        autofillHints: const [AutofillHints.email],
-                        decoration: paceInputDecoration(label: 'Email', error: widget.emailError),
+                        autofillHints: const [AutofillHints.username],
+                        decoration: paceInputDecoration(label: 'Username', error: widget.usernameError, helper: '3–30 letters, numbers, dots, dashes or underscores'),
                         style: field,
                       ),
                       const SizedBox(height: 18),
@@ -145,9 +156,42 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       const SizedBox(height: 18),
                       TextField(
                         controller: _answer,
-                        textInputAction: TextInputAction.done,
-                        onSubmitted: (_) => widget.isLoading ? null : _submit(),
+                        textInputAction: TextInputAction.next,
                         decoration: paceInputDecoration(label: 'Answer', error: widget.securityAnswerError, helper: 'Not case-sensitive'),
+                        style: field,
+                      ),
+                      const SizedBox(height: 28),
+                      const Text('Plaid sandbox keys', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Pace links Plaid's test bank with your own free sandbox keys. Find them at "
+                        'dashboard.plaid.com → Developers → Keys. Use the Sandbox secret, never Production.',
+                        style: T.body,
+                      ),
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: _plaidClientId,
+                        textInputAction: TextInputAction.next,
+                        autocorrect: false,
+                        enableSuggestions: false,
+                        decoration: paceInputDecoration(label: 'Client ID', error: widget.plaidClientIdError),
+                        style: field,
+                      ),
+                      const SizedBox(height: 18),
+                      TextField(
+                        controller: _plaidSecret,
+                        obscureText: _obscureSecret,
+                        textInputAction: TextInputAction.done,
+                        autocorrect: false,
+                        enableSuggestions: false,
+                        onSubmitted: (_) => widget.isLoading ? null : _submit(),
+                        decoration: paceInputDecoration(
+                          label: 'Sandbox secret',
+                          error: widget.plaidSecretError,
+                          helper: 'Stored only on this device, with your account',
+                          suffix: PasswordVisibilityToggle(
+                              obscured: _obscureSecret, onToggle: () => setState(() => _obscureSecret = !_obscureSecret)),
+                        ),
                         style: field,
                       ),
                       const SizedBox(height: 28),

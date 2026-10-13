@@ -9,6 +9,9 @@ import '../../repositories/device_linked_bank_repository.dart' show DeviceLinked
 import '../../repositories/goal_repository.dart' show InMemoryGoalRepository;
 import '../../repositories/linked_bank_repository.dart' show LinkedBankRepository;
 import '../../repositories/pace_database.dart' show PaceDatabase;
+import '../../models/plaid_keys.dart' show PlaidKeys;
+import '../../repositories/plaid_key_repository.dart' show InMemoryPlaidKeyRepository, PlaidKeyRepository;
+import '../../repositories/sqlite_plaid_key_repository.dart' show SqlitePlaidKeyRepository;
 import '../../repositories/preferences_repository.dart' show InMemoryPreferencesRepository, PreferencesRepository;
 import '../../repositories/sqlite_budget_repository.dart' show SqliteBudgetRepository;
 import '../../repositories/sqlite_preferences_repository.dart' show SqlitePreferencesRepository;
@@ -55,6 +58,7 @@ AppServices demoServices({
   PreferencesRepository? preferencesStore,
   StatementSaver? statementSaver,
   RecurringExpenseRepository? recurringStore,
+  PlaidKeyRepository? plaidKeyStore,
   DateTime Function()? now,
 }) {
   // One repository (the users table) shared by sign-in and the profile.
@@ -65,16 +69,25 @@ AppServices demoServices({
   final budgetLimits = budgetStore ?? (accounts == null ? SqliteBudgetRepository(database) : InMemoryBudgetRepository());
   final preferences = preferencesStore ?? (accounts == null ? SqlitePreferencesRepository(database) : InMemoryPreferencesRepository());
   final recurring = recurringStore ?? (accounts == null ? SqliteRecurringExpenseRepository(database) : InMemoryRecurringExpenseRepository());
+  // Each user's Plaid sandbox keys, entered at sign-up (or on Profile).
+  final plaidKeys = plaidKeyStore ?? (accounts == null ? SqlitePlaidKeyRepository(database) : InMemoryPlaidKeyRepository());
   final auth = RepositoryAuthService(
     accounts: users,
     google: google ?? GoogleSignInAccountRepository(),
     hasher: hasher ?? const PasswordHasher(),
+    plaidKeys: plaidKeys,
   );
   String? currentUserId() => auth.currentAccount?.id;
-  final profile = RepositoryProfileService(accounts: users, currentUserId: currentUserId);
+  final profile = RepositoryProfileService(accounts: users, plaidKeys: plaidKeys, currentUserId: currentUserId);
 
   // Bank data: one Plaid sandbox client and one cached data source shared by every bank feature.
-  final plaidApi = plaid ?? SandboxPlaidApi();
+  // Plaid calls use the signed-in user's own sandbox keys.
+  Future<PlaidKeys> currentPlaidKeys() async {
+    final userId = currentUserId();
+    return (userId == null ? null : await plaidKeys.load(userId)) ?? PlaidKeys.none;
+  }
+
+  final plaidApi = plaid ?? SandboxPlaidApi(keys: currentPlaidKeys);
   final linkedBanks = banks ?? DeviceLinkedBankRepository();
   final bankData = PlaidBankDataRepository(plaid: plaidApi, banks: linkedBanks, currentUserId: currentUserId, now: now);
   final notes = InMemoryTransactionAnnotationRepository();

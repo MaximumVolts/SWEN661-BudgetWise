@@ -6,13 +6,13 @@ import '../models/user_account.dart' show UserAccount;
 abstract class UserAccountRepository {
   /// null when no account with [id] exists.
   Future<UserAccount?> fetchById(String id);
-  /// Case-insensitive. null when no account uses [email].
-  Future<UserAccount?> fetchByEmail(String email);
+  /// Case-insensitive. null when no account uses [username].
+  Future<UserAccount?> fetchByUsername(String username);
   /// null when no account is linked to that Google user.
   Future<UserAccount?> fetchByGoogleId(String googleId);
   /// Stores a new account and returns it with its assigned id.
   Future<UserAccount> create({
-    String? email,
+    String? username,
     String? displayName,
     String? googleId,
     String? passwordHash,
@@ -41,15 +41,15 @@ class InMemoryUserAccountRepository implements UserAccountRepository {
   Future<UserAccount?> fetchById(String id) => _first((a) => a.id == id);
 
   @override
-  Future<UserAccount?> fetchByEmail(String email) =>
-      _first((a) => a.email?.toLowerCase() == email.trim().toLowerCase());
+  Future<UserAccount?> fetchByUsername(String username) =>
+      _first((a) => a.username?.toLowerCase() == username.trim().toLowerCase());
 
   @override
   Future<UserAccount?> fetchByGoogleId(String googleId) => _first((a) => a.googleId == googleId);
 
   @override
   Future<UserAccount> create({
-    String? email,
+    String? username,
     String? displayName,
     String? googleId,
     String? passwordHash,
@@ -61,7 +61,7 @@ class InMemoryUserAccountRepository implements UserAccountRepository {
     }
     final account = UserAccount(
       id: 'u${_nextId++}',
-      email: email?.trim(),
+      username: username?.trim(),
       displayName: displayName,
       googleId: googleId,
       passwordHash: passwordHash,

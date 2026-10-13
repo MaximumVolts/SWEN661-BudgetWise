@@ -1,9 +1,20 @@
 import '../models/money.dart' show Money;
 /// Pure validation helpers for services to use when enforcing business rules.
 class Validators {
-  static final _email = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+  static const minUsernameLength = 3, maxUsernameLength = 30;
+  static final _username = RegExp(r'^[A-Za-z0-9][A-Za-z0-9._-]*$');
 
-  static String? email(String value) => _email.hasMatch(value.trim()) ? null : 'Enter a valid email address';
+  /// New usernames: [minUsernameLength]–[maxUsernameLength] letters, numbers, dots, dashes or
+  /// underscores, starting with a letter or number. Matching ignores case.
+  static String? newUsername(String value) {
+    final v = value.trim();
+    if (v.isEmpty) return 'Choose a username';
+    if (v.length < minUsernameLength || v.length > maxUsernameLength) {
+      return 'Use $minUsernameLength–$maxUsernameLength characters';
+    }
+    return _username.hasMatch(v) ? null : 'Use letters, numbers, dots, dashes or underscores, starting with a letter or number';
+  }
+
   static String? requiredText(String value, String message) => value.trim().isEmpty ? message : null;
 
   static const minPasswordLength = 8;
@@ -38,6 +49,20 @@ class Validators {
 
   static String _article(String word) => RegExp(r'^[aeiou]').hasMatch(word) ? 'an' : 'a';
   static String _whole(double v) => Money.format(v, decimals: v == v.roundToDouble() ? 0 : 2);
+
+  /// Plaid client IDs are 24 hexadecimal characters (dashboard.plaid.com → Developers → Keys).
+  static String? plaidClientId(String value) {
+    final v = value.trim();
+    if (v.isEmpty) return 'Enter your Plaid client ID';
+    return RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(v) ? null : 'A Plaid client ID is 24 letters and numbers (0–9, a–f)';
+  }
+
+  /// Plaid secrets are 30 hexadecimal characters. Use the **Sandbox** secret.
+  static String? plaidSandboxSecret(String value) {
+    final v = value.trim();
+    if (v.isEmpty) return 'Enter your Plaid sandbox secret';
+    return RegExp(r'^[0-9a-fA-F]{30}$').hasMatch(v) ? null : 'A Plaid secret is 30 letters and numbers (0–9, a–f)';
+  }
 
   static String? positiveAmount(double value, [String message = 'Enter an amount greater than zero']) =>
       value > 0 ? null : message;

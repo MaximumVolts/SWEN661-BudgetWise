@@ -3,7 +3,7 @@ library;
 
 class UserAccount {
   final String id;
-  final String? email;
+  final String? username;
   final String? displayName;
   /// Google's stable user id when the account was created with / linked to Google.
   final String? googleId;
@@ -16,7 +16,7 @@ class UserAccount {
   final String? securityAnswerHash;
   const UserAccount({
     required this.id,
-    this.email,
+    this.username,
     this.displayName,
     this.googleId,
     this.passwordHash,
@@ -25,7 +25,7 @@ class UserAccount {
   });
 
   UserAccount copyWith({
-    String? email,
+    String? username,
     String? displayName,
     String? googleId,
     String? passwordHash,
@@ -34,7 +34,7 @@ class UserAccount {
   }) =>
       UserAccount(
         id: id,
-        email: email ?? this.email,
+        username: username ?? this.username,
         displayName: displayName ?? this.displayName,
         googleId: googleId ?? this.googleId,
         passwordHash: passwordHash ?? this.passwordHash,

@@ -52,8 +52,8 @@ void main() {
     test('a new user starts with the defaults; changes are saved per user', () async {
       final users = SqliteUserAccountRepository(db);
       final prefs = SqlitePreferencesRepository(db);
-      final ada = await users.create(email: 'ada@example.com');
-      final bo = await users.create(email: 'bo@example.com');
+      final ada = await users.create(username: 'ada');
+      final bo = await users.create(username: 'bo');
       expect(await prefs.load(ada.id), UserPreferences.defaults);
 
       await prefs.save(ada.id, const UserPreferences(highContrast: true, colorblindMode: true));
@@ -88,7 +88,7 @@ void main() {
       expect(await services.settings.preferences(), UserPreferences.defaults);
       expect(announced.last, UserPreferences.defaults);
 
-      await services.auth.signIn(email: 'ada@example.com', password: 'secret123');
+      await services.auth.signIn(username: 'ada', password: 'secret123');
       await Future<void>.delayed(Duration.zero);
       expect(announced.last, const UserPreferences(highContrast: true, colorblindMode: true)); // remembered
       await sub.cancel();

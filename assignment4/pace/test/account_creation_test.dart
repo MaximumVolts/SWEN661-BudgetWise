@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart'
         isFalse,
         isNot,
         isNotNull,
+        isNull,
         isTrue,
         setUp,
         test,
@@ -24,7 +25,7 @@ import 'package:pace_app/views/pace_app.dart' show PaceApp;
 import 'package:pace_app/views/screens/create_account_screen.dart' show CreateAccountScreen;
 
 
-import 'helpers.dart' show fieldErrors, NoGoogle;
+import 'helpers.dart' show fieldErrors, NoGoogle, testPlaidClientId, testPlaidSecret;
 const fastHasher = PasswordHasher(iterations: 1000);
 const petQuestion = 'What was the name of your first pet?';
 
@@ -53,28 +54,30 @@ void main() {
       auth = RepositoryAuthService(accounts: accounts, google: NoGoogle(), hasher: fastHasher);
     });
 
-    Future<FlowStep> create({String name = 'Ada', String email = 'ada@example.com', String pw = 'secret123', String? confirm}) =>
+    Future<FlowStep> create({String name = 'Ada', String username = 'ada', String pw = 'secret123', String? confirm}) =>
         auth.createAccount(
           name: name,
-          email: email,
+          username: username,
           password: pw,
           confirmPassword: confirm ?? pw,
           securityQuestion: petQuestion,
           securityAnswer: 'Rex',
+          plaidClientId: testPlaidClientId,
+          plaidSecret: testPlaidSecret,
         );
 
     test('creates a hashed account, signs in and starts onboarding', () async {
       expect(await create(), FlowStep.onboarding);
       expect(auth.isSignedIn, isTrue);
-      final stored = (await accounts.fetchByEmail('ada@example.com'))!;
+      final stored = (await accounts.fetchByUsername('ada'))!;
       expect(stored.displayName, 'Ada');
       expect(stored.passwordHash, isNotNull);
       expect(stored.passwordHash, isNot(contains('secret123')));
     });
 
     test('reports every invalid field at once', () async {
-      final errors = await fieldErrors(() => create(name: ' ', email: 'nope', pw: 'short', confirm: 'other'));
-      expect(errors.keys.toSet(), {'name', 'email', 'password', 'confirmPassword'});
+      final errors = await fieldErrors(() => create(name: ' ', username: 'no', pw: 'short', confirm: 'other'));
+      expect(errors.keys.toSet(), {'name', 'username', 'password', 'confirmPassword'});
       expect(auth.isSignedIn, isFalse);
     });
 
@@ -83,10 +86,24 @@ void main() {
       expect((await fieldErrors(() => create(pw: '12345678')))['password'], 'Include at least one letter and one number');
     });
 
-    test('rejects an email that is already registered (any case)', () async {
+    test('usernames: 3–30 letters, numbers, dots, dashes or underscores', () async {
+      for (final ok in ['ada', 'Ada.Lovelace', 'ada_1815', 'a-b']) {
+        expect((await fieldErrors(() => create(username: ok, pw: 'short')))['username'], isNull, reason: ok);
+      }
+      expect((await fieldErrors(() => create(username: '  ')))['username'], 'Choose a username');
+      expect((await fieldErrors(() => create(username: 'ab')))['username'], 'Use 3–30 characters');
+      expect((await fieldErrors(() => create(username: 'a' * 31)))['username'], 'Use 3–30 characters');
+      for (final bad in ['ada@example.com', 'ada lovelace', '.ada', '_ada']) {
+        expect((await fieldErrors(() => create(username: bad)))['username'],
+            'Use letters, numbers, dots, dashes or underscores, starting with a letter or number',
+            reason: bad);
+      }
+    });
+
+    test('rejects a username that is already taken (any case)', () async {
       await create();
       await auth.signOut();
-      expect((await fieldErrors(() => create(email: 'ADA@example.com')))['email'], 'An account with this email already exists');
+      expect((await fieldErrors(() => create(username: 'ADA')))['username'], 'An account with this username already exists');
     });
   });
 
@@ -96,24 +113,26 @@ void main() {
       auth = RepositoryAuthService(accounts: InMemoryUserAccountRepository(), google: NoGoogle(), hasher: fastHasher);
       await auth.createAccount(
         name: 'Ada',
-        email: 'ada@example.com',
+        username: 'ada',
         password: 'secret123',
         confirmPassword: 'secret123',
         securityQuestion: petQuestion,
         securityAnswer: 'Rex',
+        plaidClientId: testPlaidClientId,
+        plaidSecret: testPlaidSecret,
       );
       await auth.signOut();
     });
 
     test('correct password goes home', () async {
-      expect(await auth.signIn(email: 'Ada@Example.com', password: 'secret123'), FlowStep.home);
+      expect(await auth.signIn(username: 'Ada', password: 'secret123'), FlowStep.home);
       expect(auth.isSignedIn, isTrue);
     });
 
-    test('wrong password and unknown email fail the same way', () async {
-      final wrong = await fieldErrors(() => auth.signIn(email: 'ada@example.com', password: 'nope'));
-      final unknown = await fieldErrors(() => auth.signIn(email: 'bob@example.com', password: 'secret123'));
-      expect(wrong, {'password': 'Email or password is incorrect'});
+    test('wrong password and unknown username fail the same way', () async {
+      final wrong = await fieldErrors(() => auth.signIn(username: 'ada', password: 'nope'));
+      final unknown = await fieldErrors(() => auth.signIn(username: 'bob', password: 'secret123'));
+      expect(wrong, {'password': 'Username or password is incorrect'});
       expect(unknown, wrong);
       expect(auth.isSignedIn, isFalse);
     });
@@ -133,14 +152,14 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(CreateAccountScreen), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(TextField, 'Email'));
-      await tester.enterText(find.widgetWithText(TextField, 'Email'), 'not-an-email');
+      await tester.tap(find.widgetWithText(TextField, 'Username'));
+      await tester.enterText(find.widgetWithText(TextField, 'Username'), 'not a username!');
       await tester.ensureVisible(find.text('Create account').last);
       await tester.tap(find.text('Create account').last);
       await tester.pumpAndSettle();
 
       expect(find.text('Enter your name'), findsOneWidget);
-      expect(find.text('Enter a valid email address'), findsOneWidget);
+      expect(find.text('Use letters, numbers, dots, dashes or underscores, starting with a letter or number'), findsOneWidget);
       expect(router.delegate.current, AppRoute.createAccount);
       router.dispose();
     });
@@ -153,7 +172,7 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(find.widgetWithText(TextField, 'Name'), 'Ada');
-      await tester.enterText(find.widgetWithText(TextField, 'Email'), 'ada@example.com');
+      await tester.enterText(find.widgetWithText(TextField, 'Username'), 'ada');
       await tester.enterText(find.widgetWithText(TextField, 'Password'), 'secret123');
       await tester.enterText(find.widgetWithText(TextField, 'Confirm password'), 'secret123');
       final picker = find.byType(DropdownButtonFormField<String>);
@@ -163,7 +182,11 @@ void main() {
       await tester.tap(find.text(petQuestion).last);
       await tester.pumpAndSettle();
       await tester.enterText(find.widgetWithText(TextField, 'Answer'), 'Rex');
+      await tester.ensureVisible(find.widgetWithText(TextField, 'Sandbox secret'));
+      await tester.enterText(find.widgetWithText(TextField, 'Client ID'), testPlaidClientId);
+      await tester.enterText(find.widgetWithText(TextField, 'Sandbox secret'), testPlaidSecret);
       await tester.ensureVisible(find.text('Create account').last);
+      await tester.pumpAndSettle();
       // Password hashing runs on a real background isolate, outside the test's fake clock.
       await tester.runAsync(() async {
         await tester.tap(find.text('Create account').last);

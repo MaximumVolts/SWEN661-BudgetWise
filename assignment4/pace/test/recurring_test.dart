@@ -225,7 +225,7 @@ void main() {
     test('save, update, list, delete; deleting the user removes theirs', () async {
       final users = SqliteUserAccountRepository(db);
       final repo = SqliteRecurringExpenseRepository(db);
-      final ada = await users.create(email: 'ada@example.com');
+      final ada = await users.create(username: 'ada');
       final saved = await repo.save(
         ada.id,
         RecurringExpense(

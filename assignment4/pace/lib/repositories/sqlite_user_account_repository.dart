@@ -7,6 +7,7 @@ import 'user_account_repository.dart' show UserAccountRepository;
 class SqliteUserAccountRepository extends SqliteRepository implements UserAccountRepository {
   static const _columns = [
     'id',
+    'username',
     'email',
     'display_name',
     'google_id',
@@ -29,16 +30,18 @@ class SqliteUserAccountRepository extends SqliteRepository implements UserAccoun
     return row == null ? null : _first('id = ?', [row]);
   }
 
-  /// The email column is `COLLATE NOCASE`, so this match ignores case.
+  /// Both columns are `COLLATE NOCASE`, so this match ignores case. An account from before
+  /// usernames (username NULL) matches on its old email.
   @override
-  Future<UserAccount?> fetchByEmail(String email) => _first('email = ?', [email.trim()]);
+  Future<UserAccount?> fetchByUsername(String username) =>
+      _first('username = ? OR (username IS NULL AND email = ?)', [username.trim(), username.trim()]);
 
   @override
   Future<UserAccount?> fetchByGoogleId(String googleId) => _first('google_id = ?', [googleId]);
 
   @override
   Future<UserAccount> create({
-    String? email,
+    String? username,
     String? displayName,
     String? googleId,
     String? passwordHash,
@@ -47,7 +50,7 @@ class SqliteUserAccountRepository extends SqliteRepository implements UserAccoun
   }) async {
     final db = await this.db;
     final id = await db.insert('users', {
-      'email': email?.trim(),
+      'username': username?.trim(),
       'display_name': displayName,
       'google_id': googleId,
       'password_hash': passwordHash,
@@ -56,7 +59,7 @@ class SqliteUserAccountRepository extends SqliteRepository implements UserAccoun
     });
     return UserAccount(
       id: '$id',
-      email: email?.trim(),
+      username: username?.trim(),
       displayName: displayName,
       googleId: googleId,
       passwordHash: passwordHash,
@@ -73,7 +76,7 @@ class SqliteUserAccountRepository extends SqliteRepository implements UserAccoun
     await db.update(
       'users',
       {
-        'email': account.email,
+        'username': account.username,
         'display_name': account.displayName,
         'google_id': account.googleId,
         'password_hash': account.passwordHash,
@@ -95,7 +98,8 @@ class SqliteUserAccountRepository extends SqliteRepository implements UserAccoun
 
   static UserAccount _fromRow(Map<String, Object?> r) => UserAccount(
         id: '${r['id']}',
-        email: r['email'] as String?,
+        // Accounts from before usernames sign in with their old email until next saved.
+        username: (r['username'] ?? r['email']) as String?,
         displayName: r['display_name'] as String?,
         googleId: r['google_id'] as String?,
         passwordHash: r['password_hash'] as String?,

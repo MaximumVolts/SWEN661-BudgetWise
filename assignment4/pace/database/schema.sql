@@ -20,7 +20,7 @@
 -- lines are for the sqlite3 CLI and are skipped by the app.
 
 PRAGMA foreign_keys = ON;
-PRAGMA user_version = 8;
+PRAGMA user_version = 10;
 
 BEGIN;
 
@@ -30,6 +30,9 @@ BEGIN;
 -- ('pbkdf2-sha256$<iterations>$<salt>$<hash>'); password_hash is NULL for Google-only accounts.
 CREATE TABLE users (
     id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+    username             TEXT    UNIQUE COLLATE NOCASE, -- how the user signs in
+    -- Accounts created before usernames signed in with an email; it stays their username until
+    -- the account is next saved (the app reads it when username is NULL). New accounts leave it NULL.
     email                TEXT    UNIQUE COLLATE NOCASE,
     display_name         TEXT,
     created_at           TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
@@ -116,6 +119,19 @@ CREATE TABLE recurring_expenses (
 );
 
 CREATE INDEX idx_recurring_expenses_user ON recurring_expenses(user_id);
+
+-- ── Plaid Sandbox API keys ───────────────────────────────────────────────────
+
+-- Each user's Plaid *Sandbox* API keys (https://dashboard.plaid.com/developers/keys), entered when
+-- they create their account or on Profile. Bank linking calls Plaid with the signed-in user's keys.
+-- Sandbox keys only: Pace only ever calls sandbox.plaid.com. Prototype shortcut: Plaid expects the
+-- secret to live on a server, not on the device.
+CREATE TABLE plaid_sandbox_keys (
+    user_id        INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    client_id      TEXT    NOT NULL CHECK (length(client_id) > 0),
+    sandbox_secret TEXT    NOT NULL CHECK (length(sandbox_secret) > 0),
+    updated_at     TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+);
 
 -- ── Plaid Sandbox test credentials ───────────────────────────────────────────
 

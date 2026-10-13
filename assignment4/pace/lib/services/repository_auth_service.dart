@@ -2,6 +2,8 @@ import 'dart:async' show StreamController;
 import '../models/navigation.dart' show FlowStep;
 import '../models/user_account.dart' show UserAccount;
 import '../repositories/user_account_repository.dart' show UserAccountRepository;
+import '../models/plaid_keys.dart' show PlaidKeys;
+import '../repositories/plaid_key_repository.dart' show InMemoryPlaidKeyRepository, PlaidKeyRepository;
 import '../models/app_exception.dart' show AppException, FieldValidationException;
 import 'auth_service.dart' show AuthService;
 import '../repositories/google_account_repository.dart' show GoogleAccountRepository;
@@ -9,16 +11,17 @@ import 'password_hasher.dart' show PasswordHasher;
 import 'validators.dart' show Validators;
 
 /// [AuthService] backed by a [UserAccountRepository], a [PasswordHasher] and Google Sign-In.
-/// BUSINESS RULES: credential validation, creating / matching Pace accounts, password resets
+/// BUSINESS RULES: credential validation, creating / matching Pace accounts (each with the user's
+/// Plaid sandbox keys, kept via [PlaidKeyRepository]), password resets
 /// via security question (with lockout), and where each way of signing in leads
 /// (new account → onboarding, existing account → home).
 ///
 /// Everything happens on the device: there is no backend, so Google ID tokens are not
 /// verified server-side.
 class RepositoryAuthService implements AuthService {
-  /// Same message for an unknown email and a wrong password, so sign-in doesn't reveal which
-  /// emails have accounts.
-  static const _badCredentials = 'Email or password is incorrect';
+  /// Same message for an unknown username and a wrong password, so sign-in doesn't reveal which
+  /// usernames have accounts.
+  static const _badCredentials = 'Username or password is incorrect';
 
   static const _questions = [
     'What was the name of your first pet?',
@@ -35,20 +38,23 @@ class RepositoryAuthService implements AuthService {
 
   final UserAccountRepository _accounts;
   final GoogleAccountRepository _google;
+  final PlaidKeyRepository _plaidKeys;
   final PasswordHasher _hasher;
   final DateTime Function() _now;
   final _changes = StreamController<bool>.broadcast();
-  /// Per-email (lower-cased) wrong-answer count and lock expiry, for this app session.
+  /// Per-username (lower-cased) wrong-answer count and lock expiry, for this app session.
   final _resetFailures = <String, ({int count, DateTime? lockedUntil})>{};
   UserAccount? _current;
 
   RepositoryAuthService({
     required UserAccountRepository accounts,
     required GoogleAccountRepository google,
+    PlaidKeyRepository? plaidKeys,
     PasswordHasher hasher = const PasswordHasher(),
     DateTime Function()? now,
   })  : _accounts = accounts,
         _google = google,
+        _plaidKeys = plaidKeys ?? InMemoryPlaidKeyRepository(),
         _hasher = hasher,
         _now = now ?? DateTime.now;
 
@@ -72,16 +78,16 @@ class RepositoryAuthService implements AuthService {
   }
 
   @override
-  Future<FlowStep> signIn({required String email, required String password}) async {
+  Future<FlowStep> signIn({required String username, required String password}) async {
     final errors = <String, String>{
-      if (Validators.email(email) != null) 'email': Validators.email(email)!,
+      if (Validators.requiredText(username, 'Enter your username') case final e?) 'username': e,
       if (password.isEmpty) 'password': 'Enter your password',
     };
     if (errors.isNotEmpty) throw FieldValidationException(errors);
 
-    final account = await _accounts.fetchByEmail(email);
+    final account = await _accounts.fetchByUsername(username);
     final hash = account?.passwordHash;
-    // Accounts created with Google have no password; they fail here like an unknown email.
+    // Accounts created with Google have no password; they fail here like an unknown username.
     if (account == null || hash == null || !await _hasher.verify(password, hash)) {
       throw const FieldValidationException({'password': _badCredentials}, _badCredentials);
     }
@@ -92,48 +98,54 @@ class RepositoryAuthService implements AuthService {
   @override
   Future<FlowStep> createAccount({
     required String name,
-    required String email,
+    required String username,
     required String password,
     required String confirmPassword,
     required String securityQuestion,
     required String securityAnswer,
+    required String plaidClientId,
+    required String plaidSecret,
   }) async {
     final errors = <String, String>{
       if (Validators.requiredText(name, 'Enter your name') case final e?) 'name': e,
-      if (Validators.email(email) case final e?) 'email': e,
+      if (Validators.newUsername(username) case final e?) 'username': e,
       if (Validators.newPassword(password) case final e?) 'password': e,
       if (Validators.passwordsMatch(password, confirmPassword) case final e?) 'confirmPassword': e,
       if (!_questions.contains(securityQuestion)) 'securityQuestion': 'Choose a security question',
       if (Validators.securityAnswer(securityAnswer) case final e?) 'securityAnswer': e,
+      if (Validators.plaidClientId(plaidClientId) case final e?) 'plaidClientId': e,
+      if (Validators.plaidSandboxSecret(plaidSecret) case final e?) 'plaidSecret': e,
     };
-    if (!errors.containsKey('email') && await _accounts.fetchByEmail(email) != null) {
-      errors['email'] = 'An account with this email already exists';
+    if (!errors.containsKey('username') && await _accounts.fetchByUsername(username) != null) {
+      errors['username'] = 'An account with this username already exists';
     }
     if (errors.isNotEmpty) throw FieldValidationException(errors);
 
-    _setCurrent(await _accounts.create(
-      email: email.trim(),
+    final account = await _accounts.create(
+      username: username.trim(),
       displayName: name.trim(),
       passwordHash: await _hasher.hash(password),
       securityQuestion: securityQuestion,
       securityAnswerHash: await _hasher.hash(_normaliseAnswer(securityAnswer)),
-    ));
+    );
+    await _plaidKeys.save(account.id, PlaidKeys(clientId: plaidClientId.trim(), sandboxSecret: plaidSecret.trim()));
+    _setCurrent(account);
     return FlowStep.onboarding;
   }
 
   @override
-  Future<String> securityQuestionFor(String email) async =>
-      (await _resettableAccount(email)).securityQuestion!;
+  Future<String> securityQuestionFor(String username) async =>
+      (await _resettableAccount(username)).securityQuestion!;
 
   @override
   Future<FlowStep> resetPassword({
-    required String email,
+    required String username,
     required String securityAnswer,
     required String newPassword,
     required String confirmPassword,
   }) async {
-    final account = await _resettableAccount(email);
-    final key = account.email!.toLowerCase();
+    final account = await _resettableAccount(username);
+    final key = account.username!.toLowerCase();
     final lockedUntil = _resetFailures[key]?.lockedUntil;
     if (lockedUntil != null && _now().isBefore(lockedUntil)) {
       throw const AppException('Too many incorrect answers. Try again in a few minutes.');
@@ -163,16 +175,16 @@ class RepositoryAuthService implements AuthService {
     return FlowStep.home;
   }
 
-  /// The account for [email] if its password can be reset here; otherwise an 'email' field error.
-  Future<UserAccount> _resettableAccount(String email) async {
-    if (Validators.email(email) case final e?) throw FieldValidationException({'email': e});
-    final account = await _accounts.fetchByEmail(email);
+  /// The account for [username] if its password can be reset here; otherwise a 'username' field error.
+  Future<UserAccount> _resettableAccount(String username) async {
+    if (Validators.requiredText(username, 'Enter your username') case final e?) throw FieldValidationException({'username': e});
+    final account = await _accounts.fetchByUsername(username);
     if (account == null) {
-      throw const FieldValidationException({'email': 'No account on this device uses that email'});
+      throw const FieldValidationException({'username': 'No account on this device uses that username'});
     }
     if (account.securityQuestion == null || account.securityAnswerHash == null) {
       throw FieldValidationException({
-        'email': account.passwordHash == null
+        'username': account.passwordHash == null
             ? 'This account signs in with Google, so it has no password to reset'
             : 'This account has no security question, so its password can’t be reset',
       });
@@ -191,16 +203,16 @@ class RepositoryAuthService implements AuthService {
       return FlowStep.home;
     }
 
-    // An existing Pace account with the same (Google-verified) email gets Google linked to it.
-    final byEmail = await _accounts.fetchByEmail(google.email);
-    if (byEmail != null) {
-      final updated = byEmail.copyWith(googleId: google.id, displayName: byEmail.displayName ?? google.displayName);
+    // An existing Pace account whose username is the (Google-verified) email gets Google linked to it.
+    final byUsername = await _accounts.fetchByUsername(google.email);
+    if (byUsername != null) {
+      final updated = byUsername.copyWith(googleId: google.id, displayName: byUsername.displayName ?? google.displayName);
       await _accounts.save(updated);
       _setCurrent(updated);
       return FlowStep.home;
     }
 
-    _setCurrent(await _accounts.create(email: google.email, displayName: google.displayName, googleId: google.id));
+    _setCurrent(await _accounts.create(username: google.email, displayName: google.displayName, googleId: google.id));
     return FlowStep.onboarding;
   }
 

@@ -14,14 +14,20 @@ class NoGoogle implements GoogleAccountRepository {
   Future<void> signOut() async {}
 }
 
+/// Sandbox keys in Plaid's format, for creating test accounts (requests are replayed, never sent).
+const testPlaidClientId = '0123456789abcdef01234567';
+const testPlaidSecret = '0123456789abcdef0123456789abcd';
+
 /// Creates (and signs in) the test user Ada, password "secret123", security answer "Rex".
-Future<FlowStep> createAda(AuthService auth, {String email = 'ada@example.com'}) => auth.createAccount(
+Future<FlowStep> createAda(AuthService auth, {String username = 'ada'}) => auth.createAccount(
       name: 'Ada',
-      email: email,
+      username: username,
       password: 'secret123',
       confirmPassword: 'secret123',
       securityQuestion: 'What was the name of your first pet?',
       securityAnswer: 'Rex',
+      plaidClientId: testPlaidClientId,
+      plaidSecret: testPlaidSecret,
     );
 
 /// The field errors [body] fails with (it must throw a FieldValidationException).

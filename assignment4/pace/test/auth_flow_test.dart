@@ -10,6 +10,8 @@ import 'package:pace_app/services/demo/demo_services.dart' show demoServices;
 import 'package:pace_app/repositories/user_account_repository.dart' show InMemoryUserAccountRepository;
 import 'package:pace_app/services/password_hasher.dart' show PasswordHasher;
 
+import 'helpers.dart' show testPlaidClientId, testPlaidSecret;
+
 void main() {
   group('flow', () {
     late AppRouter router;
@@ -29,18 +31,20 @@ void main() {
           .createAccount()
           .submitAccount(
             name: 'Ada',
-            email: 'ada@example.com',
+            username: 'ada',
             password: 'secret123',
             confirmPassword: 'secret123',
             securityQuestion: 'What was the name of your first pet?',
             securityAnswer: 'Rex',
+            plaidClientId: testPlaidClientId,
+            plaidSecret: testPlaidSecret,
           );
       await pumpEventQueue();
       expect(router.delegate.stack, [AppRoute.onboarding]);
 
       await router.dependencies.settingsScreen().signOut();
       await pumpEventQueue();
-      await router.dependencies.signIn().signIn('ada@example.com', 'secret123');
+      await router.dependencies.signIn().signIn('ada', 'secret123');
       await pumpEventQueue();
       expect(router.delegate.stack, [AppRoute.home]);
     });

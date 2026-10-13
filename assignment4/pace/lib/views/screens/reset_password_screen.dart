@@ -8,11 +8,11 @@ import '../widgets/widgets.dart' show PaceCard, paceInputDecoration, PaceTopBar,
 
 typedef ResetPasswordSubmit = void Function(String answer, String newPassword, String confirmPassword);
 
-/// 01c - Reset Password. Step 1 (email) while [question] is null; step 2 (answer + new
+/// 01c - Reset Password. Step 1 (username) while [question] is null; step 2 (answer + new
 /// password) once the account's security question is known.
 class ResetPasswordScreen extends StatefulWidget {
   final String? question;
-  final String? emailError;
+  final String? usernameError;
   final String? answerError;
   final String? passwordError;
   final String? confirmPasswordError;
@@ -25,7 +25,7 @@ class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({
     super.key,
     this.question,
-    this.emailError,
+    this.usernameError,
     this.answerError,
     this.passwordError,
     this.confirmPasswordError,
@@ -41,7 +41,7 @@ class ResetPasswordScreen extends StatefulWidget {
 }
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  final _email = TextEditingController();
+  final _username = TextEditingController();
   final _answer = TextEditingController();
   final _password = TextEditingController();
   final _confirm = TextEditingController();
@@ -49,14 +49,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   void dispose() {
-    _email.dispose();
+    _username.dispose();
     _answer.dispose();
     _password.dispose();
     _confirm.dispose();
     super.dispose();
   }
 
-  void _lookUp() => widget.onLookUp?.call(_email.text);
+  void _lookUp() => widget.onLookUp?.call(_username.text);
   void _reset() => widget.onReset?.call(_answer.text, _password.text, _confirm.text);
 
   @override
@@ -78,15 +78,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           const SizedBox(height: 8),
                           Text('Forgot your password?', style: T.h1),
                           const SizedBox(height: 10),
-                          Text('Enter your account’s email and we’ll ask your security question.', style: T.body),
+                          Text('Enter your account’s username and we’ll ask your security question.', style: T.body),
                           const SizedBox(height: 24),
                           TextField(
-                            controller: _email,
-                            keyboardType: TextInputType.emailAddress,
+                            controller: _username,
+                            keyboardType: TextInputType.text,
+                            autocorrect: false,
+                            enableSuggestions: false,
                             textInputAction: TextInputAction.done,
-                            autofillHints: const [AutofillHints.email],
+                            autofillHints: const [AutofillHints.username],
                             onSubmitted: (_) => widget.isLoading ? null : _lookUp(),
-                            decoration: paceInputDecoration(label: 'Email', error: widget.emailError),
+                            decoration: paceInputDecoration(label: 'Username', error: widget.usernameError),
                             style: field,
                           ),
                           const SizedBox(height: 28),

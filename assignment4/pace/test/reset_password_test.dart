@@ -13,7 +13,7 @@ import 'package:pace_app/views/navigation/app_router.dart' show AppRouter;
 import 'package:pace_app/views/pace_app.dart' show PaceApp;
 
 
-import 'helpers.dart' show fieldErrors, NoGoogle;
+import 'helpers.dart' show fieldErrors, NoGoogle, testPlaidClientId, testPlaidSecret;
 const fastHasher = PasswordHasher(iterations: 1000);
 const petQuestion = 'What was the name of your first pet?';
 
@@ -21,11 +21,13 @@ const petQuestion = 'What was the name of your first pet?';
 Future<void> createAda(RepositoryAuthService auth) async {
   await auth.createAccount(
     name: 'Ada',
-    email: 'ada@example.com',
+    username: 'ada',
     password: 'secret123',
     confirmPassword: 'secret123',
     securityQuestion: petQuestion,
     securityAnswer: '  New   York ',
+    plaidClientId: testPlaidClientId,
+    plaidSecret: testPlaidSecret,
   );
   await auth.signOut();
 }
@@ -43,15 +45,15 @@ void main() {
     });
 
     Future<FlowStep> reset({String answer = 'new york', String pw = 'fresh456', String? confirm}) => auth.resetPassword(
-          email: 'ada@example.com',
+          username: 'ada',
           securityAnswer: answer,
           newPassword: pw,
           confirmPassword: confirm ?? pw,
         );
 
     test('shows the account’s question; the answer is stored hashed', () async {
-      expect(await auth.securityQuestionFor('ADA@example.com'), petQuestion);
-      final stored = (await accounts.fetchByEmail('ada@example.com'))!;
+      expect(await auth.securityQuestionFor('ADA'), petQuestion);
+      final stored = (await accounts.fetchByUsername('ada'))!;
       expect(stored.securityAnswerHash!.contains('york'), isFalse);
     });
 
@@ -59,14 +61,14 @@ void main() {
       expect(await reset(answer: 'NEW YORK'), FlowStep.home);
       expect(auth.isSignedIn, isTrue);
       await auth.signOut();
-      expect(await auth.signIn(email: 'ada@example.com', password: 'fresh456'), FlowStep.home);
-      expect(() => auth.signIn(email: 'ada@example.com', password: 'secret123'), throwsA(isA<FieldValidationException>()));
+      expect(await auth.signIn(username: 'ada', password: 'fresh456'), FlowStep.home);
+      expect(() => auth.signIn(username: 'ada', password: 'secret123'), throwsA(isA<FieldValidationException>()));
     });
 
     test('wrong answer keeps the old password', () async {
       expect(await fieldErrors(() => reset(answer: 'Boston')), {'securityAnswer': "That answer doesn't match"});
       expect(auth.isSignedIn, isFalse);
-      expect(await auth.signIn(email: 'ada@example.com', password: 'secret123'), FlowStep.home);
+      expect(await auth.signIn(username: 'ada', password: 'secret123'), FlowStep.home);
     });
 
     test('new password must follow the rules and match', () async {
@@ -86,31 +88,33 @@ void main() {
       expect(await reset(), FlowStep.home);
     });
 
-    test('unknown email, Google-only and question-less accounts can’t be reset', () async {
-      expect((await fieldErrors(() => auth.securityQuestionFor('bob@example.com')))['email'],
-          'No account on this device uses that email');
-      await accounts.create(email: 'g@example.com', googleId: 'g-1');
-      expect((await fieldErrors(() => auth.securityQuestionFor('g@example.com')))['email'],
+    test('unknown username, Google-only and question-less accounts can’t be reset', () async {
+      expect((await fieldErrors(() => auth.securityQuestionFor('bob')))['username'],
+          'No account on this device uses that username');
+      await accounts.create(username: 'g', googleId: 'g-1');
+      expect((await fieldErrors(() => auth.securityQuestionFor('g')))['username'],
           'This account signs in with Google, so it has no password to reset');
-      await accounts.create(email: 'old@example.com', passwordHash: 'x');
-      expect((await fieldErrors(() => auth.securityQuestionFor('old@example.com')))['email'],
+      await accounts.create(username: 'old', passwordHash: 'x');
+      expect((await fieldErrors(() => auth.securityQuestionFor('old')))['username'],
           'This account has no security question, so its password can’t be reset');
     });
 
     test('sign-up requires a question from the list and an answer', () async {
       final errors = await fieldErrors(() => auth.createAccount(
             name: 'Bo',
-            email: 'bo@example.com',
+            username: 'bo.lee',
             password: 'secret123',
             confirmPassword: 'secret123',
             securityQuestion: 'Made-up question?',
             securityAnswer: ' ',
+            plaidClientId: testPlaidClientId,
+            plaidSecret: testPlaidSecret,
           ));
       expect(errors.keys.toSet(), {'securityQuestion', 'securityAnswer'});
     });
   });
 
-  testWidgets('reset page: email → question → new password → Home', (tester) async {
+  testWidgets('reset page: username → question → new password → Home', (tester) async {
     final accounts = InMemoryUserAccountRepository();
     final router = AppRouter.create(
       services: demoServices(
@@ -125,7 +129,7 @@ void main() {
     await tester.pumpWidget(PaceApp(router: router));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.widgetWithText(TextField, 'Email'), 'ada@example.com');
+    await tester.enterText(find.widgetWithText(TextField, 'Username'), 'ada');
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
     expect(find.text(petQuestion), findsOneWidget);

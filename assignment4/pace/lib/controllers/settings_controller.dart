@@ -11,7 +11,7 @@ class SettingsController extends ScreenController {
       : _settings = settings,
         _auth = auth,
         super(navigator) {
-    // e.g. after editing the profile, the header (name / email / initials) updates on return.
+    // e.g. after editing the profile, the header (name / username / initials) updates on return.
     refreshOn(_settings.changes);
   }
 

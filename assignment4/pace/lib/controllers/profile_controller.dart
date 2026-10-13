@@ -6,7 +6,7 @@ import '../services/profile_service.dart' show ProfileService;
 import 'base_controller.dart' show FormController;
 
 /// UI state for the Profile screen: the loaded profile and bank connection, saving / connecting /
-/// removing flags, inline field errors (keyed 'name') and a "saved" confirmation. Rules live in the
+/// removing flags, inline field errors (keyed 'name', 'plaidClientId', 'plaidSecret') and a "saved" confirmation. Rules live in the
 /// services.
 class ProfileController extends FormController {
   final ProfileService _profile;
@@ -37,9 +37,11 @@ class ProfileController extends FormController {
     notifyListeners();
   }
 
-  Future<void> save({required String name}) async {
+  /// Saves the name and Plaid sandbox keys (a blank secret keeps the stored one).
+  Future<void> save({required String name, required String plaidClientId, required String plaidSecret}) async {
     justSaved = false;
-    justSaved = await submit(() async => data = await _profile.update(name: name));
+    justSaved = await submit(
+        () async => data = await _profile.update(name: name, plaidClientId: plaidClientId, plaidSecret: plaidSecret));
     notifyListeners();
   }
 

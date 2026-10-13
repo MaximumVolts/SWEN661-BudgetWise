@@ -10,10 +10,10 @@ class SignInController extends FormController {
       : _auth = auth,
         super(navigator);
 
-  String? get emailError => errorFor('email');
+  String? get usernameError => errorFor('username');
   String? get passwordError => errorFor('password');
 
-  Future<void> signIn(String email, String password) => submitStep(() => _auth.signIn(email: email, password: password));
+  Future<void> signIn(String username, String password) => submitStep(() => _auth.signIn(username: username, password: password));
   Future<void> signInWithGoogle() => submitStep(_auth.signInWithGoogle);
   void signInWithApple() => navigator.openSocialSignIn('apple');
   void forgotPassword() => navigator.openForgotPassword();

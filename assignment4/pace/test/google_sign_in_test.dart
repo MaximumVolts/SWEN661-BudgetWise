@@ -39,7 +39,7 @@ void main() {
       expect(await auth.signInWithGoogle(), FlowStep.onboarding);
       expect(auth.isSignedIn, isTrue);
       final created = (await accounts.fetchByGoogleId('g-1'))!;
-      expect(created.email, 'ada@gmail.com');
+      expect(created.username, 'ada@gmail.com');
       expect(created.displayName, 'Ada Lovelace');
     });
 
@@ -47,12 +47,12 @@ void main() {
       await auth.signInWithGoogle();
       await auth.signOut();
       expect(await auth.signInWithGoogle(), FlowStep.home);
-      expect((await accounts.fetchByEmail('ada@gmail.com'))!.id, auth.currentAccount!.id);
+      expect((await accounts.fetchByUsername('ada@gmail.com'))!.id, auth.currentAccount!.id);
       expect(google.signOuts, 1);
     });
 
     test('links Google to an existing account with the same email', () async {
-      final existing = await accounts.create(email: 'ADA@gmail.com');
+      final existing = await accounts.create(username: 'ADA@gmail.com');
       expect(await auth.signInWithGoogle(), FlowStep.home);
       expect(auth.currentAccount!.id, existing.id);
       expect((await accounts.fetchById(existing.id))!.googleId, 'g-1');

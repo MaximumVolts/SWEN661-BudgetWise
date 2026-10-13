@@ -53,13 +53,13 @@ void main() {
     expect(trigger, contains('INSERT INTO user_preferences (user_id) VALUES (NEW.id);'));
     expect(trigger.endsWith('END'), true);
     expect(statements.any((s) => s.startsWith('PRAGMA') || s == 'BEGIN' || s == 'COMMIT'), false);
-    expect(PaceDatabase.schemaVersion(await loadFromProject(PaceDatabase.schemaAsset)), 8);
+    expect(PaceDatabase.schemaVersion(await loadFromProject(PaceDatabase.schemaAsset)), 10);
   });
 
   test('first launch creates the database from schema.sql', () async {
     final pace = openDb();
     final db = await pace.database;
-    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 8);
+    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 10);
     final tables = [for (final r in await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'")) r['name']];
     expect(tables, contains('users'));
     expect(tables, contains('plaid_sandbox_test_credentials'));
@@ -82,7 +82,7 @@ void main() {
 
     final db = await first.database;
     final row = (await db.query('users')).single;
-    expect(row['email'], 'ada@example.com');
+    expect(row['username'], 'ada');
     expect(row['display_name'], 'Ada');
     expect(row['password_hash'] as String, startsWith('pbkdf2-sha256\$'));
     expect(row['password_hash'] as String, isNotNull);
@@ -98,17 +98,36 @@ void main() {
       google: NoGoogle(),
       hasher: const PasswordHasher(iterations: 1000),
     );
-    expect(await restarted.signIn(email: 'ADA@example.com', password: 'secret123'), FlowStep.home);
+    expect(await restarted.signIn(username: 'ADA', password: 'secret123'), FlowStep.home);
     final db2 = await second.database;
     expect((await db2.query('users')).length, 1);
     expect((await db2.query('plaid_sandbox_test_credentials')).length, 1); // seed not re-inserted
     await second.close();
   });
 
+  test('an account from before usernames signs in with its old email, which becomes its username', () async {
+    final pace = openDb();
+    const hasher = PasswordHasher(iterations: 1000);
+    // As an older version stored it: an email, no username.
+    await (await pace.database).insert('users', {'email': 'ada@example.com', 'password_hash': await hasher.hash('secret123')});
+    final repo = SqliteUserAccountRepository(pace);
+    final auth = RepositoryAuthService(accounts: repo, google: NoGoogle(), hasher: hasher);
+    expect(await auth.signIn(username: 'ADA@example.com', password: 'secret123'), FlowStep.home);
+    expect(auth.currentAccount!.username, 'ada@example.com');
+
+    // Saving the account (e.g. a profile edit) writes it to the username column.
+    await repo.save(auth.currentAccount!.copyWith(displayName: 'Ada'));
+    final row = (await (await pace.database).query('users')).single;
+    expect(row['username'], 'ada@example.com');
+    // Nobody can take that username for a new account.
+    expect(await repo.fetchByUsername('Ada@Example.com'), isNotNull);
+    await pace.close();
+  });
+
   test('deleting an account removes its row and cascades to its preferences', () async {
     final pace = openDb();
     final repo = SqliteUserAccountRepository(pace);
-    final account = await repo.create(email: 'bo@example.com', passwordHash: 'h');
+    final account = await repo.create(username: 'bo', passwordHash: 'h');
     await repo.save(account.copyWith(googleId: 'g-1'));
     expect((await repo.fetchByGoogleId('g-1'))!.id, account.id);
 
@@ -128,20 +147,20 @@ void main() {
       display_name TEXT,
       created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')))''');
     await addV1Preferences(v2);
-    await v2.insert('users', {'email': 'old@example.com', 'display_name': 'Old'});
+    await v2.insert('users', {'email': 'old', 'display_name': 'Old'});
     await v2.execute('PRAGMA user_version = 2');
     await v2.close();
 
     final pace = openDb();
     final db = await pace.database;
-    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 8);
+    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 10);
     expect(await db.query('budgets'), isEmpty); // a table the old database didn't have starts empty
     final repo = SqliteUserAccountRepository(pace);
-    final old = (await repo.fetchByEmail('old@example.com'))!;
+    final old = (await repo.fetchByUsername('old'))!;
     expect(old.displayName, 'Old');
     expect(old.passwordHash, isNull);
     await repo.save(old.copyWith(passwordHash: 'h2'));
-    expect((await repo.fetchByEmail('old@example.com'))!.passwordHash, 'h2');
+    expect((await repo.fetchByUsername('old'))!.passwordHash, 'h2');
     await pace.close();
   });
 
@@ -160,7 +179,7 @@ void main() {
       updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
       UNIQUE (user_id, period, category_id))''');
     await v5.execute('CREATE INDEX idx_budgets_user_period ON budgets(user_id, period)');
-    final user = await v5.insert('users', {'email': 'ada@example.com'});
+    final user = await v5.insert('users', {'email': 'ada'});
     Future<void> budget(String period, String category, int cents, String updatedAt) => v5.insert('budgets', {
           'user_id': user, 'period': period, 'category_id': category, 'monthly_limit_cents': cents,
           'created_at': updatedAt, 'updated_at': updatedAt,
@@ -173,7 +192,7 @@ void main() {
 
     final pace = openDb();
     final db = await pace.database;
-    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 8);
+    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 10);
     final columns = [for (final c in await db.rawQuery('PRAGMA table_info(budgets)')) c['name']];
     expect(columns, isNot(contains('period')));
     final budgets = SqliteBudgetRepository(pace);
@@ -194,7 +213,7 @@ void main() {
       updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
       UNIQUE (user_id, category_id))''');
     await v4.execute('CREATE INDEX idx_budgets_user ON budgets(user_id)');
-    final user = await v4.insert('users', {'email': 'ada@example.com'});
+    final user = await v4.insert('users', {'email': 'ada'});
     await v4.insert('budgets', {'user_id': user, 'category_id': 'food', 'monthly_limit_cents': 100000});
     await v4.execute('PRAGMA user_version = 4');
     await v4.close();
@@ -208,14 +227,14 @@ void main() {
     final v6 = await databaseFactoryFfi.openDatabase(path);
     await v6.execute('CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT)');
     await addV1Preferences(v6);
-    final user = await v6.insert('users', {'email': 'ada@example.com'}); // trigger adds the preferences row
+    final user = await v6.insert('users', {'email': 'ada'}); // trigger adds the preferences row
     await v6.update('user_preferences', {'high_contrast': 1, 'chart_patterns': 1, 'budget_alerts': 0});
     await v6.execute('PRAGMA user_version = 6');
     await v6.close();
 
     final pace = openDb();
     final db = await pace.database;
-    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 8);
+    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 10);
     final columns = [for (final c in await db.rawQuery('PRAGMA table_info(user_preferences)')) c['name']];
     expect(columns, contains('colorblind_mode'));
     expect(columns, isNot(contains('chart_patterns')));
@@ -224,7 +243,7 @@ void main() {
     expect(row['budget_alerts'], 0);
     expect(row['colorblind_mode'], 0);
     // Both triggers are back: a new user gets a preferences row.
-    final bo = await db.insert('users', {'email': 'bo@example.com'});
+    final bo = await db.insert('users', {'email': 'bo'});
     expect(await db.query('user_preferences', where: 'user_id = ?', whereArgs: [bo]), hasLength(1));
     final triggers = [for (final t in await db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'trigger'")) t['name']];
     expect(triggers, containsAll(['users_default_preferences', 'user_preferences_touch']));
