@@ -41,7 +41,7 @@ The code follows **MVCS with a repository layer**: views → controllers → ser
 2. In the app, follow [First-time setup](#first-time-setup): create an account with your Plaid sandbox keys, finish onboarding, then **Connect test bank with Plaid**.
 
 ## Installing the APK
-Pace runs on Android only for now; it can't be built for iOS on this project's setup.
+Pace runs on Android only for now. Just copy the .apk to your device and install it.
 
 **Build it**
 ```sh
