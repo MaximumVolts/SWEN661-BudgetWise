@@ -1,0 +1,4 @@
+// Google Sign-In URL scheme: the iOS client ID reversed, e.g. for
+//   1234-abcd.apps.googleusercontent.com  ->  com.googleusercontent.apps.1234-abcd
+// Also put the (non-reversed) iOS client ID in config/google_sign_in.json. See README.
+GOOGLE_REVERSED_CLIENT_ID = com.googleusercontent.apps.REPLACE_WITH_YOUR_IOS_CLIENT_ID
