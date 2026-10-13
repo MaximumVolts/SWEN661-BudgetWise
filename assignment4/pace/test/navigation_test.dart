@@ -159,9 +159,8 @@ void main() {
     });
 
     test('service-provided targets resolve to routes', () {
-      final before = d.stack;
-      nav.openTarget(const DeepLinkTarget(TargetKind.bill, 'b1')); // bill detail not built: no navigation
-      expect(d.stack, before);
+      nav.openTarget(const DeepLinkTarget(TargetKind.bill, 'b1'));
+      expect(d.current, AppRoute.billDetail('b1'));
       nav.openTarget(const DeepLinkTarget(TargetKind.budgetCategory, 'food'));
       expect(d.current, AppRoute.budgetCategory('food'));
       nav.openTarget(const DeepLinkTarget(TargetKind.budgets));

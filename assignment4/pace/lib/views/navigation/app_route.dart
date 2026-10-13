@@ -16,6 +16,8 @@ enum AppRouteName {
   spending('/spending'),
   budgets('/budgets'),
   billsRecurring('/bills/recurring'),
+  billNew('/bills/new'),
+  billEdit('/bills/edit/:id'),
   bills('/bills'),
   // details
   transactionDetail('/transactions/:id'),
@@ -66,6 +68,7 @@ class AppRoute {
   static const budgetNew = AppRoute(AppRouteName.budgetNew);
   static const bills = AppRoute(AppRouteName.bills);
   static const billsRecurring = AppRoute(AppRouteName.billsRecurring);
+  static const billNew = AppRoute(AppRouteName.billNew);
   static const accounts = AppRoute(AppRouteName.accounts);
   static const notifications = AppRoute(AppRouteName.notifications);
   static const goals = AppRoute(AppRouteName.goals);
@@ -83,6 +86,7 @@ class AppRoute {
   factory AppRoute.budgetCategory(String id, {String? periodId}) =>
       AppRoute(AppRouteName.budgetCategory, params: {'id': id}, query: {if (periodId != null) 'period': periodId});
   factory AppRoute.billDetail(String id) => AppRoute(AppRouteName.billDetail, params: {'id': id});
+  factory AppRoute.billEdit(String id) => AppRoute(AppRouteName.billEdit, params: {'id': id});
   factory AppRoute.accountDetail(String id) => AppRoute(AppRouteName.accountDetail, params: {'id': id});
   factory AppRoute.trendDetail(String id) => AppRoute(AppRouteName.trendDetail, params: {'id': id});
   factory AppRoute.tool(String id) => AppRoute(AppRouteName.tool, params: {'id': id});

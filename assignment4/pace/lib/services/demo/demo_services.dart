@@ -12,7 +12,10 @@ import '../../repositories/pace_database.dart' show PaceDatabase;
 import '../../repositories/preferences_repository.dart' show InMemoryPreferencesRepository, PreferencesRepository;
 import '../../repositories/sqlite_budget_repository.dart' show SqliteBudgetRepository;
 import '../../repositories/sqlite_preferences_repository.dart' show SqlitePreferencesRepository;
+import '../../repositories/sqlite_recurring_expense_repository.dart' show SqliteRecurringExpenseRepository;
+import '../../repositories/recurring_expense_repository.dart' show InMemoryRecurringExpenseRepository, RecurringExpenseRepository;
 import '../../repositories/sqlite_user_account_repository.dart' show SqliteUserAccountRepository;
+import '../../repositories/statement_saver.dart' show FilePickerStatementSaver, StatementSaver;
 import '../../repositories/transaction_annotation_repository.dart' show InMemoryTransactionAnnotationRepository;
 import '../../repositories/user_account_repository.dart' show UserAccountRepository;
 import '../app_services.dart' show AppServices;
@@ -29,6 +32,7 @@ import '../plaid_dashboard_service.dart' show PlaidDashboardService;
 import '../plaid_notification_service.dart' show PlaidNotificationService;
 import '../plaid_sandbox_bank_link_service.dart' show PlaidSandboxBankLinkService;
 import '../plaid_spending_service.dart' show PlaidSpendingService;
+import '../plaid_statement_service.dart' show PlaidStatementService;
 import '../plaid_transaction_service.dart' show PlaidTransactionService;
 import '../plaid_trend_service.dart' show PlaidTrendService;
 import '../repository_auth_service.dart' show RepositoryAuthService;
@@ -49,6 +53,8 @@ AppServices demoServices({
   LinkedBankRepository? banks,
   BudgetRepository? budgetStore,
   PreferencesRepository? preferencesStore,
+  StatementSaver? statementSaver,
+  RecurringExpenseRepository? recurringStore,
   DateTime Function()? now,
 }) {
   // One repository (the users table) shared by sign-in and the profile.
@@ -58,6 +64,7 @@ AppServices demoServices({
   // Budgets live with accounts: on device by default; in memory when accounts are (tests).
   final budgetLimits = budgetStore ?? (accounts == null ? SqliteBudgetRepository(database) : InMemoryBudgetRepository());
   final preferences = preferencesStore ?? (accounts == null ? SqlitePreferencesRepository(database) : InMemoryPreferencesRepository());
+  final recurring = recurringStore ?? (accounts == null ? SqliteRecurringExpenseRepository(database) : InMemoryRecurringExpenseRepository());
   final auth = RepositoryAuthService(
     accounts: users,
     google: google ?? GoogleSignInAccountRepository(),
@@ -71,7 +78,7 @@ AppServices demoServices({
   final linkedBanks = banks ?? DeviceLinkedBankRepository();
   final bankData = PlaidBankDataRepository(plaid: plaidApi, banks: linkedBanks, currentUserId: currentUserId, now: now);
   final notes = InMemoryTransactionAnnotationRepository();
-  final bills = PlaidBillService(bankData, notes, now: now);
+  final bills = PlaidBillService(bankData, notes, recurring: recurring, currentUserId: currentUserId, now: now);
   final budgets = PlaidBudgetService(bankData, notes, budgets: budgetLimits, currentUserId: currentUserId, now: now);
   final trends = PlaidTrendService(bankData, notes, now: now);
   final cashFlow = PlaidCashFlowService(bankData, notes, now: now);
@@ -100,6 +107,7 @@ AppServices demoServices({
     ),
     cashFlow: cashFlow,
     trends: trends,
+    statements: PlaidStatementService(bankData, notes, saver: statementSaver ?? const FilePickerStatementSaver(), now: now),
   );
 }
 

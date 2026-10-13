@@ -6,7 +6,8 @@ import 'calendar.dart' show Calendar;
 import 'cash_flow_service.dart' show CashFlowService;
 import 'date_labels.dart' show DateLabels;
 import '../models/money.dart' show Money;
-import 'plaid_bill_service.dart' show PlaidBillService;
+import 'recurring_schedule.dart' show RecurringSchedule;
+import '../models/recurring.dart' show RecurringFrequency;
 
 /// [CashFlowService] projecting cash from the linked banks in Plaid (sandbox).
 /// BUSINESS RULES: cash today = checking + savings balances; recurring income and bills are
@@ -127,7 +128,7 @@ class PlaidCashFlowService extends AnnotatedBankDataService implements CashFlowS
   static Iterable<DateTime> _occurrences(RecurringStream s, DateTime from, DateTime until) sync* {
     var date = s.nextDate;
     if (date == null) return;
-    final step = PlaidBillService.periodDays(s.frequency);
+    final step = RecurringSchedule.periodDays(RecurringFrequency.fromCode(s.frequency));
     while (date!.isBefore(from)) {
       date = Calendar.addDays(date, step);
     }

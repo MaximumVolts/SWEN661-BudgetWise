@@ -1,4 +1,5 @@
 import '../models/navigation.dart' show DeepLinkTarget, FlowStep;
+import '../models/recurring.dart' show RecurringAction;
 import '../models/transaction.dart' show FilterChoice, FilterKind;
 
 /// Navigation & modal UI as a service, so controllers can say *where to go* without importing
@@ -45,7 +46,10 @@ abstract class AppNavigator {
   Future<FilterChoice?> pickFilter(FilterKind kind, {required List<FilterChoice> choices, FilterChoice? current});
   Future<bool> openNewCategory();
   Future<bool> openAddNote(String transactionId);
-  Future<bool> openAddBill();
+  /// The form to add a recurring expense (a bill or subscription).
+  void openAddBill();
+  /// The form to edit a recurring expense the user added.
+  void openEditBill(String billId);
   Future<bool> openAddGoal();
   Future<bool> openEditGoal(String goalId);
   Future<bool> openAddContribution(String goalId);
@@ -56,7 +60,10 @@ abstract class AppNavigator {
   /// Asks before deleting a budget. True if the user confirmed.
   Future<bool> confirmDeleteBudget(String categoryName);
   Future<bool> openAddExpectedIncome();
-  Future<bool> openSubscriptionMenu(String subscriptionId);
+  /// The menu for a bill or subscription named [name]: the chosen action, or null.
+  Future<RecurringAction?> openRecurringMenu(String name, List<RecurringAction> actions);
+  /// Asks before deleting a recurring expense. True if confirmed.
+  Future<bool> confirmDeleteRecurring(String name);
   Future<bool> openThemePicker();
   Future<bool> openBillReminderPicker();
   Future<bool> confirmDeleteAccount();

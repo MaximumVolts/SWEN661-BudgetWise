@@ -25,6 +25,10 @@ class Fmt {
 
   static String percent(double v, {int decimals = 1}) => '${v.toStringAsFixed(decimals)}%';
 
+  /// 2026-10-12 -> Oct 12, 2026
+  static String date(DateTime d) => '${_months[d.month - 1]} ${d.day}, ${d.year}';
+  static const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
   /// 4000 -> $4k, 2500 -> $2.5k
   static String compact(double v) => Money.compact(v);
 }

@@ -15,6 +15,7 @@ class BillsRecurringView extends StatelessWidget {
           return BillsRecurringScreen(
             monthlyTotal: r.monthlyTotal,
             yearlyTotal: r.yearlyTotal,
+            subscriptionsMonthly: r.subscriptionsMonthly,
             items: r.items,
             insight: r.insight,
             onTabChanged: (i) {

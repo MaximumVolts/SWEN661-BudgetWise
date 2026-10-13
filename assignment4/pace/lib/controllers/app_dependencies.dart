@@ -1,4 +1,6 @@
 import 'accounts_controller.dart' show AccountsController;
+import 'bill_detail_controller.dart' show BillDetailController;
+import 'bill_form_controller.dart' show BillFormController;
 import 'bills_controller.dart' show BillsController;
 import 'budget_category_controller.dart' show BudgetCategoryController;
 import 'budget_form_controller.dart' show BudgetFormController;
@@ -17,6 +19,7 @@ import 'savings_goals_controller.dart' show SavingsGoalsController;
 import 'settings_controller.dart' show SettingsController;
 import 'sign_in_controller.dart' show SignInController;
 import 'spending_controller.dart' show SpendingController;
+import 'statement_export_controller.dart' show StatementExportController;
 import 'transaction_detail_controller.dart' show TransactionDetailController;
 import 'transactions_controller.dart' show TransactionsController;
 import 'trends_controller.dart' show TrendsController;
@@ -53,9 +56,14 @@ class AppDependencies {
       BudgetFormController(service: services.budgets, navigator: navigator, editingCategoryId: categoryId);
   BudgetCategoryController budgetCategory({required String categoryId, required String periodId}) =>
       BudgetCategoryController(categoryId: categoryId, periodId: periodId, service: services.budgets, navigator: navigator);
+  StatementExportController statementExport() =>
+      StatementExportController(service: services.statements, navigator: navigator);
   SpendingController spendingOverview() => SpendingController(service: services.spending, navigator: navigator);
   /// One controller powers both BillsUpcomingView and BillsRecurringView.
   BillsController billsController() => BillsController(service: services.bills, navigator: navigator);
+  BillDetailController billDetail(String id) => BillDetailController(billId: id, service: services.bills, navigator: navigator);
+  /// [id] null = a new recurring expense.
+  BillFormController billForm({String? id}) => BillFormController(service: services.bills, navigator: navigator, editingId: id);
   SavingsGoalsController savingsGoals() => SavingsGoalsController(service: services.goals, navigator: navigator);
   NotificationsController notificationCenter() =>
       NotificationsController(service: services.notifications, navigator: navigator);

@@ -1,9 +1,10 @@
-import 'dart:convert' show jsonDecode, jsonEncode;
+import 'dart:convert' show ascii, jsonDecode, jsonEncode, utf8;
 import 'dart:io' show File;
 import 'package:flutter/material.dart' show Text, TextField;
 import 'package:flutter_test/flutter_test.dart'
     show
         closeTo,
+        completion,
         contains,
         expect,
         expectLater,
@@ -20,23 +21,29 @@ import 'package:flutter_test/flutter_test.dart'
         isFalse,
         isNot,
         isNotEmpty,
+        isNull,
         lessThanOrEqualTo,
         isTrue,
         setUp,
         startsWith,
         test,
         testWidgets,
-        throwsA;
+        throwsA,
+        WidgetTester;
 import 'package:http/http.dart' as http show Request, Response;
 import 'package:http/testing.dart' show MockClient;
 import 'package:pace_app/models/budget.dart' show BudgetOverview;
 import 'package:pace_app/models/linked_bank.dart' show LinkedItem;
 import 'package:pace_app/models/navigation.dart' show TargetKind;
 import 'package:pace_app/models/notification.dart' show NotificationKind;
+import 'package:pace_app/models/statement.dart' show Statement, StatementFormat, StatementLine;
+import 'package:pace_app/models/recurring.dart' show RecurringAction, RecurringKind;
+import 'package:pace_app/models/money.dart' show Money;
 import 'package:pace_app/models/transaction.dart' show FilterChoice, FilterKind, TransactionItem, TransactionQuery;
 import 'package:pace_app/repositories/bank_data_repository.dart' show PlaidBankDataRepository;
 import 'package:pace_app/repositories/budget_repository.dart' show InMemoryBudgetRepository;
 import 'package:pace_app/repositories/linked_bank_repository.dart' show InMemoryLinkedBankRepository;
+import 'package:pace_app/repositories/statement_saver.dart' show InMemoryStatementSaver, StatementSaver;
 import 'package:pace_app/repositories/transaction_annotation_repository.dart' show InMemoryTransactionAnnotationRepository;
 import 'package:pace_app/repositories/user_account_repository.dart' show InMemoryUserAccountRepository;
 import 'package:pace_app/models/app_exception.dart' show AppException;
@@ -48,6 +55,8 @@ import 'package:pace_app/services/plaid_cash_flow_service.dart' show PlaidCashFl
 import 'package:pace_app/services/plaid_dashboard_service.dart' show PlaidDashboardService;
 import 'package:pace_app/services/plaid_notification_service.dart' show PlaidNotificationService;
 import 'package:pace_app/services/plaid_spending_service.dart' show PlaidSpendingService;
+import 'package:pace_app/services/plaid_statement_service.dart' show PlaidStatementService;
+import 'package:pace_app/services/statement_encoders.dart' show CsvStatementEncoder, PdfStatementEncoder;
 import 'package:pace_app/services/plaid_transaction_service.dart' show PlaidTransactionService;
 import 'package:pace_app/services/password_hasher.dart' show PasswordHasher;
 import 'package:pace_app/services/plaid_trend_service.dart' show PlaidTrendService;
@@ -381,9 +390,139 @@ void main() {
     });
   });
 
+  group('Statements', () {
+    late InMemoryStatementSaver saver;
+    late PlaidStatementService statements;
+    setUp(() {
+      saver = InMemoryStatementSaver();
+      statements = PlaidStatementService(data, notes, saver: saver, now: now);
+    });
+
+    test('options: all accounts first, then each account with transactions; this month and the 5 before', () async {
+      final o = await statements.options();
+      expect(o.accounts.first.id, '');
+      expect(o.accounts.first.label, 'All accounts');
+      expect(o.accounts.map((a) => a.label), contains('Plaid Checking - 0000'));
+      expect([for (final m in o.months) m.id], ['2026-10', '2026-09', '2026-08', '2026-07', '2026-06', '2026-05']);
+      expect(o.months.first.label, 'October 2026');
+
+      userId = 'nobody'; // no linked bank: nothing to export
+      expect((await statements.options()).isEmpty, isTrue);
+    });
+
+    test('a month of posted transactions, oldest first, with the totals and the user\'s edits', () async {
+      final snap = await data.load();
+      final sept = [
+        for (final t in snap.transactions)
+          if (!t.pending && t.date.year == 2026 && t.date.month == 9) t,
+      ];
+      final target = sept.first;
+      final transactions = PlaidTransactionService(data, notes, now: now);
+      await transactions.setNote(transactionId: target.transactionId, note: 'Team lunch, paid back');
+      await transactions.setCategories(transactionId: target.transactionId, categoryIds: ['travel', 'food']);
+
+      final s = await statements.statement(accountId: '', monthId: '2026-09');
+      expect(s.lines, hasLength(sept.length));
+      expect(s.periodLabel, 'September 2026');
+      for (var i = 1; i < s.lines.length; i++) {
+        expect(s.lines[i].date.isBefore(s.lines[i - 1].date), isFalse); // oldest first
+      }
+      expect(s.lines.every((l) => l.date.month == 9), isTrue);
+      expect(s.moneyIn, closeTo(sept.where((t) => t.amount < 0).fold(0.0, (a, t) => a - t.amount), 0.001));
+      expect(s.moneyOut, closeTo(sept.where((t) => t.amount > 0).fold(0.0, (a, t) => a + t.amount), 0.001));
+      expect(s.net, closeTo(s.moneyIn - s.moneyOut, 0.001));
+      final edited = s.lines.firstWhere((l) => l.note.isNotEmpty);
+      expect(edited.note, 'Team lunch, paid back');
+      expect(edited.category, startsWith('Travel'));
+
+      final checking = (await statements.options()).accounts.firstWhere((a) => a.label == 'Plaid Checking - 0000');
+      final one = await statements.statement(accountId: checking.id, monthId: '2026-09');
+      expect(one.accountLabel, 'Plaid Checking - 0000');
+      expect(one.lines.every((l) => l.account == 'Plaid Checking - 0000'), isTrue);
+      expect(one.lines.length, lessThanOrEqualTo(s.lines.length));
+
+      await expectLater(statements.statement(accountId: '', monthId: '2026-13'), throwsA(isA<AppException>()));
+    });
+
+    test('CSV: a header row, one row per transaction, quoting cells with commas', () async {
+      final s = await statements.statement(accountId: '', monthId: '2026-09');
+      final text = utf8.decode((await CsvStatementEncoder().encode(s)).sublist(3)); // after the BOM
+      final rows = text.trim().split('\r\n');
+      expect(rows.first, 'Date,Description,Category,Account,Amount,Note');
+      expect(rows, hasLength(s.lines.length + 1));
+      expect(rows[1], startsWith('2026-09-'));
+      expect(CsvStatementEncoder().encode(Statement(
+            accountLabel: 'A',
+            periodLabel: 'P',
+            periodId: '2026-09',
+            generatedOn: SandboxReplay.today,
+            lines: [StatementLine(date: DateTime(2026, 9, 1), description: 'Coffee, "large"', category: 'Food', account: 'A', amount: -4.5)],
+            moneyIn: 0,
+            moneyOut: 4.5,
+          )).then((b) => utf8.decode(b.sublist(3)).split('\r\n')[1]),
+          completion('2026-09-01,"Coffee, ""large""",Food,A,-4.50,'));
+    });
+
+    test('PDF: a real PDF document', () async {
+      final s = await statements.statement(accountId: '', monthId: '2026-09');
+      final bytes = await PdfStatementEncoder().encode(s);
+      expect(ascii.decode(bytes.sublist(0, 5)), '%PDF-');
+      expect(bytes.length, greaterThan(1000));
+    });
+
+    test('download: saved where the user picks, named after the month and account; cancelling saves nothing', () async {
+      expect(await statements.download(accountId: '', monthId: '2026-09', format: StatementFormat.pdf),
+          'pace-statement-2026-09-all-accounts.pdf');
+      expect(saver.saved.single.mimeType, 'application/pdf');
+      final checking = (await statements.options()).accounts.firstWhere((a) => a.label == 'Plaid Checking - 0000');
+      expect(await statements.download(accountId: checking.id, monthId: '2026-10', format: StatementFormat.csv),
+          'pace-statement-2026-10-plaid-checking-0000.csv');
+      expect(saver.saved.last.mimeType, 'text/csv');
+
+      saver.cancel = true;
+      expect(await statements.download(accountId: '', monthId: '2026-09', format: StatementFormat.csv), isNull);
+      expect(saver.saved, hasLength(2));
+    });
+  });
+
   group('Bills & recurring', () {
     late PlaidBillService bills;
     setUp(() => bills = PlaidBillService(data, notes, now: now));
+
+    test('detected recurring payments are split into subscriptions and bills by category', () async {
+      final r = await bills.getRecurring();
+      final byName = {for (final i in r.items) i.name: i};
+      expect(byName['Touchstone Climbing']!.kind, RecurringKind.subscription); // personal care
+      expect(byName['CREDIT CARD 3333 PAYMENT *//']!.kind, RecurringKind.bill); // loan & card payments
+      expect(r.items.every((i) => !i.isManual), isTrue);
+      expect(r.subscriptions.length + r.bills.length, r.items.length);
+      expect(r.subscriptionsMonthly, lessThanOrEqualTo(r.monthlyTotal));
+    });
+
+    test('price changes come from the last two charges the bank matched', () async {
+      final snap = await data.load();
+      for (final item in (await bills.getRecurring()).items) {
+        final stream = snap.recurring.firstWhere((s) => s.streamId == item.id);
+        final charges = ([for (final t in snap.transactions) if (stream.transactionIds.contains(t.transactionId)) t]
+              ..sort((a, b) => a.date.compareTo(b.date)))
+            .map((t) => t.amount.abs())
+            .toList();
+        final changed = charges.length >= 2 && (charges.last - charges[charges.length - 2]).abs() >= 0.01;
+        expect(item.priceChangeLine != null, changed, reason: item.name);
+        if (changed) expect(item.priceChangeLine, contains(Money.format(charges.last)));
+      }
+    });
+
+    test('details: source account, payment history (newest first), and no edit / delete', () async {
+      final item = (await bills.getRecurring()).items.firstWhere((i) => i.name == 'Touchstone Climbing');
+      final d = await bills.getDetail(item.id);
+      expect(d.isManual, isFalse);
+      expect(d.sourceLabel, startsWith('Detected in Plaid'));
+      expect(d.history, isNotEmpty);
+      expect(d.history.every((p) => p.amount < 0), isTrue); // money out
+      expect(bills.actionsFor(item), isNot(contains(RecurringAction.edit)));
+      await expectLater(bills.deleteRecurring(item.id), throwsA(isA<AppException>()));
+    });
 
     test('upcoming bills come from Plaid recurring streams due in the next 30 days', () async {
       final upcoming = await bills.getUpcoming();
@@ -495,7 +634,8 @@ void main() {
     expect((await service.open(reminders.first.id))?.kind, TargetKind.bills);
   });
 
-  testWidgets('the Accounts screen shows the sandbox accounts end to end', (tester) async {
+  /// Signs up Ada with the sandbox bank linked, opens the app on [stack] and lets it load.
+  Future<AppRouter> openWithBank(WidgetTester tester, List<AppRoute> stack, {StatementSaver? statementSaver}) async {
     final users = InMemoryUserAccountRepository();
     final ownBanks = InMemoryLinkedBankRepository(); // not the shared one: ids like 'u1' would collide
     final services = demoServices(
@@ -503,13 +643,14 @@ void main() {
       hasher: const PasswordHasher(iterations: 1000),
       plaid: SandboxPlaidApi(client: plaid.client, clientId: 'cid', secret: 'sandbox-secret'),
       banks: ownBanks,
+      statementSaver: statementSaver,
       now: now,
     );
     await tester.runAsync(() => createAda(services.auth));
     final ada = (await tester.runAsync(() => users.fetchByEmail('ada@example.com')))!;
     await ownBanks.saveItem(
       LinkedItem(
-        itemId: 'item-2',
+        itemId: 'item-app',
         userId: ada.id,
         institutionName: 'First Platypus Bank',
         accessToken: 'access-sandbox-test',
@@ -518,9 +659,15 @@ void main() {
       ),
       const [],
     );
-    final router = AppRouter.create(services: services, initialStack: const [AppRoute.home, AppRoute.accounts]);
+    final router = AppRouter.create(services: services, initialStack: stack);
     await tester.pumpWidget(PaceApp(router: router));
     await tester.pumpAndSettle();
+    return router;
+  }
+
+
+  testWidgets('the Accounts screen shows the sandbox accounts end to end', (tester) async {
+    final router = await openWithBank(tester, const [AppRoute.home, AppRoute.accounts]);
     expect(find.text('Plaid Checking'), findsOneWidget);
     expect(find.text('First Platypus Bank'), findsOneWidget);
     expect(find.text('Checking ••0000'), findsOneWidget);
@@ -529,31 +676,7 @@ void main() {
 
   testWidgets('Transactions appear on their own once Plaid has prepared them (no restart)', (tester) async {
     plaid.transactionsReady = false; // just linked: Plaid is still preparing transactions
-    final users = InMemoryUserAccountRepository();
-    final ownBanks = InMemoryLinkedBankRepository();
-    final services = demoServices(
-      accounts: users,
-      hasher: const PasswordHasher(iterations: 1000),
-      plaid: SandboxPlaidApi(client: plaid.client, clientId: 'cid', secret: 'sandbox-secret'),
-      banks: ownBanks,
-      now: now,
-    );
-    await tester.runAsync(() => createAda(services.auth));
-    final ada = (await tester.runAsync(() => users.fetchByEmail('ada@example.com')))!;
-    await ownBanks.saveItem(
-      LinkedItem(
-        itemId: 'item-3',
-        userId: ada.id,
-        institutionName: 'First Platypus Bank',
-        accessToken: 'access-sandbox-test',
-        sandboxCredentialsLabel: 'simple',
-        linkedAt: SandboxReplay.today,
-      ),
-      const [],
-    );
-    final router = AppRouter.create(services: services, initialStack: const [AppRoute.home, AppRoute.transactions]);
-    await tester.pumpWidget(PaceApp(router: router));
-    await tester.pumpAndSettle();
+    final router = await openWithBank(tester, const [AppRoute.home, AppRoute.transactions]);
     expect(find.textContaining('still loading'), findsOneWidget);
 
     plaid.transactionsReady = true; // Plaid finishes; the app re-checks a few seconds later
@@ -566,31 +689,7 @@ void main() {
   });
 
   testWidgets('Transactions: search as you type, with a no-match message and a clear button', (tester) async {
-    final users = InMemoryUserAccountRepository();
-    final ownBanks = InMemoryLinkedBankRepository();
-    final services = demoServices(
-      accounts: users,
-      hasher: const PasswordHasher(iterations: 1000),
-      plaid: SandboxPlaidApi(client: plaid.client, clientId: 'cid', secret: 'sandbox-secret'),
-      banks: ownBanks,
-      now: now,
-    );
-    await tester.runAsync(() => createAda(services.auth));
-    final ada = (await tester.runAsync(() => users.fetchByEmail('ada@example.com')))!;
-    await ownBanks.saveItem(
-      LinkedItem(
-        itemId: 'item-4',
-        userId: ada.id,
-        institutionName: 'First Platypus Bank',
-        accessToken: 'access-sandbox-test',
-        sandboxCredentialsLabel: 'simple',
-        linkedAt: SandboxReplay.today,
-      ),
-      const [],
-    );
-    final router = AppRouter.create(services: services, initialStack: const [AppRoute.home, AppRoute.transactions]);
-    await tester.pumpWidget(PaceApp(router: router));
-    await tester.pumpAndSettle();
+    final router = await openWithBank(tester, const [AppRoute.home, AppRoute.transactions]);
     final field = find.byType(TextField);
     expect(field, findsOneWidget);
     List<String?> shown() => [for (final t in tester.widgetList<Text>(find.byType(Text))) t.data];
@@ -611,6 +710,34 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('No transactions match'), findsNothing);
     expect(shown(), everything); // the full list is back
+    router.dispose();
+  });
+
+  testWidgets('Settings → Statement export: pick a month and CSV, download, see where it was saved', (tester) async {
+    final saver = InMemoryStatementSaver();
+    final router = await openWithBank(tester, const [AppRoute.home, AppRoute.settings], statementSaver: saver);
+
+    await tester.scrollUntilVisible(find.text('Statement export'), 200);
+    await tester.tap(find.text('Statement export'));
+    await tester.pumpAndSettle();
+    expect(router.delegate.current, AppRoute.statementExport);
+    await tester.scrollUntilVisible(find.text('Download PDF statement'), 200);
+    expect(find.text('All accounts · October 2026'), findsOneWidget); // the summary of what's in it
+    await tester.scrollUntilVisible(find.text('September 2026'), -200);
+
+    await tester.tap(find.text('September 2026'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('CSV (for spreadsheets)'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Download CSV statement'), 200);
+    expect(find.text('All accounts · September 2026'), findsOneWidget);
+    expect(find.textContaining('posted transactions'), findsOneWidget);
+    await tester.tap(find.text('Download CSV statement'));
+    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50))); // encoding
+    await tester.pumpAndSettle();
+
+    expect(saver.saved.single.fileName, 'pace-statement-2026-09-all-accounts.csv');
+    expect(find.text('Statement saved as pace-statement-2026-09-all-accounts.csv'), findsOneWidget);
     router.dispose();
   });
 }

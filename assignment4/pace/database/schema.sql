@@ -20,7 +20,7 @@
 -- lines are for the sqlite3 CLI and are skipped by the app.
 
 PRAGMA foreign_keys = ON;
-PRAGMA user_version = 7;
+PRAGMA user_version = 8;
 
 BEGIN;
 
@@ -97,6 +97,25 @@ CREATE TABLE budgets (
 );
 
 CREATE INDEX idx_budgets_user ON budgets(user_id);
+
+-- ── Recurring expenses the user adds ─────────────────────────────────────────
+
+-- Bills and subscriptions the user tracks by hand (the bank's own recurring payments come from
+-- Plaid). Payments fall on first_due, then every `frequency` after it.
+CREATE TABLE recurring_expenses (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name         TEXT    NOT NULL CHECK (length(trim(name)) > 0),
+    amount_cents INTEGER NOT NULL CHECK (amount_cents > 0),
+    frequency    TEXT    NOT NULL CHECK (frequency IN ('WEEKLY', 'BIWEEKLY', 'MONTHLY', 'ANNUALLY')),
+    first_due    TEXT    NOT NULL CHECK (first_due GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]'),
+    category_id  TEXT    NOT NULL,
+    kind         TEXT    NOT NULL CHECK (kind IN ('subscription', 'bill')),
+    created_at   TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    updated_at   TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+);
+
+CREATE INDEX idx_recurring_expenses_user ON recurring_expenses(user_id);
 
 -- ── Plaid Sandbox test credentials ───────────────────────────────────────────
 

@@ -11,6 +11,7 @@ import 'onboarding_service.dart' show OnboardingService;
 import 'profile_service.dart' show ProfileService;
 import 'settings_service.dart' show SettingsService;
 import 'spending_service.dart' show SpendingService;
+import 'statement_service.dart' show StatementService;
 import 'transaction_service.dart' show TransactionService;
 import 'trend_service.dart' show TrendService;
 
@@ -31,6 +32,7 @@ class AppServices {
   final ProfileService profile;
   final CashFlowService cashFlow;
   final TrendService trends;
+  final StatementService statements;
 
   const AppServices({
     required this.auth,
@@ -48,5 +50,6 @@ class AppServices {
     required this.profile,
     required this.cashFlow,
     required this.trends,
+    required this.statements,
   });
 }

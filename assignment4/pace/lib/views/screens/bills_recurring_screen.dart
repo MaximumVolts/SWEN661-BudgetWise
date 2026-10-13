@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart'
-    show Border, BorderRadius, BoxDecoration, BuildContext, Column, Container, CrossAxisAlignment, EdgeInsets, Expanded,
+    show Border, BorderRadius, BoxDecoration, BuildContext, Column, Container, CrossAxisAlignment, EdgeInsets, Expanded, Flexible,
         FontWeight, Icon, Icons, ListView, Padding, Row, SafeArea, Scaffold, SizedBox, Spacer, StatelessWidget, Text,
         TextStyle, ValueChanged, VoidCallback, Widget;
 import '../format.dart' show Fmt;
 import '../../models/bill.dart' show RecurringItem, SubscriptionStatus;
+import '../../models/recurring.dart' show RecurringKind;
 import '../theme.dart' show C, T;
 import '../widgets/widgets.dart' show AppIcons, HairLine, Heading, IconBadge, PaceCard, PaceNavBar, SegTabs, Tap;
 
@@ -11,6 +12,8 @@ import '../widgets/widgets.dart' show AppIcons, HairLine, Heading, IconBadge, Pa
 class BillsRecurringScreen extends StatelessWidget {
   final double monthlyTotal;
   final double yearlyTotal;
+  /// Of [monthlyTotal], how much is subscriptions.
+  final double subscriptionsMonthly;
   final List<RecurringItem> items;
   final String? insight;
   final ValueChanged<int>? onTabChanged; // 0 = Upcoming, 1 = Recurring
@@ -23,6 +26,7 @@ class BillsRecurringScreen extends StatelessWidget {
     super.key,
     required this.monthlyTotal,
     required this.yearlyTotal,
+    this.subscriptionsMonthly = 0,
     required this.items,
     this.insight,
     this.onTabChanged,
@@ -59,21 +63,35 @@ class BillsRecurringScreen extends StatelessWidget {
                 Expanded(child: _Stat('Yearly', Fmt.money(yearlyTotal))),
               ],
             ),
-            const SizedBox(height: 20),
-            Heading('RECURRING & SUBSCRIPTIONS', style: T.label),
-            const SizedBox(height: 8),
-            PaceCard(
-              radius: 16,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Column(
-                children: [
-                  for (var i = 0; i < items.length; i++) ...[
-                    if (i > 0) const HairLine(),
-                    Tap(onTap: onItemTap == null ? null : () => onItemTap!(items[i]), child: _Sub(items[i], onMenu: onItemMenu)),
-                  ],
-                ],
-              ),
-            ),
+            if (items.isEmpty) ...[
+              const SizedBox(height: 20),
+              Text('Nothing tracked yet. Tap + to add a bill or subscription.', style: T.body),
+            ],
+            for (final (title, group, monthly) in [
+              ('SUBSCRIPTIONS', [for (final i in items) if (i.kind == RecurringKind.subscription) i], subscriptionsMonthly),
+              ('BILLS', [for (final i in items) if (i.kind == RecurringKind.bill) i], monthlyTotal - subscriptionsMonthly),
+            ])
+              if (group.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                Row(children: [
+                  Heading(title, style: T.label),
+                  const Spacer(),
+                  Text('${Fmt.money(monthly)} a month', style: T.sub),
+                ]),
+                const SizedBox(height: 8),
+                PaceCard(
+                  radius: 16,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    children: [
+                      for (var i = 0; i < group.length; i++) ...[
+                        if (i > 0) const HairLine(),
+                        Tap(onTap: onItemTap == null ? null : () => onItemTap!(group[i]), child: _Sub(group[i], onMenu: onItemMenu)),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
             if (insight != null) ...[
               const SizedBox(height: 14),
               Container(
@@ -136,7 +154,14 @@ class _Sub extends StatelessWidget {
                 Text(item.name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 2),
                 Text(item.detailLine, style: TextStyle(fontSize: 14, color: C.muted)),
-                Text(item.yearlyLine, style: TextStyle(fontSize: 14, color: C.muted)),
+                Text(item.isManual ? '${item.yearlyLine} · added by you' : item.yearlyLine,
+                    style: TextStyle(fontSize: 14, color: C.muted)),
+                if (item.priceChangeLine != null)
+                  Row(children: [
+                    Icon(Icons.trending_up, size: 16, color: C.red),
+                    const SizedBox(width: 4),
+                    Flexible(child: Text(item.priceChangeLine!, style: TextStyle(fontSize: 13, color: C.red, fontWeight: FontWeight.w600))),
+                  ]),
               ],
             ),
           ),

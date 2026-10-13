@@ -53,13 +53,13 @@ void main() {
     expect(trigger, contains('INSERT INTO user_preferences (user_id) VALUES (NEW.id);'));
     expect(trigger.endsWith('END'), true);
     expect(statements.any((s) => s.startsWith('PRAGMA') || s == 'BEGIN' || s == 'COMMIT'), false);
-    expect(PaceDatabase.schemaVersion(await loadFromProject(PaceDatabase.schemaAsset)), 7);
+    expect(PaceDatabase.schemaVersion(await loadFromProject(PaceDatabase.schemaAsset)), 8);
   });
 
   test('first launch creates the database from schema.sql', () async {
     final pace = openDb();
     final db = await pace.database;
-    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 7);
+    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 8);
     final tables = [for (final r in await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'")) r['name']];
     expect(tables, contains('users'));
     expect(tables, contains('plaid_sandbox_test_credentials'));
@@ -134,7 +134,7 @@ void main() {
 
     final pace = openDb();
     final db = await pace.database;
-    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 7);
+    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 8);
     expect(await db.query('budgets'), isEmpty); // a table the old database didn't have starts empty
     final repo = SqliteUserAccountRepository(pace);
     final old = (await repo.fetchByEmail('old@example.com'))!;
@@ -173,7 +173,7 @@ void main() {
 
     final pace = openDb();
     final db = await pace.database;
-    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 7);
+    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 8);
     final columns = [for (final c in await db.rawQuery('PRAGMA table_info(budgets)')) c['name']];
     expect(columns, isNot(contains('period')));
     final budgets = SqliteBudgetRepository(pace);
@@ -215,7 +215,7 @@ void main() {
 
     final pace = openDb();
     final db = await pace.database;
-    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 7);
+    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 8);
     final columns = [for (final c in await db.rawQuery('PRAGMA table_info(user_preferences)')) c['name']];
     expect(columns, contains('colorblind_mode'));
     expect(columns, isNot(contains('chart_patterns')));

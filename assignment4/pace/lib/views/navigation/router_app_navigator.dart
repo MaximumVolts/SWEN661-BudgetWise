@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart' show BuildContext;
 import '../../models/navigation.dart' show DeepLinkTarget, FlowStep, TargetKind;
+import '../../models/recurring.dart' show RecurringAction;
 import '../../models/transaction.dart' show FilterChoice, FilterKind;
 import '../../controllers/app_navigator.dart' show AppNavigator;
 import 'app_modals.dart' show AppModals;
@@ -152,7 +153,9 @@ class RouterAppNavigator implements AppNavigator {
   @override
   Future<bool> openAddNote(String id) => _modals.addNote(_ctx, id);
   @override
-  Future<bool> openAddBill() => _modals.addBill(_ctx);
+  void openAddBill() => _push(AppRoute.billNew);
+  @override
+  void openEditBill(String billId) => _push(AppRoute.billEdit(billId));
   @override
   Future<bool> openAddGoal() => _modals.addGoal(_ctx);
   @override
@@ -168,7 +171,10 @@ class RouterAppNavigator implements AppNavigator {
   @override
   Future<bool> openAddExpectedIncome() => _modals.addExpectedIncome(_ctx);
   @override
-  Future<bool> openSubscriptionMenu(String id) => _modals.subscriptionMenu(_ctx, id);
+  Future<RecurringAction?> openRecurringMenu(String name, List<RecurringAction> actions) =>
+      _modals.recurringMenu(_ctx, name, actions);
+  @override
+  Future<bool> confirmDeleteRecurring(String name) => _modals.confirmDeleteRecurring(_ctx, name);
   @override
   Future<bool> openThemePicker() => _modals.themePicker(_ctx);
   @override

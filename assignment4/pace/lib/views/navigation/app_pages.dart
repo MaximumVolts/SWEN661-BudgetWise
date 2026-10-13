@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart' show Widget;
 import '../../controllers/base_controller.dart' show BaseController;
 import '../accounts_view.dart' show AccountsView;
+import '../bill_detail_view.dart' show BillDetailView;
+import '../bill_form_view.dart' show BillFormView;
 import '../bills_recurring_view.dart' show BillsRecurringView;
 import '../bills_upcoming_view.dart' show BillsUpcomingView;
 import '../budget_form_view.dart' show BudgetFormView;
@@ -20,6 +22,7 @@ import '../savings_goals_view.dart' show SavingsGoalsView;
 import '../settings_view.dart' show SettingsView;
 import '../sign_in_view.dart' show SignInView;
 import '../spending_view.dart' show SpendingView;
+import '../statement_export_view.dart' show StatementExportView;
 import '../transaction_detail_view.dart' show TransactionDetailView;
 import '../transactions_view.dart' show TransactionsView;
 import '../trends_view.dart' show TrendsView;
@@ -79,6 +82,12 @@ class AppPages {
         return _bankPage(deps.billsController(), (c) => BillsUpcomingView(controller: c));
       case AppRouteName.billsRecurring:
         return _bankPage(deps.billsController(), (c) => BillsRecurringView(controller: c));
+      case AppRouteName.billDetail:
+        return _bankPage(deps.billDetail(r.params['id']!), (c) => BillDetailView(controller: c));
+      case AppRouteName.billNew:
+        return _page(deps.billForm(), (c) => BillFormView(controller: c));
+      case AppRouteName.billEdit:
+        return _page(deps.billForm(id: r.params['id']!), (c) => BillFormView(controller: c));
       case AppRouteName.accounts:
         return _bankPage(deps.accountsList(), (c) => AccountsView(controller: c));
       case AppRouteName.notifications:
@@ -94,15 +103,16 @@ class AppPages {
       case AppRouteName.settings:
         return _page(deps.settingsScreen(), (c) => SettingsView(controller: c));
 
+      case AppRouteName.statementExport:
+        return _bankPage(deps.statementExport(), (c) => StatementExportView(controller: c));
+
       // No design yet. In-app navigation shows a "not implemented" toast instead
       // (see [notImplemented]); these pages only appear when opened by URL / deep link.
       case AppRouteName.socialSignIn:
-      case AppRouteName.billDetail:
       case AppRouteName.accountDetail:
       case AppRouteName.spendingCategory:
       case AppRouteName.trendDetail:
       case AppRouteName.tool:
-      case AppRouteName.statementExport:
         final what = notImplemented(r)!;
         return PlaceholderView(title: what, detail: '$what is not implemented yet.');
     }
@@ -112,12 +122,10 @@ class AppPages {
   /// Remove a route from here when you add its real page above.
   static String? notImplemented(AppRoute r) => switch (r.name) {
         AppRouteName.socialSignIn => r.params['provider'] == 'apple' ? 'Sign in with Apple' : 'Sign in with Google',
-        AppRouteName.billDetail => 'Bill details',
         AppRouteName.accountDetail => 'Account details',
         AppRouteName.spendingCategory => 'Spending by category',
         AppRouteName.trendDetail => 'Trend details',
         AppRouteName.tool => 'This tool',
-        AppRouteName.statementExport => 'Statement export',
         _ => null,
       };
 }

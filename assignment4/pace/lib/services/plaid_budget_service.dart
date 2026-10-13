@@ -9,6 +9,7 @@ import 'bank_categories.dart' show BankCategories;
 import 'calendar.dart' show Calendar;
 import 'budget_service.dart' show BudgetService;
 import 'date_labels.dart' show DateLabels;
+import 'validators.dart' show Validators;
 import '../models/money.dart' show Money;
 import 'plaid_spending_service.dart' show PlaidSpendingService;
 import 'plaid_transaction_service.dart' show PlaidTransactionService;
@@ -191,15 +192,8 @@ class PlaidBudgetService extends AnnotatedBankDataService implements BudgetServi
   /// Parses what the user typed ("400", "$1,250.50"): an amount with at most 2 decimals, between
   /// $1 and $1,000,000.
   static ({double? value, String? error}) parseLimit(String text) {
-    final cleaned = text.trim().replaceAll(RegExp(r'[\$,\s]'), '');
-    if (cleaned.isEmpty) return (value: null, error: 'Enter a monthly limit');
-    if (!RegExp(r'^\d+(\.\d{1,2})?$').hasMatch(cleaned)) {
-      return (value: null, error: 'Enter an amount like 400 or 400.50');
-    }
-    final value = double.parse(cleaned);
-    if (value < _minLimit) return (value: null, error: 'The limit must be at least \$1');
-    if (value > _maxLimit) return (value: null, error: 'The limit can be at most \$1,000,000');
-    return (value: value, error: null);
+    final r = Validators.money(text, what: 'limit', min: _minLimit, max: _maxLimit);
+    return r.error == 'Enter a limit' ? (value: null, error: 'Enter a monthly limit') : r;
   }
 
   Future<Map<String, double>> _spentByCategory(DateTime start, DateTime end) async {

@@ -88,17 +88,18 @@ Every arrow is a controller calling `AppNavigator`; routes are in `app_route.dar
 | Sign in | success → `FlowStep` from the service (onboarding → connect bank → home); Forgot password / Create account → placeholders |
 | Onboarding | Continue → Connect bank (pushed, Back works) |
 | Connect bank | Connect → next `FlowStep` (home); linking is required after creating an account (no skip) |
-| **Dashboard** | gear → Settings · bell → Notifications · review banner / See more → Transactions tab · account row → Account detail* · Add account → Connect bank · See budget → Budgets tab · budget row → Budget category · See all bills → Bills tab · bill row → Bill detail* · See all trends → Trends · trend button → Trend detail* · tools → Recurring / Savings goals / Cash flow |
+| **Dashboard** | gear → Settings · bell → Notifications · review banner / See more → Transactions tab · account row → Account detail* · Add account → Connect bank · See budget → Budgets tab · budget row → Budget category · See all bills → Bills tab · bill row → Bill detail · See all trends → Trends · trend button → Trend detail* · tools → Recurring / Savings goals / Cash flow |
 | Transactions | search (merchant, category, account, note, amount; as you type) · row → Transaction detail · filters → picker sheet |
 | Transaction detail | Back · category chips (saved) · New category / Add a note → sheets |
 | Budgets | month tabs (limits apply to every month; spending is that month's) · category → Budget category · New budget → budget form · ⋮ → Manage budgets |
 | Budget category | Back · Edit → budget form · transaction → Transaction detail |
 | Manage budgets | edit → budget form · delete → confirm · New budget → budget form |
 | Spending | category → Spending category* · bars highlight |
-| Bills (Upcoming ⇄ Recurring) | tab switch swaps pages · row → Bill detail* · + → sheet · ⋮ → subscription menu |
+| Bills (Upcoming ⇄ Recurring) | tab switch swaps pages · Recurring lists Subscriptions and Bills (bank-detected + your own, with price changes) · row → Bill detail · + → New recurring expense form · ⋮ → menu (details, pause / resume, edit / delete for your own) |
+| Bill detail | Back · Mark next payment as paid · Pause / Resume tracking · Edit → form · Delete → confirm (your own only) · payment → Transaction detail |
 | Savings goals / Cash flow / Trends | Back · actions open sheets / detail* |
 | Notifications | tap / "View bill" → closes, then opens the service-provided target (bill, budget category, bills…) · Mark as paid → service |
-| Settings | Connected accounts → Accounts · Profile, Statement export → pages* · Budget categories → Manage budgets · Sign out → Sign in · Delete → confirm → Sign in |
+| Settings | Connected accounts → Accounts · Profile → Profile · Statement export → pick account, month and PDF / CSV, download (system Save dialog) · Budget categories → Manage budgets · Sign out → Sign in · Delete → confirm → Sign in |
 | Accounts | Link another account → Connect bank · row → Account detail* |
 | Bottom nav (any screen with one) | Home / Transactions / Spending / Budgets / Bills |
 
