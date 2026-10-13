@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'
-    show Align, Alignment, BuildContext, Column, CrossAxisAlignment, EdgeInsets, Expanded, FontWeight,
+    show Align, Alignment, BoxFit, BuildContext, Column, CrossAxisAlignment, EdgeInsets, Expanded, FittedBox, FontWeight,
         FractionallySizedBox, Icon, Icons, ListView, MainAxisSize, Padding, Row, SafeArea, Scaffold, SizedBox, Spacer,
         StatelessWidget, Text, TextStyle, ValueChanged, VoidCallback, Widget;
 import '../widgets/charts.dart' show PaceBarChart;
@@ -124,7 +124,8 @@ class _CatRow extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: c.changePercent == null
                       ? Text('No change', style: TextStyle(fontSize: 13, color: C.muted))
-                      : _Change(c.changePercent!),
+                      // Large changes ("1234.5%") shrink to fit rather than overflow.
+                      : FittedBox(fit: BoxFit.scaleDown, child: _Change(c.changePercent!)),
                 ),
               ),
             ],

@@ -110,7 +110,11 @@ Auth: the default `AppRouter.sessionGuard` keeps signed-out users on public rout
 ## Running it
 `lib/main.dart` currently starts with `demoServices()` (`lib/services/demo/`, in-memory sample data) so you can click through the whole graph: sign in → home → every tab and detail, or create account → onboarding → connect bank → home. Replace it with your real `AppServices(...)` and delete `lib/services/demo/`.
 
-`flutter test` runs `test/navigation_test.dart` (route parsing, deep links, tab/stack behaviour, guard redirects, target/flow mapping).
+## Tests
+`flutter test` runs the whole suite; `flutter test --coverage` also writes `coverage/lcov.info` (about 94% of lines, every layer above 89%).
+- **Feature tests** (`test/features_test.dart`): the real app (services, controllers, views, navigation) on recorded Plaid sandbox data, used the way a person would — first run (onboarding → connect bank), Home, Transactions (search, filters, categories), Spending, Budgets, Bills (upcoming, recurring, details), Notifications, Cash flow, Trends, Savings goals, Accounts, Profile, Settings.
+- **Shared harness**: `test/sandbox.dart` replays real sandbox responses (`test/fixtures/plaid_sandbox`, captured on 2026-10-12 — "today" in tests) and `openSandboxApp(...)` opens the app signed in with the sandbox bank linked; `test/helpers.dart` has `createAda`, `NoGoogle`, `fieldErrors`.
+- **Service / repository tests**: business rules (budgets, bills and subscriptions, statements, search, display preferences, auth, password reset), SQLite storage against the real `schema.sql`, schema upgrades, and navigation (`test/navigation_test.dart`).
 
 ## What you implement
 1. Services in `lib/services/` (REST/Plaid/Firebase/fakes).

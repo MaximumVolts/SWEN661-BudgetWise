@@ -1,5 +1,4 @@
-import 'dart:convert' show ascii, jsonDecode, jsonEncode, utf8;
-import 'dart:io' show File;
+import 'dart:convert' show ascii, utf8;
 import 'package:flutter/material.dart' show Text, TextField;
 import 'package:flutter_test/flutter_test.dart'
     show
@@ -8,7 +7,6 @@ import 'package:flutter_test/flutter_test.dart'
         contains,
         expect,
         expectLater,
-        fail,
         find,
         findsNothing,
         findsOneWidget,
@@ -30,8 +28,6 @@ import 'package:flutter_test/flutter_test.dart'
         testWidgets,
         throwsA,
         WidgetTester;
-import 'package:http/http.dart' as http show Request, Response;
-import 'package:http/testing.dart' show MockClient;
 import 'package:pace_app/models/budget.dart' show BudgetOverview;
 import 'package:pace_app/models/linked_bank.dart' show LinkedItem;
 import 'package:pace_app/models/navigation.dart' show TargetKind;
@@ -45,9 +41,7 @@ import 'package:pace_app/repositories/budget_repository.dart' show InMemoryBudge
 import 'package:pace_app/repositories/linked_bank_repository.dart' show InMemoryLinkedBankRepository;
 import 'package:pace_app/repositories/statement_saver.dart' show InMemoryStatementSaver, StatementSaver;
 import 'package:pace_app/repositories/transaction_annotation_repository.dart' show InMemoryTransactionAnnotationRepository;
-import 'package:pace_app/repositories/user_account_repository.dart' show InMemoryUserAccountRepository;
 import 'package:pace_app/models/app_exception.dart' show AppException;
-import 'package:pace_app/services/demo/demo_services.dart' show demoServices;
 import 'package:pace_app/services/plaid_account_service.dart' show PlaidAccountService;
 import 'package:pace_app/services/plaid_bill_service.dart' show PlaidBillService;
 import 'package:pace_app/services/plaid_budget_service.dart' show PlaidBudgetService;
@@ -58,62 +52,13 @@ import 'package:pace_app/services/plaid_spending_service.dart' show PlaidSpendin
 import 'package:pace_app/services/plaid_statement_service.dart' show PlaidStatementService;
 import 'package:pace_app/services/statement_encoders.dart' show CsvStatementEncoder, PdfStatementEncoder;
 import 'package:pace_app/services/plaid_transaction_service.dart' show PlaidTransactionService;
-import 'package:pace_app/services/password_hasher.dart' show PasswordHasher;
 import 'package:pace_app/services/plaid_trend_service.dart' show PlaidTrendService;
 import 'package:pace_app/repositories/sandbox_plaid_api.dart' show SandboxPlaidApi;
 import 'package:pace_app/views/navigation/app_route.dart' show AppRoute;
 import 'package:pace_app/views/navigation/app_router.dart' show AppRouter;
-import 'package:pace_app/views/pace_app.dart' show PaceApp;
 import 'package:pace_app/views/screens/transactions_screen.dart' show TransactionsScreen;
 
-import 'helpers.dart' show createAda;
-/// Replays real responses captured from Plaid's sandbox (test/fixtures/plaid_sandbox), which
-/// were taken on 2026-10-12, so tests use that date as "today".
-class SandboxReplay {
-  static final today = DateTime(2026, 10, 12, 9);
-  static String _fixture(String name) => File('test/fixtures/plaid_sandbox/$name.json').readAsStringSync();
-
-  final requests = <http.Request>[];
-  bool transactionsReady = true;
-  /// False: Plaid has only sent its first batch (the last ~30 days), like right after linking.
-  bool historyReady = true;
-
-  /// The first batch Plaid sends after linking: transactions from the last 30 days only.
-  static String _initialBatch() {
-    final j = jsonDecode(_fixture('transactions_sync')) as Map<String, dynamic>;
-    final cutoff = today.subtract(const Duration(days: 30));
-    j['added'] = [
-      for (final t in j['added'] as List<dynamic>)
-        if (!DateTime.parse((t as Map<String, dynamic>)['date'] as String).isBefore(cutoff)) t,
-    ];
-    j['transactions_update_status'] = 'INITIAL_UPDATE_COMPLETE';
-    return jsonEncode(j);
-  }
-
-  late final client = MockClient((req) async {
-    requests.add(req);
-    if (req.url.host != 'sandbox.plaid.com' || req.url.scheme != 'https') fail('Non-sandbox request: ${req.url}');
-    final body = jsonDecode(req.body) as Map<String, dynamic>;
-    if (body['access_token'] != 'access-sandbox-test') fail('Missing/wrong access token for ${req.url.path}');
-    return switch (req.url.path) {
-      '/accounts/balance/get' => http.Response(_fixture('accounts_balance_get'), 200),
-      '/transactions/sync' => transactionsReady
-          ? http.Response(historyReady ? _fixture('transactions_sync') : _initialBatch(), 200)
-          : http.Response(
-              jsonEncode({
-                'added': [], 'modified': [], 'removed': [], 'accounts': [],
-                'has_more': false, 'next_cursor': '', 'transactions_update_status': 'NOT_READY',
-              }),
-              200),
-      '/transactions/recurring/get' => transactionsReady
-          ? http.Response(_fixture('transactions_recurring_get'), 200)
-          : http.Response(jsonEncode({'error_type': 'ITEM_ERROR', 'error_code': 'PRODUCT_NOT_READY'}), 400),
-      _ => http.Response(jsonEncode({'error_code': 'NOT_FOUND'}), 404),
-    };
-  });
-
-  int calls(String path) => requests.where((r) => r.url.path == path).length;
-}
+import 'sandbox.dart' show openSandboxApp, SandboxReplay;
 
 void main() {
   late SandboxReplay plaid;
@@ -631,39 +576,13 @@ void main() {
     expect(reminders, isNotEmpty);
     expect(reminders.first.kind, NotificationKind.reminder);
     expect(reminders.first.title, contains('in 2 days'));
-    expect((await service.open(reminders.first.id))?.kind, TargetKind.bills);
+    final target = await service.open(reminders.first.id);
+    expect(target?.kind, TargetKind.bill); // opens that bill's details
+    expect(target?.id, reminders.first.id.substring('reminder-'.length));
   });
 
-  /// Signs up Ada with the sandbox bank linked, opens the app on [stack] and lets it load.
-  Future<AppRouter> openWithBank(WidgetTester tester, List<AppRoute> stack, {StatementSaver? statementSaver}) async {
-    final users = InMemoryUserAccountRepository();
-    final ownBanks = InMemoryLinkedBankRepository(); // not the shared one: ids like 'u1' would collide
-    final services = demoServices(
-      accounts: users,
-      hasher: const PasswordHasher(iterations: 1000),
-      plaid: SandboxPlaidApi(client: plaid.client, clientId: 'cid', secret: 'sandbox-secret'),
-      banks: ownBanks,
-      statementSaver: statementSaver,
-      now: now,
-    );
-    await tester.runAsync(() => createAda(services.auth));
-    final ada = (await tester.runAsync(() => users.fetchByEmail('ada@example.com')))!;
-    await ownBanks.saveItem(
-      LinkedItem(
-        itemId: 'item-app',
-        userId: ada.id,
-        institutionName: 'First Platypus Bank',
-        accessToken: 'access-sandbox-test',
-        sandboxCredentialsLabel: 'simple',
-        linkedAt: SandboxReplay.today,
-      ),
-      const [],
-    );
-    final router = AppRouter.create(services: services, initialStack: stack);
-    await tester.pumpWidget(PaceApp(router: router));
-    await tester.pumpAndSettle();
-    return router;
-  }
+  Future<AppRouter> openWithBank(WidgetTester tester, List<AppRoute> stack, {StatementSaver? statementSaver}) async =>
+      (await openSandboxApp(tester, plaid, stack, statementSaver: statementSaver)).router;
 
 
   testWidgets('the Accounts screen shows the sandbox accounts end to end', (tester) async {

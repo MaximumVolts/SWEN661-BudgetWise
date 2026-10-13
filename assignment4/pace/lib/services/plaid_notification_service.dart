@@ -105,7 +105,7 @@ class PlaidNotificationService implements NotificationService {
     final dash = notificationId.indexOf('-');
     final kind = notificationId.substring(0, dash), id = notificationId.substring(dash + 1);
     return switch (kind) {
-      'overdue' || 'reminder' => const DeepLinkTarget(TargetKind.bills),
+      'overdue' || 'reminder' => DeepLinkTarget(TargetKind.bill, id), // that bill's details
       'over' || 'near' => DeepLinkTarget(TargetKind.budgetCategory, id),
       _ => null,
     };

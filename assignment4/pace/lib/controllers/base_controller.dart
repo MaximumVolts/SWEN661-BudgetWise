@@ -96,7 +96,7 @@ abstract class BaseController extends ChangeNotifier {
   /// Runs a user action, then reloads the screen if it succeeded.
   @protected
   Future<void> performAndRefresh(Future<void> Function() action) async {
-    await performAndRefresh(action);
+    if (await perform(action)) await refresh();
   }
 
   /// Reloads the screen if [changed] (e.g. a dialog reporting that it saved something) is true.

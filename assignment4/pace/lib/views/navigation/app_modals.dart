@@ -64,7 +64,11 @@ class DefaultAppModals implements AppModals {
   @override
   Future<FilterChoice?> pickFilter(BuildContext context, FilterKind kind,
       {required List<FilterChoice> choices, FilterChoice? current}) {
-    final title = switch (kind) { FilterKind.account => 'Account', FilterKind.category => 'Category', FilterKind.date => 'Date' };
+    final (title, all) = switch (kind) {
+      FilterKind.account => ('Account', 'All accounts'),
+      FilterKind.category => ('Category', 'All categories'),
+      FilterKind.date => ('Date', 'Any date'),
+    };
     return showModalBottomSheet<FilterChoice>(
       context: context,
       backgroundColor: C.bg,
@@ -82,7 +86,7 @@ class DefaultAppModals implements AppModals {
               ),
             ),
             ListTile(
-              title: Text('All ${title.toLowerCase()}s'),
+              title: Text(all),
               selected: current == null,
               trailing: current == null ? const Icon(Icons.check) : null,
               onTap: () => Navigator.of(ctx).pop(const FilterChoice(id: '', label: '')),
