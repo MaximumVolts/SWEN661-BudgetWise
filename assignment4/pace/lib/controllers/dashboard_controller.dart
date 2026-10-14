@@ -23,7 +23,7 @@ class DashboardController extends ScreenController {
   void openSettings() => navigator.openSettings();
   void openNotifications() => navigator.openNotifications();
   void openReviewTransactions() => navigator.openReviewTransactions();
-  void addAccount() => navigator.openConnectBank();
+  void addAccount() => navigator.openAddAccount();
   void openAccount(DashboardAccount a) => navigator.openAccountDetail(a.id);
   void openTransaction(TransactionItem t) => navigator.openTransaction(t.id);
   void seeMoreTransactions() => navigator.openTransactions();

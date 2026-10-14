@@ -2,45 +2,50 @@
 
 Generated 2026-10-13 from `flutter test --coverage` (regenerate: `dart run tool/coverage_report.dart`).
 
-**Total line coverage: 94.1%** (5500 of 5844 lines)
+**Total line coverage: 94.0%** (6144 of 6537 lines)
 
 ## By layer
 
 | Layer | Coverage | Lines hit / found |
 |---|---:|---:|
-| controllers | 90.1% | 491 / 545 |
-| models | 92.7% | 179 / 193 |
-| repositories | 90.5% | 541 / 598 |
-| services | 98.0% | 1289 / 1315 |
-| views | 94.0% | 3000 / 3193 |
+| controllers | 90.9% | 567 / 624 |
+| models | 88.0% | 191 / 217 |
+| repositories | 90.0% | 647 / 719 |
+| services | 98.2% | 1444 / 1471 |
+| views | 94.0% | 3295 / 3506 |
 
 ## By file
 
 | File | Coverage | Lines hit / found |
 |---|---:|---:|
 | `lib/controllers/accounts_controller.dart` | 77.8% | 7 / 9 |
-| `lib/controllers/app_dependencies.dart` | 100.0% | 35 / 35 |
-| `lib/controllers/base_controller.dart` | 92.4% | 61 / 66 |
+| `lib/controllers/add_account_controller.dart` | 100.0% | 20 / 20 |
+| `lib/controllers/app_dependencies.dart` | 100.0% | 43 / 43 |
+| `lib/controllers/base_controller.dart` | 93.9% | 62 / 66 |
 | `lib/controllers/bill_detail_controller.dart` | 76.5% | 13 / 17 |
 | `lib/controllers/bill_form_controller.dart` | 93.5% | 29 / 31 |
+| `lib/controllers/bill_reminder_controller.dart` | 100.0% | 5 / 5 |
 | `lib/controllers/bills_controller.dart` | 83.3% | 15 / 18 |
 | `lib/controllers/budget_category_controller.dart` | 90.9% | 10 / 11 |
 | `lib/controllers/budget_form_controller.dart` | 100.0% | 29 / 29 |
 | `lib/controllers/budgets_controller.dart` | 95.0% | 19 / 20 |
-| `lib/controllers/cash_flow_controller.dart` | 100.0% | 13 / 13 |
+| `lib/controllers/cash_flow_controller.dart` | 100.0% | 18 / 18 |
 | `lib/controllers/connect_bank_controller.dart` | 100.0% | 10 / 10 |
 | `lib/controllers/create_account_controller.dart` | 83.3% | 5 / 6 |
 | `lib/controllers/dashboard_controller.dart` | 60.0% | 12 / 20 |
 | `lib/controllers/display_controller.dart` | 100.0% | 8 / 8 |
+| `lib/controllers/expected_income_form_controller.dart` | 100.0% | 8 / 8 |
+| `lib/controllers/goal_form_controller.dart` | 92.9% | 13 / 14 |
 | `lib/controllers/manage_budgets_controller.dart` | 100.0% | 15 / 15 |
 | `lib/controllers/notifications_controller.dart` | 94.1% | 16 / 17 |
 | `lib/controllers/onboarding_controller.dart` | 100.0% | 11 / 11 |
 | `lib/controllers/profile_controller.dart` | 93.9% | 31 / 33 |
 | `lib/controllers/recurring_actions.dart` | 85.7% | 12 / 14 |
 | `lib/controllers/reset_password_controller.dart` | 52.9% | 9 / 17 |
-| `lib/controllers/savings_goals_controller.dart` | 71.4% | 5 / 7 |
-| `lib/controllers/settings_controller.dart` | 83.3% | 25 / 30 |
+| `lib/controllers/savings_goals_controller.dart` | 75.0% | 6 / 8 |
+| `lib/controllers/settings_controller.dart` | 87.5% | 35 / 40 |
 | `lib/controllers/sign_in_controller.dart` | 88.9% | 8 / 9 |
+| `lib/controllers/spending_category_controller.dart` | 62.5% | 5 / 8 |
 | `lib/controllers/spending_controller.dart` | 80.0% | 12 / 15 |
 | `lib/controllers/statement_export_controller.dart` | 96.3% | 26 / 27 |
 | `lib/controllers/transaction_detail_controller.dart` | 93.8% | 15 / 16 |
@@ -51,11 +56,11 @@ Generated 2026-10-13 from `flutter test --coverage` (regenerate: `dart run tool/
 | `lib/models/bank_data.dart` | 100.0% | 11 / 11 |
 | `lib/models/bill.dart` | 100.0% | 8 / 8 |
 | `lib/models/budget.dart` | 88.9% | 8 / 9 |
-| `lib/models/cash_flow.dart` | 100.0% | 3 / 3 |
+| `lib/models/cash_flow.dart` | 100.0% | 4 / 4 |
 | `lib/models/dashboard.dart` | 100.0% | 6 / 6 |
-| `lib/models/goal.dart` | 89.5% | 17 / 19 |
+| `lib/models/goal.dart` | 100.0% | 21 / 21 |
 | `lib/models/google_account.dart` | 100.0% | 1 / 1 |
-| `lib/models/linked_bank.dart` | 100.0% | 4 / 4 |
+| `lib/models/linked_bank.dart` | 100.0% | 5 / 5 |
 | `lib/models/money.dart` | 94.1% | 16 / 17 |
 | `lib/models/navigation.dart` | 100.0% | 2 / 2 |
 | `lib/models/notification.dart` | 75.0% | 6 / 8 |
@@ -63,17 +68,19 @@ Generated 2026-10-13 from `flutter test --coverage` (regenerate: `dart run tool/
 | `lib/models/plaid_keys.dart` | 100.0% | 2 / 2 |
 | `lib/models/profile.dart` | 100.0% | 2 / 2 |
 | `lib/models/recurring.dart` | 100.0% | 13 / 13 |
-| `lib/models/settings.dart` | 100.0% | 14 / 14 |
-| `lib/models/spending.dart` | 91.7% | 11 / 12 |
+| `lib/models/settings.dart` | 100.0% | 15 / 15 |
+| `lib/models/spending.dart` | 44.4% | 12 / 27 |
 | `lib/models/statement.dart` | 100.0% | 7 / 7 |
 | `lib/models/transaction.dart` | 100.0% | 12 / 12 |
 | `lib/models/trend.dart` | 83.3% | 5 / 6 |
 | `lib/models/user_account.dart` | 100.0% | 10 / 10 |
-| `lib/models/user_preferences.dart` | 86.7% | 13 / 15 |
-| `lib/repositories/bank_data_repository.dart` | 94.4% | 67 / 71 |
+| `lib/models/user_preferences.dart` | 89.5% | 17 / 19 |
+| `lib/repositories/bank_data_repository.dart` | 98.6% | 70 / 71 |
 | `lib/repositories/budget_repository.dart` | 100.0% | 10 / 10 |
 | `lib/repositories/device_linked_bank_repository.dart` | 100.0% | 64 / 64 |
-| `lib/repositories/goal_repository.dart` | 76.9% | 10 / 13 |
+| `lib/repositories/device_notifications.dart` | 46.7% | 14 / 30 |
+| `lib/repositories/expected_income_repository.dart` | 100.0% | 7 / 7 |
+| `lib/repositories/goal_repository.dart` | 92.0% | 23 / 25 |
 | `lib/repositories/google_sign_in_account_repository.dart` | 24.2% | 8 / 33 |
 | `lib/repositories/linked_bank_repository.dart` | 100.0% | 12 / 12 |
 | `lib/repositories/pace_database.dart` | 91.8% | 67 / 73 |
@@ -82,8 +89,10 @@ Generated 2026-10-13 from `flutter test --coverage` (regenerate: `dart run tool/
 | `lib/repositories/recurring_expense_repository.dart` | 100.0% | 7 / 7 |
 | `lib/repositories/sandbox_plaid_api.dart` | 94.5% | 104 / 110 |
 | `lib/repositories/sqlite_budget_repository.dart` | 100.0% | 23 / 23 |
+| `lib/repositories/sqlite_expected_income_repository.dart` | 100.0% | 22 / 22 |
+| `lib/repositories/sqlite_goal_repository.dart` | 93.8% | 45 / 48 |
 | `lib/repositories/sqlite_plaid_key_repository.dart` | 100.0% | 15 / 15 |
-| `lib/repositories/sqlite_preferences_repository.dart` | 100.0% | 24 / 24 |
+| `lib/repositories/sqlite_preferences_repository.dart` | 100.0% | 26 / 26 |
 | `lib/repositories/sqlite_recurring_expense_repository.dart` | 90.9% | 30 / 33 |
 | `lib/repositories/sqlite_repository.dart` | 100.0% | 8 / 8 |
 | `lib/repositories/sqlite_user_account_repository.dart` | 100.0% | 43 / 43 |
@@ -93,29 +102,31 @@ Generated 2026-10-13 from `flutter test --coverage` (regenerate: `dart run tool/
 | `lib/services/app_services.dart` | 100.0% | 1 / 1 |
 | `lib/services/bank_categories.dart` | 100.0% | 11 / 11 |
 | `lib/services/bank_data_service.dart` | 100.0% | 6 / 6 |
+| `lib/services/bill_reminder_service.dart` | 100.0% | 27 / 27 |
 | `lib/services/calendar.dart` | 100.0% | 4 / 4 |
 | `lib/services/date_labels.dart` | 72.7% | 8 / 11 |
-| `lib/services/demo/demo_services.dart` | 91.9% | 34 / 37 |
+| `lib/services/demo/demo_services.dart` | 93.0% | 40 / 43 |
 | `lib/services/password_hasher.dart` | 100.0% | 29 / 29 |
 | `lib/services/plaid_account_service.dart` | 91.4% | 32 / 35 |
 | `lib/services/plaid_bill_service.dart` | 98.6% | 213 / 216 |
 | `lib/services/plaid_budget_service.dart` | 98.7% | 148 / 150 |
-| `lib/services/plaid_cash_flow_service.dart` | 98.8% | 85 / 86 |
+| `lib/services/plaid_cash_flow_service.dart` | 98.4% | 124 / 126 |
 | `lib/services/plaid_dashboard_service.dart` | 97.5% | 79 / 81 |
-| `lib/services/plaid_notification_service.dart` | 100.0% | 53 / 53 |
-| `lib/services/plaid_sandbox_bank_link_service.dart` | 100.0% | 28 / 28 |
-| `lib/services/plaid_spending_service.dart` | 100.0% | 61 / 61 |
+| `lib/services/plaid_notification_service.dart` | 100.0% | 55 / 55 |
+| `lib/services/plaid_sandbox_bank_link_service.dart` | 100.0% | 44 / 44 |
+| `lib/services/plaid_spending_service.dart` | 100.0% | 89 / 89 |
 | `lib/services/plaid_statement_service.dart` | 100.0% | 62 / 62 |
 | `lib/services/plaid_transaction_service.dart` | 99.0% | 100 / 101 |
 | `lib/services/plaid_trend_service.dart` | 100.0% | 43 / 43 |
 | `lib/services/recurring_schedule.dart` | 96.0% | 24 / 25 |
 | `lib/services/repository_auth_service.dart` | 98.8% | 84 / 85 |
-| `lib/services/repository_goal_service.dart` | 100.0% | 13 / 13 |
+| `lib/services/repository_goal_service.dart` | 100.0% | 47 / 47 |
 | `lib/services/repository_profile_service.dart` | 100.0% | 44 / 44 |
-| `lib/services/repository_settings_service.dart` | 92.1% | 35 / 38 |
+| `lib/services/repository_settings_service.dart` | 92.7% | 38 / 41 |
 | `lib/services/statement_encoders.dart` | 98.4% | 61 / 62 |
 | `lib/services/validators.dart` | 93.9% | 31 / 33 |
 | `lib/views/accounts_view.dart` | 100.0% | 13 / 13 |
+| `lib/views/add_account_view.dart` | 100.0% | 11 / 11 |
 | `lib/views/bill_detail_view.dart` | 100.0% | 12 / 12 |
 | `lib/views/bill_form_view.dart` | 100.0% | 23 / 23 |
 | `lib/views/bills_recurring_view.dart` | 88.9% | 16 / 18 |
@@ -123,27 +134,30 @@ Generated 2026-10-13 from `flutter test --coverage` (regenerate: `dart run tool/
 | `lib/views/budget_category_view.dart` | 100.0% | 10 / 10 |
 | `lib/views/budget_form_view.dart` | 100.0% | 17 / 17 |
 | `lib/views/budgets_view.dart` | 100.0% | 16 / 16 |
-| `lib/views/cash_flow_view.dart` | 100.0% | 11 / 11 |
+| `lib/views/cash_flow_view.dart` | 100.0% | 12 / 12 |
 | `lib/views/connect_bank_view.dart` | 100.0% | 8 / 8 |
 | `lib/views/create_account_view.dart` | 100.0% | 18 / 18 |
 | `lib/views/dashboard_view.dart` | 100.0% | 23 / 23 |
+| `lib/views/expected_income_form_view.dart` | 100.0% | 11 / 11 |
 | `lib/views/format.dart` | 90.0% | 9 / 10 |
+| `lib/views/goal_form_view.dart` | 100.0% | 14 / 14 |
 | `lib/views/manage_budgets_view.dart` | 100.0% | 11 / 11 |
-| `lib/views/navigation/app_modals.dart` | 91.6% | 87 / 95 |
-| `lib/views/navigation/app_pages.dart` | 94.7% | 72 / 76 |
-| `lib/views/navigation/app_route.dart` | 88.2% | 45 / 51 |
+| `lib/views/navigation/app_modals.dart` | 92.7% | 101 / 109 |
+| `lib/views/navigation/app_pages.dart` | 96.4% | 81 / 84 |
+| `lib/views/navigation/app_route.dart` | 88.5% | 46 / 52 |
 | `lib/views/navigation/app_route_parser.dart` | 100.0% | 6 / 6 |
 | `lib/views/navigation/app_router.dart` | 100.0% | 15 / 15 |
 | `lib/views/navigation/app_router_delegate.dart` | 93.7% | 59 / 63 |
-| `lib/views/navigation/router_app_navigator.dart` | 73.7% | 101 / 137 |
+| `lib/views/navigation/router_app_navigator.dart` | 73.0% | 103 / 141 |
 | `lib/views/notifications_view.dart` | 100.0% | 12 / 12 |
 | `lib/views/onboarding_priorities_view.dart` | 100.0% | 15 / 15 |
-| `lib/views/pace_app.dart` | 100.0% | 35 / 35 |
+| `lib/views/pace_app.dart` | 100.0% | 38 / 38 |
 | `lib/views/placeholder_view.dart` | 100.0% | 11 / 11 |
 | `lib/views/profile_view.dart` | 100.0% | 19 / 19 |
 | `lib/views/reset_password_view.dart` | 100.0% | 15 / 15 |
 | `lib/views/savings_goals_view.dart` | 100.0% | 11 / 11 |
 | `lib/views/screens/accounts_screen.dart` | 64.5% | 40 / 62 |
+| `lib/views/screens/add_account_screen.dart` | 98.1% | 51 / 52 |
 | `lib/views/screens/bill_detail_screen.dart` | 80.3% | 49 / 61 |
 | `lib/views/screens/bill_form_screen.dart` | 100.0% | 62 / 62 |
 | `lib/views/screens/bills_recurring_screen.dart` | 95.4% | 62 / 65 |
@@ -151,25 +165,29 @@ Generated 2026-10-13 from `flutter test --coverage` (regenerate: `dart run tool/
 | `lib/views/screens/budget_category_screen.dart` | 100.0% | 53 / 53 |
 | `lib/views/screens/budget_form_screen.dart` | 98.3% | 59 / 60 |
 | `lib/views/screens/budgets_screen.dart` | 100.0% | 55 / 55 |
-| `lib/views/screens/cash_flow_screen.dart` | 100.0% | 86 / 86 |
+| `lib/views/screens/cash_flow_screen.dart` | 100.0% | 88 / 88 |
 | `lib/views/screens/connect_bank_screen.dart` | 100.0% | 33 / 33 |
 | `lib/views/screens/create_account_screen.dart` | 98.7% | 76 / 77 |
 | `lib/views/screens/dashboard_screen.dart` | 86.9% | 179 / 206 |
+| `lib/views/screens/expected_income_form_screen.dart` | 100.0% | 49 / 49 |
+| `lib/views/screens/goal_form_screen.dart` | 79.1% | 53 / 67 |
 | `lib/views/screens/manage_budgets_screen.dart` | 100.0% | 46 / 46 |
 | `lib/views/screens/notifications_screen.dart` | 90.1% | 82 / 91 |
 | `lib/views/screens/onboarding_priorities_screen.dart` | 100.0% | 51 / 51 |
 | `lib/views/screens/profile_screen.dart` | 95.5% | 106 / 111 |
 | `lib/views/screens/reset_password_screen.dart` | 96.7% | 59 / 61 |
 | `lib/views/screens/savings_goals_screen.dart` | 75.6% | 65 / 86 |
-| `lib/views/screens/settings_screen.dart` | 97.5% | 79 / 81 |
+| `lib/views/screens/settings_screen.dart` | 97.6% | 81 / 83 |
 | `lib/views/screens/sign_in_screen.dart` | 100.0% | 55 / 55 |
+| `lib/views/screens/spending_category_screen.dart` | 96.8% | 61 / 63 |
 | `lib/views/screens/spending_screen.dart` | 100.0% | 49 / 49 |
 | `lib/views/screens/statement_export_screen.dart` | 96.4% | 54 / 56 |
 | `lib/views/screens/transaction_detail_screen.dart` | 100.0% | 67 / 67 |
 | `lib/views/screens/transactions_screen.dart` | 100.0% | 71 / 71 |
 | `lib/views/screens/trends_screen.dart` | 100.0% | 39 / 39 |
-| `lib/views/settings_view.dart` | 100.0% | 19 / 19 |
+| `lib/views/settings_view.dart` | 100.0% | 20 / 20 |
 | `lib/views/sign_in_view.dart` | 100.0% | 13 / 13 |
+| `lib/views/spending_category_view.dart` | 100.0% | 10 / 10 |
 | `lib/views/spending_view.dart` | 100.0% | 11 / 11 |
 | `lib/views/statement_export_view.dart` | 100.0% | 17 / 17 |
 | `lib/views/theme.dart` | 100.0% | 57 / 57 |

@@ -1,26 +1,30 @@
 # Pace – Flutter (MVCS + Navigator 2.0)
 
 ## Project description
-Pace is a personal-finance app built with Flutter. You create an account on the device (a username and password, plus your own Plaid sandbox keys), link a bank through Plaid, and see your money in one place:
+Pace is a personal-finance app built with Flutter. You create an account on the device (a username and password, plus your own Plaid sandbox keys), link one or more banks through Plaid, and see your money in one place:
 
 - **Home:** balances, spending so far this month against last month, budgets, upcoming bills and trends.
 - **Transactions:** search, filters, multiple categories per transaction.
-- **Spending:** by category over a month, 3 months or a year.
+- **Spending:** by category over a month, 3 months or a year, with each category's details and transactions.
 - **Budgets:** a monthly limit per category, tracked month by month.
 - **Bills & subscriptions:** recurring payments the bank detects plus your own, with price-change alerts.
 - **Notifications:** overdue and upcoming bills, budgets near or over their limit.
-- **Cash-flow projection and trends.**
+- **Bill reminders:** push notifications at 9 AM on the due date or 1, 3 or 7 days before (your choice in Settings), with a button to send a test one.
+- **Savings goals:** a target, how much is saved, and with a target date how much to save each month.
+- **Cash-flow projection** (including one-off income you expect) **and trends.**
 - **Statements:** download a month as PDF or CSV.
 - **Profile and settings,** including high-contrast and colorblind modes, and your Plaid sandbox keys.
 
 Pace is a prototype. Every bank connection uses **Plaid's Sandbox** with Plaid's published test bank, so no real bank details can be entered and no real money data exists.
 
+## Pace required either an installation on an android device, or running in an android emulator. It will not work with Chrome or iOS.
+
 Data stored on the device in SQLite (`database/schema.sql`):
 - accounts (username, password hash, security question);
 - each user's Plaid sandbox keys;
-- budgets;
+- budgets, savings goals and expected income;
 - your own recurring expenses;
-- display preferences.
+- display and bill reminder preferences.
 
 The code follows **MVCS with a repository layer**: views → controllers → services (business rules) → repositories (SQLite, Plaid, device storage). [Architecture](#architecture) explains each layer below.
 
@@ -112,7 +116,7 @@ The tests need no device, network or Plaid keys:
   - `test/helpers.dart` has `createAda`, `NoGoogle`, `fieldErrors` and test Plaid keys (`testPlaidClientId`, `testPlaidSecret`).
 
 ## Test coverage report
-**[docs/coverage.md](docs/coverage.md)** has coverage in total, by layer and by file. At the last run: 179 tests, 94.1% of lines. To regenerate it:
+**[docs/coverage.md](docs/coverage.md)** has coverage in total, by layer and by file. At the last run: 202 tests, 94.0% of lines. To regenerate it:
 ```sh
 flutter test --coverage
 dart run tool/coverage_report.dart
@@ -122,7 +126,12 @@ dart run tool/coverage_report.dart
 - **Sandbox only:**
   - Pace never connects to real banks.
   - Plaid's test bank repeats the same transactions every month, so whole months can look identical.
+  - Every sandbox test bank holds the same sample accounts and transactions. Linking a second one (Accounts → Add an account) repeats them, which doubles totals such as spending.
 - **Android only:** Pace hasn't been built or tested on iOS.
+- **Bill reminders:**
+  - They're scheduled on the phone when Pace runs (and moved again whenever bills or the setting change), so a bill that appears while Pace is closed gets its reminder the next time it's opened.
+  - Android may deliver them a few minutes late to save battery.
+  - If notifications are turned off for Pace, reminders only show in the app's Notifications.
 - **Prototype security shortcuts:**
   - Each user's Plaid secret is stored unencrypted on the phone with their account; in production it belongs on a server.
   - A wrong key is only noticed when connecting a bank. Pace checks the keys' format at sign-up, not whether Plaid accepts them. If Plaid rejects them, the error points to Profile to fix them.
@@ -132,9 +141,8 @@ dart run tool/coverage_report.dart
   - Category changes and notes on transactions are lost.
   - Bills marked paid and subscriptions paused are lost.
   - Which notifications you've read is lost.
-  - Savings goals are lost.
 - **Not built yet:**
-  - These show a "not implemented" message: account details, spending by category, trend details, the tool shortcuts, adding a note, new categories, the theme and bill-reminder pickers, adding expected income, adding or editing savings goals, and the ⋮ menus on Accounts, Transaction detail and Spending's calendar.
+  - These show a "not implemented" message: account details, trend details, the tool shortcuts, adding a note, new categories, the theme picker, editing savings goals and adding money to them, and the ⋮ menus on Accounts, Transaction detail and Spending's calendar.
   - Google and Apple sign-in are hidden.
   - The **Show values on charts** setting is saved but has no effect.
 - **Accounts from before usernames:** they sign in with their old email as the username. Accounts from before Plaid keys moved into the app have no keys until they're added in Profile.
@@ -254,20 +262,23 @@ Every arrow is a controller calling `AppNavigator`; routes are in `app_route.dar
 | Sign in | username + password → Home · Forgot password → Reset password (username, then security question) · Create account (name, username, password, security question, Plaid sandbox keys) → onboarding → connect bank → Home |
 | Onboarding | Continue → Connect bank (pushed, Back works) |
 | Connect bank | Connect → next `FlowStep` (home); linking is required after creating an account (no skip) |
-| **Dashboard** | gear → Settings · bell → Notifications · review banner / See more → Transactions tab · account row → Account detail* · Add account → Connect bank · See budget → Budgets tab · budget row → Budget category · See all bills → Bills tab · bill row → Bill detail · See all trends → Trends · trend button → Trend detail* · tools → Recurring / Savings goals / Cash flow |
+| **Dashboard** | gear → Settings · bell → Notifications · review banner / See more → Transactions tab · account row → Account detail* · Add account → Add an account · See budget → Budgets tab · budget row → Budget category · See all bills → Bills tab · bill row → Bill detail · See all trends → Trends · trend button → Trend detail* · tools → Recurring / Savings goals / Cash flow |
 | Transactions | search (merchant, category, account, note, amount; as you type) · row → Transaction detail · filters → picker sheet |
 | Transaction detail | Back · category chips (saved) · New category / Add a note → sheets |
 | Budgets | month tabs (limits apply to every month; spending is that month's) · category → Budget category · New budget → budget form · ⋮ → Manage budgets |
 | Budget category | Back · Edit → budget form · transaction → Transaction detail |
 | Manage budgets | edit → budget form · delete → confirm · New budget → budget form |
-| Spending | category → Spending category* · bars highlight |
+| Spending | category → Spending category (same period: total, change, share of spending, bars, transactions) · bars highlight |
 | Bills (Upcoming ⇄ Recurring) | tab switch swaps pages · Recurring lists Subscriptions and Bills (bank-detected + your own, with price changes) · row → Bill detail · + → New recurring expense form · ⋮ → menu (details, pause / resume, edit / delete for your own) |
 | Bill detail | Back · Mark next payment as paid · Pause / Resume tracking · Edit → form · Delete → confirm (your own only) · payment → Transaction detail |
-| Savings goals / Cash flow / Trends | Back · actions open sheets / detail* |
+| Savings goals | Back · + → New savings goal form (name, target, saved so far, optional target date → monthly saving tip, icon) → back to the list · edit / Add contribution → not implemented yet |
+| Cash flow | Back · ranges and income scenarios · Add expected income → form (what, amount, date within a year) → back, counted in full on its date · × on an added income → confirm → removed |
+| Trends | Back · trend → Trend detail* |
 | Notifications | tap / "View bill" → closes, then opens the service-provided target (bill, budget category, bills…) · Mark as paid → service |
-| Settings | Connected accounts → Accounts · Profile → Profile · Statement export → pick account, month and PDF / CSV, download (system Save dialog) · Budget categories → Manage budgets · Sign out → Sign in · Delete → confirm → Sign in |
+| Settings | Connected accounts → Accounts · Profile → Profile · Bill reminders → picker (Off, on the due date, 1, 3 or 7 days before; turning them on asks for notification permission) · Send a test reminder → a notification now · Statement export → pick account, month and PDF / CSV, download (system Save dialog) · Budget categories → Manage budgets · Sign out → Sign in · Delete → confirm → Sign in |
 | Profile | edit name and Plaid sandbox keys → Save changes (username is read-only) · Connect test bank / Remove → confirm |
-| Accounts | Link another account → Connect bank · row → Account detail* |
+| Add an account | pick one of Plaid's sandbox test banks not connected yet (already-connected ones are marked) → Connect → back where you came from, which reloads with the new accounts |
+| Accounts | Link another account → Add an account · row → Account detail* |
 | Bottom nav (any screen with one) | Home / Transactions / Spending / Budgets / Bills |
 
 \* No design yet – shows a "not implemented" toast; add the page in `app_pages.dart` and remove it from `notImplemented()` when you build it.

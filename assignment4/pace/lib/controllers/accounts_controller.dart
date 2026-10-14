@@ -18,7 +18,7 @@ class AccountsController extends ScreenController {
 
   Future<void> dismissBanner() => performAndRefresh(_accounts.dismissReconnectBanner);
 
-  void linkAccount() => navigator.openConnectBank();
+  void linkAccount() => navigator.openAddAccount();
   void openAccount(LinkedAccount a) => navigator.openAccountDetail(a.id);
   void openMenu() => navigator.openMenu('accounts');
 }

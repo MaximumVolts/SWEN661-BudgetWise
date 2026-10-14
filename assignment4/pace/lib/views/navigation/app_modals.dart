@@ -3,6 +3,7 @@ import 'package:flutter/material.dart'
         ScaffoldMessenger, Semantics, SnackBar, Text, TextButton, TextStyle, showDialog, showModalBottomSheet;
 import '../../models/recurring.dart' show RecurringAction;
 import '../../models/transaction.dart' show FilterChoice, FilterKind;
+import '../../models/user_preferences.dart' show BillReminder;
 import '../theme.dart' show C, T;
 
 /// Dialogs, sheets and pickers that are not pages in the route stack.
@@ -14,14 +15,14 @@ abstract class AppModals {
       {required List<FilterChoice> choices, FilterChoice? current});
   Future<bool> newCategory(BuildContext context);
   Future<bool> addNote(BuildContext context, String transactionId);
-  Future<bool> addGoal(BuildContext context);
   Future<bool> editGoal(BuildContext context, String goalId);
   Future<bool> addContribution(BuildContext context, String goalId);
-  Future<bool> addExpectedIncome(BuildContext context);
+  Future<bool> confirmRemoveExpectedIncome(BuildContext context, String name);
   /// The menu for a bill or subscription: the user's pick among [actions], or null.
   Future<RecurringAction?> recurringMenu(BuildContext context, String name, List<RecurringAction> actions);
   Future<bool> themePicker(BuildContext context);
-  Future<bool> billReminderPicker(BuildContext context);
+  /// When to be reminded about bills; null if dismissed.
+  Future<BillReminder?> billReminderPicker(BuildContext context, BillReminder current);
   Future<bool> confirmDeleteAccount(BuildContext context);
   Future<bool> confirmRemoveBankConnection(BuildContext context, String institutionName);
   Future<bool> confirmDeleteBudget(BuildContext context, String categoryName);
@@ -181,21 +182,54 @@ class DefaultAppModals implements AppModals {
       );
 
   @override
+  Future<bool> confirmRemoveExpectedIncome(BuildContext context, String name) => _confirm(
+        context,
+        title: 'Remove $name?',
+        message: 'It won’t count in your cash flow projection any more.',
+        action: 'Remove',
+      );
+
+  @override
   Future<bool> newCategory(BuildContext c) => _todo(c, 'New category');
   @override
   Future<bool> addNote(BuildContext c, String id) => _todo(c, 'Add note');
-  @override
-  Future<bool> addGoal(BuildContext c) => _todo(c, 'Add goal');
   @override
   Future<bool> editGoal(BuildContext c, String id) => _todo(c, 'Edit goal');
   @override
   Future<bool> addContribution(BuildContext c, String id) => _todo(c, 'Add contribution');
   @override
-  Future<bool> addExpectedIncome(BuildContext c) => _todo(c, 'Add expected income');
-  @override
   Future<bool> themePicker(BuildContext c) => _todo(c, 'Theme picker');
   @override
-  Future<bool> billReminderPicker(BuildContext c) => _todo(c, 'Bill reminder picker');
+  Future<BillReminder?> billReminderPicker(BuildContext context, BillReminder current) =>
+      showModalBottomSheet<BillReminder>(
+        context: context,
+        backgroundColor: C.bg,
+        showDragHandle: true,
+        isScrollControlled: true,
+        builder: (ctx) => SafeArea(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              Semantics(
+                header: true,
+                child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 4), child: Text('Remind me about bills', style: T.title)),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+                child: Text('As a notification on this phone at 9 AM, and in Notifications.', style: T.sub),
+              ),
+              for (final r in BillReminder.values)
+                ListTile(
+                  title: Text(r.label),
+                  selected: r == current,
+                  trailing: r == current ? const Icon(Icons.check) : null,
+                  onTap: () => Navigator.of(ctx).pop(r),
+                ),
+            ],
+          ),
+        ),
+      );
   @override
   void menu(BuildContext c, String screenId) => _todo(c, 'Menu "$screenId"');
   @override

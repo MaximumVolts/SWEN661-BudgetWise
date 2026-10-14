@@ -28,6 +28,6 @@ class SpendingController extends ScreenController {
     notifyListeners();
   }
 
-  void openCategory(SpendingCategory c) => navigator.openSpendingCategory(c.id);
+  void openCategory(SpendingCategory c) => navigator.openSpendingCategory(c.id, rangeIndex: rangeIndex);
   void openCalendar() => navigator.openMenu('spending_calendar');
 }

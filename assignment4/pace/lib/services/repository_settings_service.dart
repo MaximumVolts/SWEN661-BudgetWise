@@ -1,6 +1,6 @@
 import 'dart:async' show StreamController, StreamSubscription;
 import '../models/settings.dart' show SettingsData;
-import '../models/user_preferences.dart' show UserPreferences;
+import '../models/user_preferences.dart' show BillReminder, UserPreferences;
 import '../repositories/linked_bank_repository.dart' show LinkedBankRepository;
 import '../repositories/preferences_repository.dart' show PreferencesRepository;
 import 'profile_service.dart' show ProfileService;
@@ -54,7 +54,7 @@ class RepositorySettingsService implements SettingsService {
       username: me.username,
       initials: me.initials,
       connectedAccountCount: linkedAccounts,
-      billReminderLabel: '3 days before',
+      billReminder: prefs.billReminder,
       highContrast: prefs.highContrast,
       colorblindMode: prefs.colorblindMode,
       showChartValues: prefs.showChartValues,
@@ -79,6 +79,8 @@ class RepositorySettingsService implements SettingsService {
   Future<void> setShowChartValues(bool v) => _update((p) => p.copyWith(showChartValues: v));
   @override
   Future<void> setBudgetAlerts(bool v) => _update((p) => p.copyWith(budgetAlerts: v));
+  @override
+  Future<void> setBillReminder(BillReminder reminder) => _update((p) => p.copyWith(billReminder: reminder));
 
   void dispose() {
     _session?.cancel();

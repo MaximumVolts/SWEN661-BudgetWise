@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http show Request, Response;
 import 'package:http/testing.dart' show MockClient;
 import 'package:pace_app/models/linked_bank.dart' show LinkedItem;
 import 'package:pace_app/repositories/budget_repository.dart' show InMemoryBudgetRepository;
+import 'package:pace_app/repositories/device_notifications.dart' show InMemoryDeviceNotifications;
 import 'package:pace_app/repositories/linked_bank_repository.dart' show InMemoryLinkedBankRepository;
 import 'package:pace_app/repositories/recurring_expense_repository.dart' show InMemoryRecurringExpenseRepository;
 import 'package:pace_app/repositories/sandbox_plaid_api.dart' show SandboxPlaidApi;
@@ -26,6 +27,8 @@ class SandboxReplay {
   static String _fixture(String name) => File('test/fixtures/plaid_sandbox/$name.json').readAsStringSync();
 
   final requests = <http.Request>[];
+  /// Items linked so far; each link gets its own item id, as at Plaid.
+  var _linked = 0;
   bool transactionsReady = true;
   /// False: Plaid has only sent its first batch (the last ~30 days), like right after linking.
   bool historyReady = true;
@@ -52,7 +55,7 @@ class SandboxReplay {
         return http.Response(jsonEncode({'public_token': 'public-sandbox-test', 'request_id': 'r1'}), 200);
       case '/item/public_token/exchange':
         if (body['public_token'] != 'public-sandbox-test') fail('Wrong public token');
-        return http.Response(jsonEncode({'access_token': 'access-sandbox-test', 'item_id': 'item-linked', 'request_id': 'r2'}), 200);
+        return http.Response(jsonEncode({'access_token': 'access-sandbox-test', 'item_id': 'item-linked-${++_linked}', 'request_id': 'r2'}), 200);
     }
     if (body['access_token'] != 'access-sandbox-test') fail('Missing/wrong access token for ${req.url.path}');
     return switch (req.url.path) {
@@ -87,7 +90,7 @@ typedef SandboxApp = ({
 
 /// Signs up Ada with the sandbox bank linked (replayed by [plaid]; [linkBank] false to start
 /// without one), opens the app on [stack] ("today" = [today], default [SandboxReplay.today]) and
-/// lets it load. [seed] runs before the app opens.
+/// lets it load. [seed] runs before the app opens. [notifications] records the bill reminders it sends.
 Future<SandboxApp> openSandboxApp(
   WidgetTester tester,
   SandboxReplay plaid,
@@ -96,6 +99,7 @@ Future<SandboxApp> openSandboxApp(
   Future<void> Function(SandboxApp app)? seed,
   DateTime? today,
   bool linkBank = true,
+  InMemoryDeviceNotifications? notifications,
 }) async {
   final users = InMemoryUserAccountRepository();
   final banks = InMemoryLinkedBankRepository();
@@ -110,6 +114,7 @@ Future<SandboxApp> openSandboxApp(
     budgetStore: budgets,
     recurringStore: recurring,
     statementSaver: statementSaver,
+    deviceNotifications: notifications,
     now: () => today ?? SandboxReplay.today,
   );
   await tester.runAsync(() => createAda(services.auth));
@@ -119,6 +124,7 @@ Future<SandboxApp> openSandboxApp(
       LinkedItem(
         itemId: 'item-app',
         userId: ada.id,
+        institutionId: 'ins_109508', // First Platypus Bank
         institutionName: 'First Platypus Bank',
         accessToken: 'access-sandbox-test',
         sandboxCredentialsLabel: 'simple',

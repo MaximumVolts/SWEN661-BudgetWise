@@ -7,6 +7,10 @@ import '../../repositories/bank_data_repository.dart' show PlaidBankDataReposito
 import '../../repositories/budget_repository.dart' show BudgetRepository, InMemoryBudgetRepository;
 import '../../repositories/device_linked_bank_repository.dart' show DeviceLinkedBankRepository;
 import '../../repositories/goal_repository.dart' show InMemoryGoalRepository;
+import '../../repositories/device_notifications.dart' show DeviceNotifications, InMemoryDeviceNotifications, LocalDeviceNotifications;
+import '../../repositories/expected_income_repository.dart' show InMemoryExpectedIncomeRepository;
+import '../../repositories/sqlite_expected_income_repository.dart' show SqliteExpectedIncomeRepository;
+import '../../repositories/sqlite_goal_repository.dart' show SqliteGoalRepository;
 import '../../repositories/linked_bank_repository.dart' show LinkedBankRepository;
 import '../../repositories/pace_database.dart' show PaceDatabase;
 import '../../models/plaid_keys.dart' show PlaidKeys;
@@ -28,6 +32,7 @@ import '../onboarding_service.dart' show OnboardingService;
 import '../password_hasher.dart' show PasswordHasher;
 import '../plaid_account_service.dart' show PlaidAccountService;
 import '../../repositories/plaid_api.dart' show PlaidApi;
+import '../bill_reminder_service.dart' show BillReminderService;
 import '../plaid_bill_service.dart' show PlaidBillService;
 import '../plaid_budget_service.dart' show PlaidBudgetService;
 import '../plaid_cash_flow_service.dart' show PlaidCashFlowService;
@@ -58,6 +63,7 @@ AppServices demoServices({
   PreferencesRepository? preferencesStore,
   StatementSaver? statementSaver,
   RecurringExpenseRepository? recurringStore,
+  DeviceNotifications? deviceNotifications,
   PlaidKeyRepository? plaidKeyStore,
   DateTime Function()? now,
 }) {
@@ -94,7 +100,24 @@ AppServices demoServices({
   final bills = PlaidBillService(bankData, notes, recurring: recurring, currentUserId: currentUserId, now: now);
   final budgets = PlaidBudgetService(bankData, notes, budgets: budgetLimits, currentUserId: currentUserId, now: now);
   final trends = PlaidTrendService(bankData, notes, now: now);
-  final cashFlow = PlaidCashFlowService(bankData, notes, now: now);
+  // One-off income the user expects lives with accounts: on device by default, in memory in tests.
+  final incomes = accounts == null ? SqliteExpectedIncomeRepository(database) : InMemoryExpectedIncomeRepository();
+  final cashFlow = PlaidCashFlowService(bankData, notes, incomes: incomes, currentUserId: currentUserId, now: now);
+  final settings = RepositorySettingsService(
+    profile: profile,
+    store: preferences,
+    banks: linkedBanks,
+    currentUserId: currentUserId,
+    signedInChanges: auth.signedInChanges,
+  );
+  // Bill reminders as push notifications: the phone's own on device; recorded in tests.
+  final reminders = BillReminderService(
+    bills: bills,
+    preferences: settings.preferences,
+    isSignedIn: () => auth.isSignedIn,
+    device: deviceNotifications ?? (accounts == null ? LocalDeviceNotifications() : InMemoryDeviceNotifications()),
+    now: now,
+  );
 
   return AppServices(
     profile: profile,
@@ -108,19 +131,16 @@ AppServices demoServices({
     budgets: budgets,
     spending: PlaidSpendingService(bankData, notes, now: now),
     bills: bills,
-    // Real service over an empty repository: swap InMemoryGoalRepository for your storage.
-    goals: RepositoryGoalService(InMemoryGoalRepository()),
-    notifications: PlaidNotificationService(bills, budgets, now: now),
-    settings: RepositorySettingsService(
-      profile: profile,
-      store: preferences,
-      banks: linkedBanks,
-      currentUserId: currentUserId,
-      signedInChanges: auth.signedInChanges,
-    ),
+    // Goals live with accounts: on device by default; in memory when accounts are (tests).
+    goals: RepositoryGoalService(
+        accounts == null ? SqliteGoalRepository(database, currentUserId: currentUserId) : InMemoryGoalRepository(),
+        now: now),
+    notifications: PlaidNotificationService(bills, budgets, preferences: settings.preferences, now: now),
+    settings: settings,
     cashFlow: cashFlow,
     trends: trends,
     statements: PlaidStatementService(bankData, notes, saver: statementSaver ?? const FilePickerStatementSaver(), now: now),
+    reminders: reminders,
   );
 }
 

@@ -8,7 +8,7 @@ abstract class GoalRepository {
   Future<List<SavingsGoal>> fetchGoals();
   /// null when no goal with [id] exists.
   Future<SavingsGoal?> fetchGoal(String id);
-  /// Inserts or replaces the goal with the same id.
+  /// Replaces the goal with the same id, or inserts it (a goal with an empty id is new and gets one).
   Future<void> saveGoal(SavingsGoal goal);
   Future<void> deleteGoal(String id);
 }
@@ -30,11 +30,28 @@ class InMemoryGoalRepository implements GoalRepository {
     return null;
   }
 
+  var _nextId = 1;
+
   @override
   Future<void> saveGoal(SavingsGoal goal) async {
-    final i = _goals.indexWhere((g) => g.id == goal.id);
+    final i = goal.id.isEmpty ? -1 : _goals.indexWhere((g) => g.id == goal.id);
     if (i < 0) {
-      _goals.add(goal);
+      var id = goal.id;
+      while (id.isEmpty || _goals.any((g) => g.id == id)) {
+        id = 'goal-${_nextId++}';
+      }
+      _goals.add(SavingsGoal(
+        id: id,
+        name: goal.name,
+        subtitle: goal.subtitle,
+        iconKey: goal.iconKey,
+        saved: goal.saved,
+        target: goal.target,
+        tip: goal.tip,
+        tipHighlight: goal.tipHighlight,
+        contributions: goal.contributions,
+        targetDate: goal.targetDate,
+      ));
     } else {
       _goals[i] = goal;
     }

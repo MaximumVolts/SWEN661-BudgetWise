@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart' show BuildContext;
 import '../../models/navigation.dart' show DeepLinkTarget, FlowStep, TargetKind;
 import '../../models/recurring.dart' show RecurringAction;
 import '../../models/transaction.dart' show FilterChoice, FilterKind;
+import '../../models/user_preferences.dart' show BillReminder;
 import '../../controllers/app_navigator.dart' show AppNavigator;
 import 'app_modals.dart' show AppModals;
 import 'app_pages.dart' show AppPages;
@@ -54,6 +55,8 @@ class RouterAppNavigator implements AppNavigator {
   @override
   void openAccounts() => _push(AppRoute.accounts);
   @override
+  void openAddAccount() => _push(AppRoute.addAccount);
+  @override
   void openTransactions() => openTab(1);
   @override
   void openTransaction(String id) => _push(AppRoute.transactionDetail(id));
@@ -77,7 +80,8 @@ class RouterAppNavigator implements AppNavigator {
   @override
   void openTrendDetail(String id) => _push(AppRoute.trendDetail(id));
   @override
-  void openSpendingCategory(String id) => _push(AppRoute.spendingCategory(id));
+  void openSpendingCategory(String id, {int rangeIndex = 0}) =>
+      _push(AppRoute.spendingCategory(id, rangeIndex: rangeIndex));
   @override
   void openAccountDetail(String id) => _push(AppRoute.accountDetail(id));
   @override
@@ -157,7 +161,7 @@ class RouterAppNavigator implements AppNavigator {
   @override
   void openEditBill(String billId) => _push(AppRoute.billEdit(billId));
   @override
-  Future<bool> openAddGoal() => _modals.addGoal(_ctx);
+  void openAddGoal() => _push(AppRoute.goalNew);
   @override
   Future<bool> openEditGoal(String id) => _modals.editGoal(_ctx, id);
   @override
@@ -169,7 +173,9 @@ class RouterAppNavigator implements AppNavigator {
   @override
   Future<bool> confirmDeleteBudget(String categoryName) => _modals.confirmDeleteBudget(_ctx, categoryName);
   @override
-  Future<bool> openAddExpectedIncome() => _modals.addExpectedIncome(_ctx);
+  void openAddExpectedIncome() => _push(AppRoute.cashFlowIncomeNew);
+  @override
+  Future<bool> confirmRemoveExpectedIncome(String name) => _modals.confirmRemoveExpectedIncome(_ctx, name);
   @override
   Future<RecurringAction?> openRecurringMenu(String name, List<RecurringAction> actions) =>
       _modals.recurringMenu(_ctx, name, actions);
@@ -178,7 +184,7 @@ class RouterAppNavigator implements AppNavigator {
   @override
   Future<bool> openThemePicker() => _modals.themePicker(_ctx);
   @override
-  Future<bool> openBillReminderPicker() => _modals.billReminderPicker(_ctx);
+  Future<BillReminder?> pickBillReminder(BillReminder current) => _modals.billReminderPicker(_ctx, current);
   @override
   Future<bool> confirmDeleteAccount() => _modals.confirmDeleteAccount(_ctx);
   @override

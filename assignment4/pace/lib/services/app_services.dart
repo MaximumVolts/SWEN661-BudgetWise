@@ -2,6 +2,7 @@ import 'account_service.dart' show AccountService;
 import 'auth_service.dart' show AuthService;
 import 'bank_link_service.dart' show BankLinkService;
 import 'bill_service.dart' show BillService;
+import 'bill_reminder_service.dart' show BillReminderService;
 import 'budget_service.dart' show BudgetService;
 import 'cash_flow_service.dart' show CashFlowService;
 import 'dashboard_service.dart' show DashboardService;
@@ -33,6 +34,7 @@ class AppServices {
   final CashFlowService cashFlow;
   final TrendService trends;
   final StatementService statements;
+  final BillReminderService reminders;
 
   const AppServices({
     required this.auth,
@@ -51,5 +53,6 @@ class AppServices {
     required this.cashFlow,
     required this.trends,
     required this.statements,
+    required this.reminders,
   });
 }

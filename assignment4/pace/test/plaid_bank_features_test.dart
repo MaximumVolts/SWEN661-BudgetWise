@@ -42,6 +42,7 @@ import 'package:pace_app/repositories/linked_bank_repository.dart' show InMemory
 import 'package:pace_app/repositories/statement_saver.dart' show InMemoryStatementSaver, StatementSaver;
 import 'package:pace_app/repositories/transaction_annotation_repository.dart' show InMemoryTransactionAnnotationRepository;
 import 'package:pace_app/models/app_exception.dart' show AppException;
+import 'package:pace_app/repositories/expected_income_repository.dart' show InMemoryExpectedIncomeRepository;
 import 'package:pace_app/services/plaid_account_service.dart' show PlaidAccountService;
 import 'package:pace_app/services/plaid_bill_service.dart' show PlaidBillService;
 import 'package:pace_app/services/plaid_budget_service.dart' show PlaidBudgetService;
@@ -59,6 +60,7 @@ import 'package:pace_app/views/navigation/app_router.dart' show AppRouter;
 import 'package:pace_app/views/screens/transactions_screen.dart' show TransactionsScreen;
 
 import 'sandbox.dart' show openSandboxApp, SandboxReplay;
+import 'helpers.dart' show fieldErrors;
 
 void main() {
   late SandboxReplay plaid;
@@ -537,6 +539,35 @@ void main() {
     expect(year.total, greaterThan(s.total));
   });
 
+  test('Spending by category: the same figures as the overview, for one category', () async {
+    final service = PlaidSpendingService(data, notes, now: now);
+    for (final range in [0, 1, 2]) {
+      final overview = await service.getSpending(rangeIndex: range);
+      final top = overview.categories.first;
+      final d = await service.getCategoryDetail(categoryId: top.id, rangeIndex: range);
+      expect(d.name, top.name, reason: 'range $range');
+      expect(d.periodTitle, overview.periodTitle);
+      expect(d.amount, closeTo(top.amount, 0.001));
+      expect(d.changePercent, top.changePercent);
+      expect(d.shareOfTotal, closeTo(top.amount / overview.total, 0.0001));
+      expect(d.bars.length, overview.bars.length); // same weeks / months as the overview
+      expect(d.bars.fold(0.0, (t, b) => t + b.value), closeTo(d.amount, 0.001));
+      expect(d.transactionCount, d.transactions.length);
+      expect(-d.transactions.fold(0.0, (t, x) => t + x.amount), closeTo(d.amount, 0.001)); // money out
+      expect(d.averageAmount, closeTo(d.amount / d.transactionCount, 0.001));
+      expect(d.largestAmount, lessThanOrEqualTo(d.amount));
+    }
+  });
+
+  test('Spending by category: a category with nothing spent is empty, not an error', () async {
+    final d = await PlaidSpendingService(data, notes, now: now).getCategoryDetail(categoryId: 'medical', rangeIndex: 0);
+    expect(d.amount, 0);
+    expect(d.transactions, isEmpty);
+    expect(d.averageAmount, isNull);
+    expect(d.largestAmount, isNull);
+    expect(d.shareOfTotal, 0);
+  });
+
   test('Budgets: 3 monthly periods; limits carry over, spending is per month', () async {
     final budgets = budgetService(now);
     final periods = await budgets.getPeriods();
@@ -571,6 +602,67 @@ void main() {
     expect(cf.breakdown[2].amount, greaterThan(0)); // bills in the next 30 days
     expect(cf.projectedAmount, closeTo(cf.chart.values.last, 0.001));
     expect(cf.projectedDateLabel, 'Projected cash on Nov 11');
+  });
+
+  group('Cash flow: expected income the user adds', () {
+    late InMemoryExpectedIncomeRepository incomes;
+    late PlaidCashFlowService cashFlow;
+    String? user = 'u1';
+    setUp(() {
+      user = 'u1';
+      incomes = InMemoryExpectedIncomeRepository();
+      cashFlow = PlaidCashFlowService(data, notes, incomes: incomes, currentUserId: () => user, now: now);
+    });
+
+    test('counts in full on its date when within the range, with its own removable line', () async {
+      final before = await cashFlow.getProjection(rangeIndex: 0, scenarioIndex: 1);
+      var changes = 0;
+      final sub = cashFlow.changes.listen((_) => changes++);
+      await cashFlow.addExpectedIncome(name: ' Tax refund ', amount: r'$1,200', date: DateTime(2026, 10, 20));
+      await cashFlow.addExpectedIncome(name: 'Bonus', amount: '500', date: DateTime(2026, 12, 20)); // after 30 days
+      await Future<void>.delayed(Duration.zero);
+      expect(changes, 2);
+
+      final after = await cashFlow.getProjection(rangeIndex: 0, scenarioIndex: 1);
+      expect(after.projectedAmount, closeTo(before.projectedAmount + 1200, 0.001));
+      final line = after.breakdown.singleWhere((l) => l.expectedIncomeId != null);
+      expect((line.title, line.subtitle, line.amount), ('Tax refund', 'Expected Oct 20 · added by you', 1200.0));
+      // Not scaled by the income scenario: it's an amount the user knows.
+      final low = await cashFlow.getProjection(rangeIndex: 0, scenarioIndex: 0);
+      expect(low.breakdown.singleWhere((l) => l.expectedIncomeId != null).amount, 1200);
+      // The 90-day range includes the December bonus too.
+      expect((await cashFlow.getProjection(rangeIndex: 2, scenarioIndex: 1)).breakdown.where((l) => l.expectedIncomeId != null),
+          hasLength(2));
+
+      await cashFlow.removeExpectedIncome(line.expectedIncomeId!);
+      expect((await cashFlow.getProjection(rangeIndex: 0, scenarioIndex: 1)).projectedAmount,
+          closeTo(before.projectedAmount, 0.001));
+      await sub.cancel();
+    });
+
+    test('validates what is entered', () async {
+      final errors = await fieldErrors(
+          () => cashFlow.addExpectedIncome(name: ' ', amount: '0', date: DateTime(2026, 10, 11))); // yesterday
+      expect(errors, {
+        'name': 'Enter what the income is',
+        'amount': r'The amount must be at least $0.01',
+        'date': "Choose a date that isn't in the past",
+      });
+      expect((await fieldErrors(() => cashFlow.addExpectedIncome(name: 'X', amount: '5', date: null)))['date'],
+          'Choose when you expect it');
+      expect((await fieldErrors(() => cashFlow.addExpectedIncome(name: 'X', amount: '5', date: DateTime(2027, 10, 13))))['date'],
+          'Choose a date within the next year');
+      expect(await incomes.listFor('u1'), isEmpty);
+    });
+
+    test("each user sees only their own; signed out, nothing can be added", () async {
+      await cashFlow.addExpectedIncome(name: 'Refund', amount: '100', date: DateTime(2026, 10, 20));
+      user = 'u2';
+      expect((await cashFlow.getProjection(rangeIndex: 0, scenarioIndex: 1)).breakdown.where((l) => l.expectedIncomeId != null),
+          isEmpty);
+      user = null;
+      await expectLater(cashFlow.addExpectedIncome(name: 'X', amount: '5', date: DateTime(2026, 10, 20)), throwsA(isA<AppException>()));
+    });
   });
 
   test('Trends, notifications and the dashboard are built from the same sandbox data', () async {

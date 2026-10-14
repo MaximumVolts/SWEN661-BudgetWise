@@ -20,7 +20,7 @@
 -- lines are for the sqlite3 CLI and are skipped by the app.
 
 PRAGMA foreign_keys = ON;
-PRAGMA user_version = 10;
+PRAGMA user_version = 13;
 
 BEGIN;
 
@@ -54,7 +54,8 @@ CREATE TABLE user_preferences (
     colorblind_mode      INTEGER NOT NULL DEFAULT 0 CHECK (colorblind_mode IN (0, 1)),
     show_chart_values    INTEGER NOT NULL DEFAULT 1 CHECK (show_chart_values IN (0, 1)),
     budget_alerts        INTEGER NOT NULL DEFAULT 1 CHECK (budget_alerts IN (0, 1)),
-    bill_reminder_days   INTEGER NOT NULL DEFAULT 3 CHECK (bill_reminder_days >= 0),
+    -- Days before a bill is due to send a reminder (0 = on the day); NULL = reminders off.
+    bill_reminder_days   INTEGER DEFAULT 3 CHECK (bill_reminder_days IS NULL OR bill_reminder_days >= 0),
     -- Onboarding answers: IncomeOption id ('steady' | 'variable'), set once onboarding finishes.
     income_type          TEXT,
     onboarding_completed INTEGER NOT NULL DEFAULT 0 CHECK (onboarding_completed IN (0, 1)),
@@ -119,6 +120,47 @@ CREATE TABLE recurring_expenses (
 );
 
 CREATE INDEX idx_recurring_expenses_user ON recurring_expenses(user_id);
+
+-- ── Savings goals ────────────────────────────────────────────────────────────
+
+-- What a user is saving toward, kept separate from spending budgets.
+CREATE TABLE savings_goals (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name         TEXT    NOT NULL CHECK (length(trim(name)) > 0),
+    icon_key     TEXT    NOT NULL DEFAULT 'savings',
+    saved_cents  INTEGER NOT NULL DEFAULT 0 CHECK (saved_cents >= 0),
+    target_cents INTEGER NOT NULL CHECK (target_cents > 0),
+    target_date  TEXT    CHECK (target_date IS NULL OR target_date GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]'),
+    created_at   TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
+    updated_at   TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+);
+
+CREATE INDEX idx_savings_goals_user ON savings_goals(user_id);
+
+-- Money put toward a goal (deleted with it).
+CREATE TABLE goal_contributions (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    goal_id      INTEGER NOT NULL REFERENCES savings_goals(id) ON DELETE CASCADE,
+    date_label   TEXT    NOT NULL,
+    amount_cents INTEGER NOT NULL
+);
+
+CREATE INDEX idx_goal_contributions_goal ON goal_contributions(goal_id);
+
+-- ── Expected income ──────────────────────────────────────────────────────────
+
+-- One-off money a user expects (a refund, a freelance payment…), added to the cash flow projection.
+CREATE TABLE expected_incomes (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name         TEXT    NOT NULL CHECK (length(trim(name)) > 0),
+    amount_cents INTEGER NOT NULL CHECK (amount_cents > 0),
+    expected_on  TEXT    NOT NULL CHECK (expected_on GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]'),
+    created_at   TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
+);
+
+CREATE INDEX idx_expected_incomes_user ON expected_incomes(user_id);
 
 -- ── Plaid Sandbox API keys ───────────────────────────────────────────────────
 

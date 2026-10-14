@@ -2,7 +2,11 @@ import 'dart:io' show Directory, File;
 import 'package:flutter_test/flutter_test.dart'
     show contains, containsAll, expect, hasLength, isEmpty, isNot, isNotNull, isNull, setUp, setUpAll, startsWith, tearDown, test;
 import 'package:pace_app/models/navigation.dart' show FlowStep;
+import 'package:pace_app/models/cash_flow.dart' show ExpectedIncome;
+import 'package:pace_app/models/user_preferences.dart' show BillReminder;
 import 'package:pace_app/repositories/pace_database.dart' show PaceDatabase;
+import 'package:pace_app/repositories/sqlite_preferences_repository.dart' show SqlitePreferencesRepository;
+import 'package:pace_app/repositories/sqlite_expected_income_repository.dart' show SqliteExpectedIncomeRepository;
 import 'package:pace_app/repositories/sqlite_budget_repository.dart' show SqliteBudgetRepository;
 import 'package:pace_app/repositories/sqlite_user_account_repository.dart' show SqliteUserAccountRepository;
 import 'package:pace_app/services/password_hasher.dart' show PasswordHasher;
@@ -53,13 +57,13 @@ void main() {
     expect(trigger, contains('INSERT INTO user_preferences (user_id) VALUES (NEW.id);'));
     expect(trigger.endsWith('END'), true);
     expect(statements.any((s) => s.startsWith('PRAGMA') || s == 'BEGIN' || s == 'COMMIT'), false);
-    expect(PaceDatabase.schemaVersion(await loadFromProject(PaceDatabase.schemaAsset)), 10);
+    expect(PaceDatabase.schemaVersion(await loadFromProject(PaceDatabase.schemaAsset)), 13);
   });
 
   test('first launch creates the database from schema.sql', () async {
     final pace = openDb();
     final db = await pace.database;
-    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 10);
+    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 13);
     final tables = [for (final r in await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'")) r['name']];
     expect(tables, contains('users'));
     expect(tables, contains('plaid_sandbox_test_credentials'));
@@ -124,6 +128,48 @@ void main() {
     await pace.close();
   });
 
+  test('expected income: per user, soonest first, kept across a restart, deleted with the account', () async {
+    var pace = openDb();
+    final users = SqliteUserAccountRepository(pace);
+    final ada = (await users.create(username: 'ada', passwordHash: 'h')).id;
+    final bob = (await users.create(username: 'bob', passwordHash: 'h')).id;
+    var repo = SqliteExpectedIncomeRepository(pace);
+    await repo.add(ada, ExpectedIncome(id: '', name: 'Bonus', amount: 500, date: DateTime(2026, 12, 20)));
+    final refund = await repo.add(ada, ExpectedIncome(id: '', name: 'Refund', amount: 1200.5, date: DateTime(2026, 10, 20)));
+    await repo.add(bob, ExpectedIncome(id: '', name: 'Gift', amount: 50, date: DateTime(2026, 11, 1)));
+    await pace.close();
+
+    pace = openDb(); // restart
+    repo = SqliteExpectedIncomeRepository(pace);
+    final mine = await repo.listFor(ada);
+    expect([for (final i in mine) (i.name, i.amount, i.date)],
+        [('Refund', 1200.5, DateTime(2026, 10, 20)), ('Bonus', 500.0, DateTime(2026, 12, 20))]);
+    await repo.delete(bob, refund); // not Bob's: nothing happens
+    expect((await repo.listFor(ada)).length, 2);
+    await repo.delete(ada, refund);
+    expect([for (final i in await repo.listFor(ada)) i.name], ['Bonus']);
+
+    await SqliteUserAccountRepository(pace).delete(ada);
+    expect([for (final r in await (await pace.database).query('expected_incomes')) r['name']], ['Gift']);
+    await pace.close();
+  });
+
+  test('bill reminder setting: 3 days by default, any choice (including off) is kept', () async {
+    final pace = openDb();
+    final ada = (await SqliteUserAccountRepository(pace).create(username: 'ada', passwordHash: 'h')).id;
+    final prefs = SqlitePreferencesRepository(pace);
+    expect((await prefs.load(ada)).billReminder, BillReminder.threeDays);
+    for (final r in BillReminder.values) {
+      await prefs.save(ada, (await prefs.load(ada)).copyWith(billReminder: r));
+      expect((await prefs.load(ada)).billReminder, r);
+    }
+    final row = (await (await pace.database).query('user_preferences')).single;
+    expect(row['bill_reminder_days'], 7); // the last one saved: 1 week before
+    await prefs.save(ada, (await prefs.load(ada)).copyWith(billReminder: BillReminder.off));
+    expect((await (await pace.database).query('user_preferences')).single['bill_reminder_days'], null);
+    await pace.close();
+  });
+
   test('deleting an account removes its row and cascades to its preferences', () async {
     final pace = openDb();
     final repo = SqliteUserAccountRepository(pace);
@@ -153,7 +199,7 @@ void main() {
 
     final pace = openDb();
     final db = await pace.database;
-    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 10);
+    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 13);
     expect(await db.query('budgets'), isEmpty); // a table the old database didn't have starts empty
     final repo = SqliteUserAccountRepository(pace);
     final old = (await repo.fetchByUsername('old'))!;
@@ -192,7 +238,7 @@ void main() {
 
     final pace = openDb();
     final db = await pace.database;
-    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 10);
+    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 13);
     final columns = [for (final c in await db.rawQuery('PRAGMA table_info(budgets)')) c['name']];
     expect(columns, isNot(contains('period')));
     final budgets = SqliteBudgetRepository(pace);
@@ -234,7 +280,7 @@ void main() {
 
     final pace = openDb();
     final db = await pace.database;
-    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 10);
+    expect((await db.rawQuery('PRAGMA user_version')).single.values.single, 13);
     final columns = [for (final c in await db.rawQuery('PRAGMA table_info(user_preferences)')) c['name']];
     expect(columns, contains('colorblind_mode'));
     expect(columns, isNot(contains('chart_patterns')));

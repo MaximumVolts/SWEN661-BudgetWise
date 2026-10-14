@@ -16,6 +16,7 @@ class CashFlowView extends StatelessWidget {
           onRangeChanged: c.selectRange,
           onScenarioChanged: c.selectScenario,
           onAddExpectedIncome: c.addExpectedIncome,
+          onRemoveExpectedIncome: c.removeExpectedIncome,
           onNavTap: c.openTab,
         ),
       );

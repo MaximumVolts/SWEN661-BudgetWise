@@ -1,10 +1,12 @@
 // End-to-end tests of the app's major features: each opens the real app (services, controllers,
 // views, navigation) on the Plaid sandbox replay and uses a feature the way a person would.
+import 'dart:convert' show jsonDecode;
 import 'package:flutter/material.dart' show AxisDirection, Element, FocusManager, Icons, Scrollable, SnackBar, Switch, Text, TextField;
 import 'package:flutter_test/flutter_test.dart' show Finder;
 import 'package:flutter_test/flutter_test.dart'
     show
         ChainedFinder,
+        closeTo,
         Plurality,
         WidgetTester,
         contains,
@@ -13,18 +15,25 @@ import 'package:flutter_test/flutter_test.dart'
         findsNothing,
         findsOneWidget,
         findsWidgets,
+        isEmpty,
         isNotEmpty,
+        startsWith,
         setUp,
         testWidgets;
 import 'package:pace_app/views/navigation/app_route.dart' show AppRoute, AppRouteName;
-import 'package:pace_app/views/widgets/widgets.dart' show PaceNavBar;
+import 'package:pace_app/views/widgets/widgets.dart' show ListRow, PaceNavBar;
+import 'package:pace_app/views/screens/add_account_screen.dart' show AddAccountScreen;
 import 'package:pace_app/views/screens/bill_detail_screen.dart' show BillDetailScreen;
 import 'package:pace_app/views/screens/budget_category_screen.dart' show BudgetCategoryScreen;
 import 'package:pace_app/views/screens/cash_flow_screen.dart' show CashFlowScreen;
+import 'package:pace_app/views/screens/expected_income_form_screen.dart' show ExpectedIncomeFormScreen;
+import 'package:pace_app/views/screens/goal_form_screen.dart' show GoalFormScreen;
 import 'package:pace_app/views/screens/notifications_screen.dart' show NotificationsScreen;
+import 'package:pace_app/views/screens/spending_category_screen.dart' show SpendingCategoryScreen;
 import 'package:pace_app/views/screens/spending_screen.dart' show SpendingScreen;
 import 'package:pace_app/views/screens/transaction_detail_screen.dart' show TransactionDetailScreen;
 import 'package:pace_app/views/screens/trends_screen.dart' show TrendsScreen;
+import 'package:pace_app/repositories/device_notifications.dart' show InMemoryDeviceNotifications;
 import 'sandbox.dart' show openSandboxApp, SandboxReplay;
 
 /// The vertical lists on screen; the current page's is the last (a sheet can leave the page below visible).
@@ -84,8 +93,16 @@ void main() {
     await tapText(tester, 'Month');
     await tapOn(tester, find.byIcon(Icons.calendar_today_outlined)); // date range picker: not built yet
     expectToast('not implemented');
-    await tapText(tester, 'Food & drink'); // category breakdown: not built yet
-    expectToast('Spending by category');
+    await tapText(tester, '3 months');
+    await tapText(tester, 'Food & drink'); // the category's details, over the same 3 months
+    expect(find.byType(SpendingCategoryScreen), findsOneWidget);
+    expect(app.router.delegate.current, AppRoute.spendingCategory('food', rangeIndex: 1));
+    expect(find.textContaining('of your spending'), findsOneWidget);
+    expect(find.text('TRANSACTIONS'), findsOneWidget);
+    await tapOn(tester, find.byType(ListRow).first);
+    expect(find.byType(TransactionDetailScreen), findsOneWidget);
+    await tapOn(tester, find.byIcon(Icons.arrow_back));
+    await tapOn(tester, find.byIcon(Icons.arrow_back));
     expect(app.router.delegate.current.name, AppRouteName.spending);
     app.router.dispose();
   });
@@ -113,8 +130,34 @@ void main() {
     for (final label in ['60 days', '90 days', '30 days', 'High', 'Low', 'Expected']) {
       await tapText(tester, label);
     }
+    final before = tester.widget<CashFlowScreen>(find.byType(CashFlowScreen)).data.projectedAmount;
     await tapText(tester, 'Add expected income');
-    expectToast('Add expected income');
+    expect(find.byType(ExpectedIncomeFormScreen), findsOneWidget);
+
+    // Nothing filled in: the service's messages show under the fields.
+    await tapText(tester, 'Add income');
+    expect(find.text('Enter what the income is'), findsOneWidget);
+    expect(find.text('Choose when you expect it'), findsOneWidget);
+
+    await tester.enterText(find.widgetWithText(TextField, 'What is it?'), 'Tax refund');
+    await tester.enterText(find.widgetWithText(TextField, 'Amount'), '1200');
+    await tapText(tester, 'Choose a date');
+    await tapText(tester, '20'); // Oct 20 in the date picker ("today" is Oct 12)
+    await tapText(tester, 'OK');
+    await tapText(tester, 'Add income');
+
+    // Back on Cash flow: the income has its own line and raises the projection.
+    expect(app.router.delegate.current, AppRoute.cashFlow);
+    expect(find.text('Tax refund'), findsOneWidget);
+    expect(find.text('Expected Oct 20 · added by you'), findsOneWidget);
+    expect(tester.widget<CashFlowScreen>(find.byType(CashFlowScreen)).data.projectedAmount, closeTo(before + 1200, 0.001));
+
+    // Removing it asks first, then takes it out again.
+    await tapOn(tester, find.byIcon(Icons.close)); // its remove button
+    await tapText(tester, 'Remove');
+    expect(find.text('Tax refund'), findsNothing);
+    expect(tester.widget<CashFlowScreen>(find.byType(CashFlowScreen)).data.projectedAmount, closeTo(before, 0.001));
+
     await tapOn(tester, find.byIcon(Icons.arrow_back));
     expect(app.router.delegate.current, AppRoute.home);
     app.router.dispose();
@@ -211,7 +254,26 @@ void main() {
     expect(find.text('Savings Goals'), findsOneWidget);
     expect(find.text('No savings goals yet'), findsOneWidget);
     await tapOn(tester, find.byIcon(Icons.add));
-    expectToast('Add goal');
+    expect(find.byType(GoalFormScreen), findsOneWidget);
+
+    // Nothing filled in: the service's messages show under the fields, and nothing is saved.
+    await tapText(tester, 'Add goal');
+    expect(find.text('Enter a name'), findsOneWidget);
+    expect(find.text('Enter a target'), findsOneWidget);
+    expect(app.router.delegate.current, AppRoute.goalNew);
+
+    await tester.enterText(find.widgetWithText(TextField, 'Name'), 'Trip to Japan');
+    await tester.enterText(find.widgetWithText(TextField, 'Target'), '3000');
+    await tester.enterText(find.widgetWithText(TextField, 'Saved so far (optional)'), '600');
+    await tapText(tester, 'Car');
+    await tapText(tester, 'Add goal');
+
+    // Back on the list, which shows the new goal.
+    expect(app.router.delegate.current, AppRoute.goals);
+    expect(find.text('Trip to Japan'), findsOneWidget);
+    expect(find.text('No target date'), findsOneWidget);
+    expect(find.text('20% saved'), findsOneWidget);
+    expect(find.text(r'$2,400.00 to go'), findsOneWidget);
     app.router.dispose();
   });
 
@@ -226,7 +288,7 @@ void main() {
 
     await expectOpens('See budget', AppRouteName.budgets);
     await expectOpens('See all bills', AppRouteName.bills);
-    await expectOpens('Add account', AppRouteName.connectBank);
+    await expectOpens('Add account', AppRouteName.addAccount);
     if (find.text('See all trends').evaluate().isNotEmpty) await expectOpens('See all trends', AppRouteName.trends);
 
     await tapOn(tester, find.byIcon(Icons.settings_outlined));
@@ -241,16 +303,52 @@ void main() {
     await tapText(tester, 'Plaid Checking');
     expectToast('Account details');
     await tapText(tester, 'Link another account');
-    expect(app.router.delegate.current, AppRoute.connectBank);
+    expect(find.byType(AddAccountScreen), findsOneWidget);
+    expect(find.text('Already connected'), findsOneWidget); // First Platypus Bank, linked at sign-up
+    await tapText(tester, 'Tartan Bank');
+    await tester.pump(const Duration(seconds: 5)); // let the earlier toasts close: they cover the button
+    await tester.pumpAndSettle();
+    await tapText(tester, 'Connect Tartan Bank');
+    // Back on Accounts, which now lists both banks.
+    expect(app.router.delegate.current, AppRoute.accounts);
+    await tester.pumpAndSettle();
+    expect(find.text('Tartan Bank', skipOffstage: false), findsWidgets);
+    expect(plaid.requests.where((r) => r.url.path == '/sandbox/public_token/create').map((r) => jsonDecode(r.body)['institution_id']),
+        ['ins_109511']);
     app.router.dispose();
   });
 
   testWidgets('Settings: toggles, pickers and links', (tester) async {
-    final app = await openSandboxApp(tester, plaid, const [AppRoute.home, AppRoute.settings]);
+    final device = InMemoryDeviceNotifications();
+    final app = await openSandboxApp(tester, plaid, const [AppRoute.home, AppRoute.settings], notifications: device);
     await tapText(tester, 'Theme');
     expectToast('Theme picker');
+
+    // Bill reminders: 3 days before by default, scheduled on the phone at 9 AM.
+    expect(find.text('3 days before'), findsOneWidget);
+    expect(device.scheduled, isNotEmpty);
+    expect(device.scheduled.every((n) => n.at.hour == 9 && n.title.endsWith('is due in 3 days')), true);
     await tapText(tester, 'Bill reminders');
-    expectToast('Bill reminder picker');
+    await tapText(tester, '1 week before');
+    expectToast('Bill reminders: 1 week before');
+    expect(find.text('1 week before'), findsOneWidget);
+    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+    await tester.pumpAndSettle();
+    expect(device.scheduled.every((n) => n.title.endsWith('is due in 7 days')), true);
+
+    // The test button shows one right away.
+    await tester.pump(const Duration(seconds: 5)); // let the toast close
+    await tapText(tester, 'Send a test reminder');
+    expect(device.shown.single.title, startsWith('Test: '));
+    expectToast('Test reminder sent');
+
+    // Turning reminders off cancels them.
+    await tapText(tester, 'Bill reminders');
+    await tapText(tester, 'Off');
+    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+    await tester.pumpAndSettle();
+    expect(device.scheduled, isEmpty);
+    await tester.pump(const Duration(seconds: 5));
     await tapText(tester, 'Budget categories');
     expect(app.router.delegate.current, AppRoute.budgetCategoriesSettings);
     app.router.delegate.pop();

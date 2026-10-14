@@ -22,6 +22,8 @@ class SettingsScreen extends StatelessWidget {
   final ValueChanged<bool>? onColorblindModeChanged;
   final ValueChanged<bool>? onShowChartValuesChanged;
   final VoidCallback? onBillReminders;
+  /// Sends a sample bill reminder notification now.
+  final VoidCallback? onTestReminder;
   final ValueChanged<bool>? onBudgetAlertsChanged;
   final VoidCallback? onSignOut;
   final VoidCallback? onDeleteAccount;
@@ -39,6 +41,7 @@ class SettingsScreen extends StatelessWidget {
     this.onColorblindModeChanged,
     this.onShowChartValuesChanged,
     this.onBillReminders,
+    this.onTestReminder,
     this.onBudgetAlertsChanged,
     this.onSignOut,
     this.onDeleteAccount,
@@ -115,6 +118,8 @@ class SettingsScreen extends StatelessWidget {
             ]),
             _group('Notifications', [
               _row(Icons.notifications_none, 'Bill reminders', value: data.billReminderLabel, chevron: true, onTap: onBillReminders),
+              _row(Icons.notifications_active_outlined, 'Send a test reminder',
+                  sub: 'Shows a bill reminder notification now', chevron: true, onTap: onTestReminder),
               _row(Icons.alarm, 'Budget alerts', toggle: data.budgetAlerts, onToggle: onBudgetAlertsChanged),
             ]),
             _group('Account', [

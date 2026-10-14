@@ -1,4 +1,4 @@
-import '../models/cash_flow.dart' show CashFlowData;
+import '../models/cash_flow.dart' show BreakdownLine, CashFlowData;
 import 'app_navigator.dart' show AppNavigator;
 import '../services/cash_flow_service.dart' show CashFlowService;
 import 'base_controller.dart' show ScreenController;
@@ -7,7 +7,10 @@ class CashFlowController extends ScreenController {
   final CashFlowService _service;
   CashFlowController({required CashFlowService service, required AppNavigator navigator})
       : _service = service,
-        super(navigator);
+        super(navigator) {
+    // e.g. back from adding expected income: include it.
+    refreshOn(_service.changes);
+  }
 
   CashFlowData? data;
   int rangeIndex = 0;
@@ -28,5 +31,12 @@ class CashFlowController extends ScreenController {
     await refresh();
   }
 
-  Future<void> addExpectedIncome() => refreshIf(navigator.openAddExpectedIncome());
+  void addExpectedIncome() => navigator.openAddExpectedIncome();
+
+  /// Removes income the user added (after confirming); the projection reloads.
+  Future<void> removeExpectedIncome(BreakdownLine line) async {
+    final id = line.expectedIncomeId;
+    if (id == null || !await navigator.confirmRemoveExpectedIncome(line.title)) return;
+    await perform(() => _service.removeExpectedIncome(id));
+  }
 }
