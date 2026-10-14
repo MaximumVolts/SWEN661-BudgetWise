@@ -17,7 +17,7 @@ Pace is a personal-finance app built with Flutter. You create an account on the 
 
 Pace is a prototype. Every bank connection uses **Plaid's Sandbox** with Plaid's published test bank, so no real bank details can be entered and no real money data exists.
 
-## Pace required either an installation on an android device, or running in an android emulator. It will not work with Chrome or iOS.
+### It will not run in chrome. It needs to either run on an android device, or an android emulator.
 
 Data stored on the device in SQLite (`database/schema.sql`):
 - accounts (username, password hash, security question);
@@ -43,7 +43,7 @@ The code follows **MVCS with a repository layer**: views → controllers → ser
 2. In the app, follow [First-time setup](#first-time-setup): create an account with your Plaid sandbox keys, finish onboarding, then **Connect test bank with Plaid**.
 
 ## Installing the APK
-Pace runs on Android only for now; it can't be built for iOS on this project's setup.
+Pace runs on Android only for now. Just copy the .apk to your device and install it.
 
 **Build it**
 ```sh
