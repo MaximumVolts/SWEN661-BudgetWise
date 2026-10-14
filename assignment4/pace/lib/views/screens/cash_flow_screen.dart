@@ -16,6 +16,8 @@ class CashFlowScreen extends StatelessWidget {
   final ValueChanged<int>? onRangeChanged;
   final ValueChanged<int>? onScenarioChanged;
   final VoidCallback? onAddExpectedIncome;
+  /// Removes income the user added (lines with an expectedIncomeId).
+  final ValueChanged<BreakdownLine>? onRemoveExpectedIncome;
   final ValueChanged<int>? onNavTap;
 
   const CashFlowScreen({
@@ -25,6 +27,7 @@ class CashFlowScreen extends StatelessWidget {
     this.onRangeChanged,
     this.onScenarioChanged,
     this.onAddExpectedIncome,
+    this.onRemoveExpectedIncome,
     this.onNavTap,
   });
 
@@ -112,7 +115,7 @@ class CashFlowScreen extends StatelessWidget {
                     child: Align(alignment: Alignment.centerLeft, child: Text('How we got this', style: TextStyle(fontWeight: FontWeight.w700))),
                   ),
                   const HairLine(),
-                  for (final l in data.breakdown) _Line(l),
+                  for (final l in data.breakdown) _Line(l, onRemove: onRemoveExpectedIncome),
                   Container(
                     color: C.panel,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -183,7 +186,8 @@ class _RangeTabs extends StatelessWidget {
 
 class _Line extends StatelessWidget {
   final BreakdownLine l;
-  const _Line(this.l);
+  final ValueChanged<BreakdownLine>? onRemove;
+  const _Line(this.l, {this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -207,6 +211,10 @@ class _Line extends StatelessWidget {
                 ),
               ),
               Text(text, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: color)),
+              if (l.expectedIncomeId != null && onRemove != null) ...[
+                const SizedBox(width: 4),
+                Tap(onTap: () => onRemove!(l), semanticLabel: 'Remove ${l.title}', child: Icon(Icons.close, size: 20, color: C.muted)),
+              ],
             ],
           ),
         ),

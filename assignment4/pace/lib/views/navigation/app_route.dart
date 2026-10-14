@@ -27,10 +27,13 @@ enum AppRouteName {
   budgetCategory('/budgets/category/:id'),
   billDetail('/bills/:id'),
   accounts('/accounts'),
+  addAccount('/accounts/add'), // before accountDetail: static paths match first
   accountDetail('/accounts/:id'),
   notifications('/notifications'),
   goals('/goals'),
+  goalNew('/goals/new'),
   cashFlow('/cash-flow'),
+  cashFlowIncomeNew('/cash-flow/income/new'),
   trends('/trends'),
   trendDetail('/trends/:id'),
   tool('/tools/:id'),
@@ -70,9 +73,12 @@ class AppRoute {
   static const billsRecurring = AppRoute(AppRouteName.billsRecurring);
   static const billNew = AppRoute(AppRouteName.billNew);
   static const accounts = AppRoute(AppRouteName.accounts);
+  static const addAccount = AppRoute(AppRouteName.addAccount);
   static const notifications = AppRoute(AppRouteName.notifications);
   static const goals = AppRoute(AppRouteName.goals);
+  static const goalNew = AppRoute(AppRouteName.goalNew);
   static const cashFlow = AppRoute(AppRouteName.cashFlow);
+  static const cashFlowIncomeNew = AppRoute(AppRouteName.cashFlowIncomeNew);
   static const trends = AppRoute(AppRouteName.trends);
   static const settings = AppRoute(AppRouteName.settings);
   static const profile = AppRoute(AppRouteName.profile);
@@ -81,7 +87,9 @@ class AppRoute {
 
   // Parameterised routes
   factory AppRoute.transactionDetail(String id) => AppRoute(AppRouteName.transactionDetail, params: {'id': id});
-  factory AppRoute.spendingCategory(String id) => AppRoute(AppRouteName.spendingCategory, params: {'id': id});
+  /// [rangeIndex]: the period Spending was showing (0 Month, 1 3 months, 2 Year).
+  factory AppRoute.spendingCategory(String id, {int rangeIndex = 0}) => AppRoute(AppRouteName.spendingCategory,
+      params: {'id': id}, query: {if (rangeIndex != 0) 'range': '$rangeIndex'});
   factory AppRoute.budgetEdit(String categoryId) => AppRoute(AppRouteName.budgetEdit, params: {'id': categoryId});
   factory AppRoute.budgetCategory(String id, {String? periodId}) =>
       AppRoute(AppRouteName.budgetCategory, params: {'id': id}, query: {if (periodId != null) 'period': periodId});

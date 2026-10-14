@@ -1,4 +1,4 @@
-import '../models/user_preferences.dart' show UserPreferences;
+import '../models/user_preferences.dart' show BillReminder, UserPreferences;
 import 'preferences_repository.dart' show PreferencesRepository;
 import 'sqlite_repository.dart' show SqliteRepository;
 
@@ -14,7 +14,7 @@ class SqlitePreferencesRepository extends SqliteRepository implements Preference
   Future<UserPreferences> load(String userId) =>
       forUser(userId, orElse: UserPreferences.defaults, action: (db, user) async {
         final rows = await db.query('user_preferences',
-            columns: ['high_contrast', 'colorblind_mode', 'show_chart_values', 'budget_alerts'],
+            columns: ['high_contrast', 'colorblind_mode', 'show_chart_values', 'budget_alerts', 'bill_reminder_days'],
             where: 'user_id = ?',
             whereArgs: [user]);
         if (rows.isEmpty) return UserPreferences.defaults;
@@ -24,6 +24,7 @@ class SqlitePreferencesRepository extends SqliteRepository implements Preference
           colorblindMode: r['colorblind_mode'] == 1,
           showChartValues: r['show_chart_values'] == 1,
           budgetAlerts: r['budget_alerts'] == 1,
+          billReminder: BillReminder.fromDays(r['bill_reminder_days'] as int?),
         );
       });
 
@@ -34,6 +35,7 @@ class SqlitePreferencesRepository extends SqliteRepository implements Preference
           'colorblind_mode': _bit(p.colorblindMode),
           'show_chart_values': _bit(p.showChartValues),
           'budget_alerts': _bit(p.budgetAlerts),
+          'bill_reminder_days': p.billReminder.days,
         };
         await db.transaction((txn) async {
           final updated = await txn.update('user_preferences', values, where: 'user_id = ?', whereArgs: [user]);

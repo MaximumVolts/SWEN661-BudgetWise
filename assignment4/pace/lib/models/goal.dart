@@ -20,6 +20,8 @@ class SavingsGoal {
   /// Substring of [tip] to render in bold.
   final String? tipHighlight;
   final List<GoalContribution> contributions;
+  /// When the user wants to reach [target], if they chose a date.
+  final DateTime? targetDate;
   const SavingsGoal({
     required this.id,
     this.name,
@@ -30,6 +32,7 @@ class SavingsGoal {
     this.tip,
     this.tipHighlight,
     this.contributions = const [],
+    this.targetDate,
   });
   /// False when [saved] or [target] is unknown, so progress can't be computed.
   bool get hasProgress => saved != null && target != null;
@@ -45,6 +48,7 @@ class SavingsGoal {
     String? tip,
     String? tipHighlight,
     List<GoalContribution>? contributions,
+    DateTime? targetDate,
   }) =>
       SavingsGoal(
         id: id,
@@ -56,6 +60,7 @@ class SavingsGoal {
         tip: tip ?? this.tip,
         tipHighlight: tipHighlight ?? this.tipHighlight,
         contributions: contributions ?? this.contributions,
+        targetDate: targetDate ?? this.targetDate,
       );
 }
 
@@ -68,4 +73,11 @@ class SavingsGoalsData {
   /// What the screen shows when the repository has no goals.
   const SavingsGoalsData.empty() : this();
   bool get isEmpty => goals.isEmpty;
+}
+
+/// An icon a goal can have, with a name for screen readers.
+class GoalIcon {
+  final String key;
+  final String label;
+  const GoalIcon(this.key, this.label);
 }

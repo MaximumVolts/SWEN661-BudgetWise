@@ -22,6 +22,7 @@ class SettingsView extends StatelessWidget {
           onColorblindModeChanged: c.setColorblindMode,
           onShowChartValuesChanged: c.setShowChartValues,
           onBillReminders: c.pickBillReminders,
+          onTestReminder: c.sendTestReminder,
           onBudgetAlertsChanged: c.setBudgetAlerts,
           onSignOut: c.signOut,
           onDeleteAccount: c.deleteAccount,

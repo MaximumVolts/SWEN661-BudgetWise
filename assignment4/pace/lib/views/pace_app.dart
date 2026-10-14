@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' show BuildContext, Element, MaterialApp, State, StatefulWidget, Widget;
+import '../controllers/bill_reminder_controller.dart' show BillReminderController;
 import '../controllers/display_controller.dart' show DisplayController;
 import 'theme.dart' show C, paceTheme;
 import 'navigation/app_router.dart' show AppRouter;
@@ -21,6 +22,8 @@ class PaceApp extends StatefulWidget {
 
 class _PaceAppState extends State<PaceApp> {
   late final DisplayController _display = widget.router.dependencies.display();
+  /// Keeps the phone's bill reminders scheduled while the app runs.
+  late final BillReminderController _reminders = widget.router.dependencies.billReminders();
   bool _highContrast = false, _colorblind = false;
 
   @override
@@ -29,6 +32,7 @@ class _PaceAppState extends State<PaceApp> {
     C.use(highContrast: false, colorblind: false);
     _display.addListener(_apply);
     _display.load();
+    _reminders.load();
   }
 
   void _apply() {
@@ -53,6 +57,7 @@ class _PaceAppState extends State<PaceApp> {
     _display
       ..removeListener(_apply)
       ..dispose();
+    _reminders.dispose();
     C.use(highContrast: false, colorblind: false);
     super.dispose();
   }

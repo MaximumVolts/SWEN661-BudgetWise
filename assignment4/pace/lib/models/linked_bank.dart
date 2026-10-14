@@ -81,3 +81,13 @@ class BankConnection {
     this.isSandbox = true,
   });
 }
+
+/// One of Plaid's sandbox test banks that can be linked (Accounts → Add an account).
+class SandboxInstitution {
+  /// Plaid's institution id, e.g. "ins_109508".
+  final String id;
+  final String name;
+  /// Already connected for the signed-in user (each test bank can be linked once).
+  final bool isLinked;
+  const SandboxInstitution({required this.id, required this.name, this.isLinked = false});
+}

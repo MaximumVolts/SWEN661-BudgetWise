@@ -1,6 +1,8 @@
 /// Settings screen.
 library;
 
+import 'user_preferences.dart' show BillReminder;
+
 class SettingsData {
   final String name;
   final String username;
@@ -8,7 +10,7 @@ class SettingsData {
   final int connectedAccountCount;
   final int accountsNeedingAttention;
   final String themeLabel;
-  final String billReminderLabel;
+  final BillReminder billReminder;
   final bool highContrast;
   final bool colorblindMode;
   final bool showChartValues;
@@ -21,13 +23,15 @@ class SettingsData {
     this.connectedAccountCount = 0,
     this.accountsNeedingAttention = 0,
     this.themeLabel = 'Light',
-    this.billReminderLabel = '',
+    this.billReminder = BillReminder.threeDays,
     this.highContrast = false,
     this.colorblindMode = false,
     this.showChartValues = true,
     this.budgetAlerts = true,
     this.footerLabel = '',
   });
+
+  String get billReminderLabel => billReminder.label;
 
   SettingsData copyWith({bool? highContrast, bool? colorblindMode, bool? showChartValues, bool? budgetAlerts}) => SettingsData(
         name: name,
@@ -36,7 +40,7 @@ class SettingsData {
         connectedAccountCount: connectedAccountCount,
         accountsNeedingAttention: accountsNeedingAttention,
         themeLabel: themeLabel,
-        billReminderLabel: billReminderLabel,
+        billReminder: billReminder,
         highContrast: highContrast ?? this.highContrast,
         colorblindMode: colorblindMode ?? this.colorblindMode,
         showChartValues: showChartValues ?? this.showChartValues,

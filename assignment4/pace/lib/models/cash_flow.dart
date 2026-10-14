@@ -29,7 +29,10 @@ class BreakdownLine {
   final String subtitle;
   final double amount;
   final AmountTone tone;
-  const BreakdownLine({required this.title, required this.subtitle, required this.amount, this.tone = AmountTone.neutral});
+  /// Set on a line for income the user added, so it can be removed.
+  final String? expectedIncomeId;
+  const BreakdownLine(
+      {required this.title, required this.subtitle, required this.amount, this.tone = AmountTone.neutral, this.expectedIncomeId});
 }
 
 class CashFlowData {
@@ -57,4 +60,13 @@ class CashFlowData {
     this.lowestAmount,
     this.lowestDescription,
   });
+}
+
+/// One-off money the user expects (a tax refund, a freelance payment…), added to the projection.
+class ExpectedIncome {
+  final String id;
+  final String name;
+  final double amount;
+  final DateTime date;
+  const ExpectedIncome({required this.id, required this.name, required this.amount, required this.date});
 }

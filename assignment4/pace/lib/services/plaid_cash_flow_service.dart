@@ -1,6 +1,10 @@
+import 'dart:async' show StreamController;
 import '../models/bank_data.dart' show RecurringStream;
 import 'bank_data_service.dart' show AnnotatedBankDataService;
-import '../models/cash_flow.dart' show AmountTone, BreakdownLine, CashFlowChartData, CashFlowData;
+import '../models/app_exception.dart' show AppException, FieldValidationException;
+import '../models/cash_flow.dart' show AmountTone, BreakdownLine, CashFlowChartData, CashFlowData, ExpectedIncome;
+import '../repositories/expected_income_repository.dart' show ExpectedIncomeRepository, InMemoryExpectedIncomeRepository;
+import 'validators.dart' show Validators;
 import 'bank_categories.dart' show BankCategories;
 import 'calendar.dart' show Calendar;
 import 'cash_flow_service.dart' show CashFlowService;
@@ -12,12 +16,67 @@ import '../models/recurring.dart' show RecurringFrequency;
 /// [CashFlowService] projecting cash from the linked banks in Plaid (sandbox).
 /// BUSINESS RULES: cash today = checking + savings balances; recurring income and bills are
 /// projected on their predicted dates; everyday spending = the last 90 days' non-recurring
-/// average per day; the income scenario scales expected income (Low 85% / Expected / High 115%).
+/// average per day; the income scenario scales the bank's recurring income (Low 85% / Expected /
+/// High 115%). One-off income the user adds counts in full on its date, when that's within the
+/// range: a name of up to 40 characters, $0.01–$1,000,000, dated today to a year from now.
 class PlaidCashFlowService extends AnnotatedBankDataService implements CashFlowService {
   static const _ranges = [('30 days', 30), ('60 days', 60), ('90 days', 90)];
   static const _scenarios = [('Low', 0.85), ('Expected', 1.0), ('High', 1.15)];
+  static const _maxName = 40;
+  static const _maxAmount = 1000000.0;
 
-  PlaidCashFlowService(super.bankData, super.annotations, {super.now});
+  final ExpectedIncomeRepository _incomes;
+  final String? Function() _currentUserId;
+  final _changes = StreamController<void>.broadcast();
+
+  /// [incomes] / [currentUserId]: where the signed-in user's own expected income is kept (none
+  /// when not given).
+  PlaidCashFlowService(super.bankData, super.annotations,
+      {ExpectedIncomeRepository? incomes, String? Function()? currentUserId, super.now})
+      : _incomes = incomes ?? InMemoryExpectedIncomeRepository(),
+        _currentUserId = currentUserId ?? (() => null);
+
+  @override
+  Stream<void> get changes => _changes.stream;
+
+  Future<List<ExpectedIncome>> _added() async {
+    final userId = _currentUserId();
+    return userId == null ? const [] : _incomes.listFor(userId);
+  }
+
+  @override
+  Future<void> addExpectedIncome({required String name, required String amount, required DateTime? date}) async {
+    final userId = _currentUserId();
+    if (userId == null) throw const AppException('Sign in to add expected income.');
+    final trimmed = name.trim();
+    final parsed = Validators.money(amount, what: 'amount', min: 0.01, max: _maxAmount);
+    final today = currentDate();
+    final day = date == null ? null : Calendar.dateOnly(date);
+    final errors = <String, String>{
+      if (trimmed.isEmpty)
+        'name': 'Enter what the income is'
+      else if (trimmed.length > _maxName)
+        'name': 'Keep the name under $_maxName characters',
+      if (parsed.error case final e?) 'amount': e,
+      if (day == null)
+        'date': 'Choose when you expect it'
+      else if (day.isBefore(today))
+        'date': "Choose a date that isn't in the past"
+      else if (day.isAfter(DateTime(today.year + 1, today.month, today.day)))
+        'date': 'Choose a date within the next year',
+    };
+    if (errors.isNotEmpty) throw FieldValidationException(errors);
+    await _incomes.add(userId, ExpectedIncome(id: '', name: trimmed, amount: parsed.value!, date: day!));
+    _changes.add(null);
+  }
+
+  @override
+  Future<void> removeExpectedIncome(String id) async {
+    final userId = _currentUserId();
+    if (userId == null) return;
+    await _incomes.delete(userId, id);
+    _changes.add(null);
+  }
 
   @override
   Future<CashFlowData> getProjection({required int rangeIndex, required int scenarioIndex}) async {
@@ -47,6 +106,11 @@ class PlaidCashFlowService extends AnnotatedBankDataService implements CashFlowS
     }
     final income = events.where((e) => e.amount > 0).fold(0.0, (s, e) => s + e.amount);
     final bills = -events.where((e) => e.amount < 0).fold(0.0, (s, e) => s + e.amount);
+    // Income the user added, within the range.
+    final added = [for (final i in await _added()) if (!i.date.isBefore(today) && !i.date.isAfter(end)) i];
+    for (final i in added) {
+      events.add((day: Calendar.daysBetween(today, i.date), amount: i.amount, name: i.name));
+    }
 
     // Everyday spending: last 90 days, excluding transactions Plaid tied to recurring streams.
     final recurringTx = {for (final s in snap.recurring) ...s.transactionIds};
@@ -108,6 +172,14 @@ class PlaidCashFlowService extends AnnotatedBankDataService implements CashFlowS
           amount: income,
           tone: AmountTone.positive,
         ),
+        for (final i in added)
+          BreakdownLine(
+            title: i.name,
+            subtitle: 'Expected ${DateLabels.short(i.date)} · added by you',
+            amount: i.amount,
+            tone: AmountTone.positive,
+            expectedIncomeId: i.id,
+          ),
         BreakdownLine(
           title: 'Bills & recurring',
           subtitle: '${events.where((e) => e.amount < 0).length} payments in the next $days days',

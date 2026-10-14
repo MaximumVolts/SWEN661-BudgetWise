@@ -4,24 +4,32 @@ import '../models/notification.dart' show NotificationItem, NotificationKind, No
 import 'calendar.dart' show Calendar;
 import '../models/money.dart' show Money;
 import 'notification_service.dart' show NotificationService;
+import '../models/user_preferences.dart' show UserPreferences;
 import 'bill_service.dart' show BillService;
 import 'budget_service.dart' show BudgetService;
 
 /// [NotificationService] raising alerts from the linked banks' data in Plaid (sandbox).
-/// BUSINESS RULES: overdue bills; bills due within 3 days; this month's budgets that are over or
+/// BUSINESS RULES: overdue bills; bills due within the user's reminder window (3 days unless they chose otherwise; none when off); this month's budgets that are over or
 /// near their limit (as BudgetService rates them). "Read" state is kept for this session.
 class PlaidNotificationService implements NotificationService {
   static const _filters = ['Bills', 'Budgets', 'Goals'];
 
   final BillService _bills;
   final BudgetService _budgets;
+  final Future<UserPreferences> Function() _preferences;
   final DateTime Function() _now;
   final _read = <String>{};
-  PlaidNotificationService(this._bills, this._budgets, {DateTime Function()? now}) : _now = now ?? DateTime.now;
+
+  /// [preferences]: the signed-in user's (SettingsService.preferences), for their bill reminder
+  /// setting; the defaults (3 days before) when not given.
+  PlaidNotificationService(this._bills, this._budgets, {Future<UserPreferences> Function()? preferences, DateTime Function()? now})
+      : _preferences = preferences ?? (() async => UserPreferences.defaults),
+        _now = now ?? DateTime.now;
 
   Future<List<NotificationItem>> _all() async {
     final today = Calendar.dateOnly(_now());
     final items = <NotificationItem>[];
+    final reminderDays = (await _preferences()).billReminder.days; // null: reminders off
     for (final (:bill, :due) in await _bills.upcomingWithDates()) {
       final days = Calendar.daysBetween(today, due);
       if (bill.isOverdue) {
@@ -35,7 +43,7 @@ class PlaidNotificationService implements NotificationService {
           primaryActionLabel: 'Mark as paid',
           secondaryActionLabel: 'View bill',
         ));
-      } else if (days <= 3) {
+      } else if (reminderDays != null && days <= reminderDays) {
         items.add(NotificationItem(
           id: 'reminder-${bill.id}',
           kind: NotificationKind.reminder,

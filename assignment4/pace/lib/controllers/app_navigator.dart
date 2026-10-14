@@ -1,6 +1,7 @@
 import '../models/navigation.dart' show DeepLinkTarget, FlowStep;
 import '../models/recurring.dart' show RecurringAction;
 import '../models/transaction.dart' show FilterChoice, FilterKind;
+import '../models/user_preferences.dart' show BillReminder;
 
 /// Navigation & modal UI as a service, so controllers can say *where to go* without importing
 /// any view. Implement it with your router (go_router, Navigator 1/2, auto_route…).
@@ -23,6 +24,8 @@ abstract class AppNavigator {
   void openSettings();
   void openNotifications();
   void openAccounts();
+  /// Link another of Plaid's sandbox test banks; returns here when done.
+  void openAddAccount();
   void openTransactions();
   void openTransaction(String transactionId);
   void openReviewTransactions();
@@ -39,7 +42,8 @@ abstract class AppNavigator {
   void openTarget(DeepLinkTarget target);
   /// Moves the sign-in / onboarding journey to the step a service decided on.
   void openFlowStep(FlowStep step);
-  void openSpendingCategory(String categoryId);
+  /// One category's spending over the period Spending shows ([rangeIndex]: Month / 3 months / Year).
+  void openSpendingCategory(String categoryId, {int rangeIndex = 0});
 
   // Modals / pickers (return when dismissed so controllers can refresh)
   /// Returns null if dismissed. To clear a filter, return FilterChoice(id: '', label: '').
@@ -50,7 +54,8 @@ abstract class AppNavigator {
   void openAddBill();
   /// The form to edit a recurring expense the user added.
   void openEditBill(String billId);
-  Future<bool> openAddGoal();
+  /// The form to add a savings goal.
+  void openAddGoal();
   Future<bool> openEditGoal(String goalId);
   Future<bool> openAddContribution(String goalId);
   /// Opens the budget form to edit the budget for [categoryId].
@@ -59,13 +64,17 @@ abstract class AppNavigator {
   void openAddBudgetCategory();
   /// Asks before deleting a budget. True if the user confirmed.
   Future<bool> confirmDeleteBudget(String categoryName);
-  Future<bool> openAddExpectedIncome();
+  /// The form to add one-off income the user expects (Cash flow).
+  void openAddExpectedIncome();
+  /// Asks before removing expected income. True if confirmed.
+  Future<bool> confirmRemoveExpectedIncome(String name);
   /// The menu for a bill or subscription named [name]: the chosen action, or null.
   Future<RecurringAction?> openRecurringMenu(String name, List<RecurringAction> actions);
   /// Asks before deleting a recurring expense. True if confirmed.
   Future<bool> confirmDeleteRecurring(String name);
   Future<bool> openThemePicker();
-  Future<bool> openBillReminderPicker();
+  /// When to be reminded about bills; null if dismissed.
+  Future<BillReminder?> pickBillReminder(BillReminder current);
   Future<bool> confirmDeleteAccount();
   /// Asks before disconnecting a linked bank. True if the user confirmed.
   Future<bool> confirmRemoveBankConnection(String institutionName);

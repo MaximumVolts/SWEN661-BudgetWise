@@ -1,7 +1,7 @@
 import 'dart:convert' show jsonDecode, jsonEncode;
 import 'package:flutter/material.dart' show MaterialApp, TextField;
 import 'package:flutter_test/flutter_test.dart'
-    show expect, expectLater, find, findsNothing, findsOneWidget, group, isA, isEmpty, setUp, test, testWidgets, throwsA;
+    show contains, expect, expectLater, find, findsNothing, findsOneWidget, group, isA, isEmpty, setUp, test, testWidgets, throwsA;
 import 'package:http/http.dart' as http show Request, Response;
 import 'package:http/testing.dart' show MockClient;
 import 'package:pace_app/models/linked_bank.dart' show LinkedBankAccount, LinkedItem;
@@ -25,13 +25,15 @@ class FakePlaid {
   http.Response? failWith;
   /// Overrides the /item/remove reply (e.g. a Plaid error).
   http.Response? removeResponse;
+  /// Items exchanged so far: each gets its own id (item-1, item-2…), as at Plaid.
+  var linked = 0;
 
   late final client = MockClient((req) async {
     requests.add(req);
     if (failWith case final f?) return f;
     return switch (req.url.path) {
       '/sandbox/public_token/create' => _json({'public_token': publicToken, 'request_id': 'r1'}),
-      '/item/public_token/exchange' => _json({'access_token': accessToken, 'item_id': 'item-1', 'request_id': 'r2'}),
+      '/item/public_token/exchange' => _json({'access_token': accessToken, 'item_id': 'item-${++linked}', 'request_id': 'r2'}),
       '/accounts/get' => _json({
           'accounts': [
             {
@@ -185,6 +187,50 @@ void main() {
       userId = 'u2';
       await expectLater(service().removeConnection('item-1'), throwsA(isA<AppException>()));
       expect((await banks.itemsFor('u1')).length, 1);
+    });
+
+    test("lists Plaid's test banks, marking the ones already connected", () async {
+      expect([for (final i in await service().institutions()) i.isLinked], [false, false, false, false, false]);
+      await service().startLink(); // e.g. at sign-up: First Platypus Bank
+      final banks = await service().institutions();
+      expect(banks.first.name, 'First Platypus Bank');
+      expect([for (final i in banks) i.isLinked], [true, false, false, false, false]);
+    });
+
+    test('adds another test bank by id; each can only be linked once', () async {
+      await service().startLink();
+      await service().startLink(institutionId: 'ins_109511');
+      final create = jsonDecode(plaid.requests.lastWhere((r) => r.url.path == '/sandbox/public_token/create').body);
+      expect(create['institution_id'], 'ins_109511');
+      expect([for (final c in await service().connections()) c.institutionName], ['First Platypus Bank', 'Tartan Bank']);
+
+      plaid.requests.clear();
+      await expectLater(service().startLink(institutionId: 'ins_109511'),
+          throwsA(isA<AppException>().having((e) => e.message, 'message', 'Tartan Bank is already connected.')));
+      await expectLater(service().startLink(institutionId: 'ins_real_bank'), throwsA(isA<AppException>()));
+      expect(plaid.requests, isEmpty); // refused before calling Plaid
+    });
+
+    test('without an id it links the next test bank; once all are connected it says so', () async {
+      for (var i = 0; i < PlaidSandboxBankLinkService.testInstitutions.length; i++) {
+        await service().startLink();
+      }
+      expect((await service().institutions()).every((i) => i.isLinked), true);
+      await expectLater(service().startLink(),
+          throwsA(isA<AppException>().having((e) => e.message, 'message', contains('already connected'))));
+    });
+
+    test('linking or removing a bank tells screens to reload', () async {
+      final s = service();
+      var updates = 0;
+      final sub = s.dataUpdates.listen((_) => updates++);
+      await s.startLink();
+      await Future<void>.delayed(Duration.zero);
+      expect(updates, 1);
+      await s.removeConnection('item-1');
+      await Future<void>.delayed(Duration.zero);
+      expect(updates, 2);
+      await sub.cancel();
     });
 
     test('must be signed in', () async {

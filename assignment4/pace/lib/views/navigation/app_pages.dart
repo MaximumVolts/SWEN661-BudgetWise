@@ -9,7 +9,9 @@ import '../budget_form_view.dart' show BudgetFormView;
 import '../budget_category_view.dart' show BudgetCategoryView;
 import '../budgets_view.dart' show BudgetsView;
 import '../cash_flow_view.dart' show CashFlowView;
+import '../expected_income_form_view.dart' show ExpectedIncomeFormView;
 import '../connect_bank_view.dart' show ConnectBankView;
+import '../add_account_view.dart' show AddAccountView;
 import '../create_account_view.dart' show CreateAccountView;
 import '../dashboard_view.dart' show DashboardView;
 import '../manage_budgets_view.dart' show ManageBudgetsView;
@@ -19,9 +21,11 @@ import '../placeholder_view.dart' show PlaceholderView;
 import '../profile_view.dart' show ProfileView;
 import '../reset_password_view.dart' show ResetPasswordView;
 import '../savings_goals_view.dart' show SavingsGoalsView;
+import '../goal_form_view.dart' show GoalFormView;
 import '../settings_view.dart' show SettingsView;
 import '../sign_in_view.dart' show SignInView;
 import '../spending_view.dart' show SpendingView;
+import '../spending_category_view.dart' show SpendingCategoryView;
 import '../statement_export_view.dart' show StatementExportView;
 import '../transaction_detail_view.dart' show TransactionDetailView;
 import '../transactions_view.dart' show TransactionsView;
@@ -57,6 +61,8 @@ class AppPages {
         return _page(deps.onboardingFlow(), (c) => OnboardingPrioritiesView(controller: c));
       case AppRouteName.connectBank:
         return _page(deps.connectBank(), (c) => ConnectBankView(controller: c));
+      case AppRouteName.addAccount:
+        return _page(deps.addAccount(), (c) => AddAccountView(controller: c));
       case AppRouteName.home:
         return _bankPage(deps.home(), (c) => DashboardView(controller: c));
       case AppRouteName.transactions:
@@ -94,8 +100,12 @@ class AppPages {
         return _bankPage(deps.notificationCenter(), (c) => NotificationsView(controller: c));
       case AppRouteName.goals:
         return _page(deps.savingsGoals(), (c) => SavingsGoalsView(controller: c));
+      case AppRouteName.goalNew:
+        return _page(deps.goalForm(), (c) => GoalFormView(controller: c));
       case AppRouteName.cashFlow:
         return _bankPage(deps.cashFlowProjection(), (c) => CashFlowView(controller: c));
+      case AppRouteName.cashFlowIncomeNew:
+        return _page(deps.expectedIncomeForm(), (c) => ExpectedIncomeFormView(controller: c));
       case AppRouteName.trends:
         return _bankPage(deps.trendsScreen(), (c) => TrendsView(controller: c));
       case AppRouteName.profile:
@@ -105,12 +115,16 @@ class AppPages {
 
       case AppRouteName.statementExport:
         return _bankPage(deps.statementExport(), (c) => StatementExportView(controller: c));
+      case AppRouteName.spendingCategory:
+        return _bankPage(
+          deps.spendingCategory(categoryId: r.params['id']!, rangeIndex: int.tryParse(r.query['range'] ?? '') ?? 0),
+          (c) => SpendingCategoryView(controller: c),
+        );
 
       // No design yet. In-app navigation shows a "not implemented" toast instead
       // (see [notImplemented]); these pages only appear when opened by URL / deep link.
       case AppRouteName.socialSignIn:
       case AppRouteName.accountDetail:
-      case AppRouteName.spendingCategory:
       case AppRouteName.trendDetail:
       case AppRouteName.tool:
         final what = notImplemented(r)!;
@@ -123,7 +137,6 @@ class AppPages {
   static String? notImplemented(AppRoute r) => switch (r.name) {
         AppRouteName.socialSignIn => r.params['provider'] == 'apple' ? 'Sign in with Apple' : 'Sign in with Google',
         AppRouteName.accountDetail => 'Account details',
-        AppRouteName.spendingCategory => 'Spending by category',
         AppRouteName.trendDetail => 'Trend details',
         AppRouteName.tool => 'This tool',
         _ => null,

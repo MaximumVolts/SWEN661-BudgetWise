@@ -1,15 +1,23 @@
 import '../models/settings.dart' show SettingsData;
 import 'app_navigator.dart' show AppNavigator;
 import '../services/auth_service.dart' show AuthService;
+import '../models/user_preferences.dart' show BillReminder;
+import '../services/bill_reminder_service.dart' show BillReminderService, TestReminderResult;
 import '../services/settings_service.dart' show SettingsService;
 import 'base_controller.dart' show ScreenController;
 
 class SettingsController extends ScreenController {
   final SettingsService _settings;
   final AuthService _auth;
-  SettingsController({required SettingsService settings, required AuthService auth, required AppNavigator navigator})
+  final BillReminderService _reminders;
+  SettingsController(
+      {required SettingsService settings,
+      required AuthService auth,
+      required BillReminderService reminders,
+      required AppNavigator navigator})
       : _settings = settings,
         _auth = auth,
+        _reminders = reminders,
         super(navigator) {
     // e.g. after editing the profile, the header (name / username / initials) updates on return.
     refreshOn(_settings.changes);
@@ -45,7 +53,27 @@ class SettingsController extends ScreenController {
 
   Future<void> pickTheme() => refreshIf(navigator.openThemePicker());
 
-  Future<void> pickBillReminders() => refreshIf(navigator.openBillReminderPicker());
+  static const _notificationsOff =
+      "Notifications are turned off for Pace, so reminders will only show in the app. You can turn them on in your phone's settings.";
+
+  /// Picks when bill reminders come. Turning them on asks for notification permission.
+  Future<void> pickBillReminders() async {
+    final current = data?.billReminder;
+    if (current == null) return;
+    final picked = await navigator.pickBillReminder(current);
+    if (picked == null || picked == current) return;
+    if (!await perform(() => _settings.setBillReminder(picked))) return;
+    await refresh();
+    if (picked == BillReminder.off) return showNotice('Bill reminders off');
+    showNotice(await _reminders.enable(picked) ? 'Bill reminders: ${picked.label.toLowerCase()}' : _notificationsOff);
+  }
+
+  /// Shows a sample bill reminder notification now.
+  Future<void> sendTestReminder() async {
+    TestReminderResult? result;
+    if (!await perform(() async => result = await _reminders.sendTest())) return;
+    showNotice(result == TestReminderResult.sent ? 'Test reminder sent. Check your notifications.' : _notificationsOff);
+  }
 
   void openProfile() => navigator.openProfile();
   void openConnectedAccounts() => navigator.openConnectedAccounts();
