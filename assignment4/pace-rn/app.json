@@ -47,7 +47,8 @@
       ],
       "expo-font",
       "expo-asset",
-      "react-native-quick-crypto"
+      "react-native-quick-crypto",
+      "./plugins/withSceneLifecycle"
     ],
     "scheme": "pace",
     "experiments": {

@@ -185,6 +185,9 @@ How the layers depend on each other:
 
 | Problem | Fix |
 | --- | --- |
+| iOS app closes right after opening on iOS 27 | iOS 27 requires the "scene" app life cycle. `plugins/withSceneLifecycle.js` (listed in `app.json`) adds it whenever the native project is generated, so regenerate with `npx expo prebuild --clean --platform ios`. |
+| `pod install` fails with `Unicode Normalization not appropriate for ASCII-8BIT` | Run `export LANG=en_US.UTF-8` first. |
+| iOS build fails with `/Users/.../UMGC: No such file or directory` | React Native's iOS bundling script breaks on folder names with spaces. Clone the repo into a path without spaces (e.g. `~/code/SWEN661-BudgetWise`). |
 | Expo Go shows "native module not found" / crypto errors | Pace uses `react-native-quick-crypto` and other native modules that Expo Go doesn't bundle. Use a development build: `npm run android`. |
 | `npm run android` can't find a device | Start an emulator in Android Studio (Device Manager), or plug in a phone with USB debugging on, and check `adb devices`. |
 | `SDK location not found` / `ANDROID_HOME` | Set `ANDROID_HOME` (macOS: `export ANDROID_HOME=$HOME/Library/Android/sdk`), or create `android/local.properties` with `sdk.dir=...`. |
