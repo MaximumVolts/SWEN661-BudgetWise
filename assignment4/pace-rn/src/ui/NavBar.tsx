@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDisplay } from '../state/PreferencesContext';
 import { Icon, type IconName } from './icons';
+import { CONTENT_MAX_WIDTH } from './responsive';
 
 const ITEMS: [IconName, string][] = [
   ['home', 'Home'],
@@ -21,31 +22,35 @@ export function NavBar({ selected, onSelect }: { selected: number; onSelect: (i:
       accessibilityLabel="Main navigation"
       style={[styles.bar, { backgroundColor: c.navBar, borderTopColor: c.line, paddingBottom: 12 + insets.bottom }]}
     >
-      {ITEMS.map(([icon, label], i) => {
-        const on = i === selected;
-        return (
-          <Pressable
-            key={label}
-            accessibilityRole="tab"
-            accessibilityLabel={label}
-            accessibilityHint={`Tab ${i + 1} of ${ITEMS.length}`}
-            accessibilityState={{ selected: on }}
-            onPress={() => onSelect(i)}
-            style={({ pressed }) => [styles.item, pressed && { transform: [{ scale: 0.97 }] }]}
-          >
-            <View style={[styles.pill, { backgroundColor: on ? c.navPill : 'transparent' }]}>
-              <Icon name={icon} color={on ? c.lime : c.ink} />
-            </View>
-            <Text style={{ fontSize: 11.5, marginTop: 4, color: c.ink, fontWeight: on ? '700' : '500' }}>{label}</Text>
-          </Pressable>
-        );
-      })}
+      <View style={styles.row}>
+        {ITEMS.map(([icon, label], i) => {
+          const on = i === selected;
+          return (
+            <Pressable
+              key={label}
+              accessibilityRole="tab"
+              accessibilityLabel={label}
+              accessibilityHint={`Tab ${i + 1} of ${ITEMS.length}`}
+              accessibilityState={{ selected: on }}
+              onPress={() => onSelect(i)}
+              style={({ pressed }) => [styles.item, pressed && { transform: [{ scale: 0.97 }] }]}
+            >
+              <View style={[styles.pill, { backgroundColor: on ? c.navPill : 'transparent' }]}>
+                <Icon name={icon} color={on ? c.lime : c.ink} />
+              </View>
+              <Text style={{ fontSize: 11.5, marginTop: 4, color: c.ink, fontWeight: on ? '700' : '500' }}>{label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  bar: { flexDirection: 'row', justifyContent: 'space-around', paddingTop: 12, paddingHorizontal: 8, borderTopWidth: 1 },
+  // On tablets the tabs stay grouped in the middle instead of spreading across the whole width.
+  bar: { paddingTop: 12, paddingHorizontal: 8, borderTopWidth: 1 },
+  row: { flexDirection: 'row', justifyContent: 'space-around', width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
   item: { alignItems: 'center', minWidth: 56 },
   pill: { width: 60, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
 });

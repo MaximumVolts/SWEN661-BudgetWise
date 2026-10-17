@@ -23,16 +23,40 @@ import { useDialogs } from '../state/DialogContext';
 import { useDisplay } from '../state/PreferencesContext';
 import { DateLabels } from '../utils/dateLabels';
 import { Icon, type IconName } from './icons';
+import { useResponsive } from './responsive';
 
 // ── Layout ────────────────────────────────────────────────────────────────────
 
-/** A full screen with the app background, inside the safe area. */
-export function Screen({ children, edges = ['top', 'bottom'] }: { children: ReactNode; edges?: ('top' | 'bottom')[] }) {
+/**
+ * A full screen with the app background, inside the safe area. On tablets the content is centered
+ * at a readable width; [wide] screens get room for two columns (see [Columns]).
+ */
+export function Screen({ children, edges = ['top', 'bottom'], wide }: { children: ReactNode; edges?: ('top' | 'bottom')[]; wide?: boolean }) {
   const { colors: c } = useDisplay();
+  const { maxWidth } = useResponsive(wide);
   return (
     <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: c.bg }}>
-      {children}
+      <View style={{ flex: 1, width: '100%', maxWidth, alignSelf: 'center' }}>{children}</View>
     </SafeAreaView>
+  );
+}
+
+/** Two columns side by side on tablets (inside a [wide] Screen), stacked on phones. */
+export function Columns({ left, right }: { left: ReactNode; right: ReactNode }) {
+  const { columns } = useResponsive(true);
+  if (columns === 1) {
+    return (
+      <>
+        {left}
+        {right}
+      </>
+    );
+  }
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 24 }}>
+      <View style={{ flex: 1 }}>{left}</View>
+      <View style={{ flex: 1 }}>{right}</View>
+    </View>
   );
 }
 

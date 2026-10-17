@@ -56,7 +56,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
   };
 
   const button = (label: string, onPress: () => void, color: string) => (
-    <Pressable accessibilityRole="button" onPress={onPress} style={styles.textButton} hitSlop={8}>
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={styles.textButton} hitSlop={8}>
       <Text style={{ color, fontSize: 15, fontWeight: '700' }}>{label}</Text>
     </Pressable>
   );
@@ -82,6 +82,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
                     <Pressable
                       key={o.id}
                       accessibilityRole="button"
+                      accessibilityLabel={o.label}
                       accessibilityState={{ selected }}
                       onPress={() => close(o.id)}
                       style={({ pressed }) => [styles.option, pressed && { backgroundColor: c.chip }]}

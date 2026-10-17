@@ -67,6 +67,7 @@ function Item({ n, onOpen, onPrimary }: { n: NotificationItem; onOpen: () => voi
   const button = (label: string, filled: boolean, onPress: () => void) => (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={label}
       onPress={onPress}
       style={{
         borderRadius: 24,

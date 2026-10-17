@@ -37,6 +37,7 @@ export function OnboardingScreen({ controller }: { controller: OnboardingControl
                         <Pressable
                           key={o.id}
                           accessibilityRole="radio"
+                          accessibilityLabel={`${o.title}. ${o.subtitle}`}
                           accessibilityState={{ checked: on }}
                           onPress={() => setIncome(o.id)}
                           style={{ flexDirection: 'row', alignItems: 'center', gap: 16, paddingHorizontal: 8, paddingVertical: 12 }}

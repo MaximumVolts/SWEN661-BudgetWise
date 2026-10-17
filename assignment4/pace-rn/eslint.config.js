@@ -1,6 +1,8 @@
 // https://docs.expo.dev/guides/using-eslint/
 const { defineConfig } = require('eslint/config');
 const expoConfig = require("eslint-config-expo/flat");
+// Static security analysis (eval, unsafe regexes, non-literal requires, timing attacks…).
+const security = require("eslint-plugin-security");
 
 /** Import paths inside any of [layers] (folders under src/), however deep the importing file is. */
 const layer = (...layers) => layers.map((l) => `**/${l}/**`);
@@ -24,8 +26,25 @@ const restrict = (files, patterns) => ({
 
 module.exports = defineConfig([
   expoConfig,
+  security.configs.recommended,
   {
-    ignores: ["dist/*"],
+    ignores: ["dist/*", "coverage/*"],
+  },
+  {
+    rules: {
+      // Flags every obj[key]. Keys here are typed (unions / Records), never raw user input, so it
+      // only produces noise; see SECURITY.md.
+      'security/detect-object-injection': 'off',
+    },
+  },
+  // Tests read their own fixture and route files from disk; jest.mock factories must use require().
+  {
+    files: ['__tests__/**', 'jest.setup.tsx'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+      'security/detect-non-literal-fs-filename': 'off',
+      'security/detect-non-literal-require': 'off',
+    },
   },
   restrict(['src/models/**'], [
     { group: layer('repositories', 'services', 'controllers', 'views', 'ui', 'state', 'navigation', 'routes'), message: 'Models are plain data: they import nothing but other models.' },

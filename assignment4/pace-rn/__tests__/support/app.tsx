@@ -16,7 +16,7 @@ function routes(): Record<string, unknown> {
       if (statSync(path).isDirectory()) walk(path);
       else if (/\.tsx?$/.test(name)) {
         const key = relative(APP_DIR, path).replace(/\\/g, '/').replace(/\.tsx?$/, '');
-        out[key] = require(path).default; // eslint-disable-line @typescript-eslint/no-require-imports
+        out[key] = require(path).default;
       }
     }
   };

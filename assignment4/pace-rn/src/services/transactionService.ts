@@ -97,6 +97,8 @@ export function matchesSearch(
   const textWords = new Set(text.split(/[^a-z0-9.]+/));
   return words.every((w) => {
     const number = w.replace(/[$,]/g, '');
+    // Anchored, with no nested repetition: linear time (the rule's check is overly cautious).
+    // eslint-disable-next-line security/detect-unsafe-regex
     if (!/^-?\d+(\.\d{1,2})?$/.test(number)) return text.includes(w);
     // Numbers match the amount, or a whole number in the text (e.g. account digits "0000"), not
     // any digits inside a longer number.

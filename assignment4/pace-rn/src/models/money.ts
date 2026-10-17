@@ -1,5 +1,7 @@
 /** Money as text, shared by services (pre-formatted labels) and screens. */
 
+// Safe: runs on the digits of a formatted number, and the lookahead can't backtrack exponentially.
+// eslint-disable-next-line security/detect-unsafe-regex
 const group = (digits: string) => digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 /** 1234.5 -> $1,234.50 (negative values get a leading minus sign). */

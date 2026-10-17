@@ -13,7 +13,7 @@ import type { AuthService } from '@/services/authService';
 import { PasswordHasher } from '@/services/passwordHasher';
 import { memoryDatabase } from './memoryDatabase';
 
-type Json = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+type Json = Record<string, any>;
 
 /** Sandbox keys in Plaid's format, for test accounts (requests are replayed, never sent). */
 export const TEST_PLAID_CLIENT_ID = '0123456789abcdef01234567';

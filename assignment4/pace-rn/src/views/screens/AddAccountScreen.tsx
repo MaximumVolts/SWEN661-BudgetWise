@@ -41,6 +41,7 @@ export function AddAccountScreen({ controller }: { controller: AddAccountControl
                           {i > 0 && <HairLine />}
                           <Pressable
                             accessibilityRole="radio"
+                            accessibilityLabel={bank.isLinked ? `${bank.name}, already connected` : bank.name}
                             accessibilityState={{ checked: on, disabled: bank.isLinked }}
                             disabled={bank.isLinked}
                             onPress={() => choose(bank.id)}

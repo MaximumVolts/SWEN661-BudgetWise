@@ -46,7 +46,9 @@ export const Validators = {
     const whole = (v: number) => formatMoney(v, v === Math.round(v) ? 0 : 2);
     const cleaned = text.trim().replace(/[$,\s]/g, '');
     if (!cleaned) return { error: `Enter ${/^[aeiou]/.test(what) ? 'an' : 'a'} ${what}` };
-    if (!/^\d+(\.\d{1,2})?$/.test(cleaned)) return { error: 'Enter an amount like 400 or 400.50' };
+    // Anchored, with no nested repetition: linear time (the rule's check is overly cautious).
+  // eslint-disable-next-line security/detect-unsafe-regex
+  if (!/^\d+(\.\d{1,2})?$/.test(cleaned)) return { error: 'Enter an amount like 400 or 400.50' };
     const value = Number(cleaned);
     if (value < min) return { error: `The ${what} must be at least ${whole(min)}` };
     if (value > max) return { error: `The ${what} can be at most ${whole(max)}` };
