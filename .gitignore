@@ -262,6 +262,4 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 flutter/lib/screens/sample.dart
-.idea/workspace.xml
-.idea/shelf/Uncommitted_changes_before_Checkout_at_10_13_2026_9_08_PM__Changes_.xml
-.idea/shelf/Uncommitted_changes_before_Checkout_at_10_13_2026_9_08_PM_\[Changes]/shelved.patch
+.idea/**

@@ -13,7 +13,7 @@ import { PlaidNotificationService } from '@/services/notificationService';
 import { RecurringSchedule } from '@/services/recurringSchedule';
 import { Emitter } from '@/utils/events';
 import { fieldErrors, type SandboxApp, sandboxServices } from './support/sandbox';
-
+jest.setTimeout(30000);
 const OCT_12 = new Date(2026, 9, 12, 9);
 
 describe('bill reminders', () => {

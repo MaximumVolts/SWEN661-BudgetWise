@@ -61,8 +61,8 @@ export class PlaidStatementService extends BankDataService implements StatementS
       accounts: [
         { id: '', label: 'All accounts' },
         ...snap.accounts
-          .filter((a) => snap.transactions.some((t) => t.accountId === a.accountId))
-          .map((a) => ({ id: a.accountId, label: accountLabel(a) })),
+          .filter((a) => snap.transactions.some((t, idx) => t.accountId === a.accountId))
+          .map((a) => ({ id: a.accountId, label: accountLabel(a), idx: snap.transactions.findIndex((t) => t.accountId === a.accountId) })),
       ],
       months: Array.from({ length: MONTHS_OFFERED }, (_, i) => {
         const m = new Date(now.getFullYear(), now.getMonth() - i, 1);

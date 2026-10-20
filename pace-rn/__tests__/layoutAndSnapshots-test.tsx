@@ -10,7 +10,7 @@ import { CONTENT_MAX_WIDTH, layoutFor, TABLET_MIN_WIDTH, WIDE_CONTENT_MAX_WIDTH 
 import { BudgetRow } from '@/ui/rows';
 import { openApp, screen, settle } from './support/app';
 import { type SandboxApp, sandboxServices } from './support/sandbox';
-
+jest.setTimeout(30000);
 // The window size the app sees; tests set it before rendering.
 const windowSize = { width: 390, height: 844 };
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({

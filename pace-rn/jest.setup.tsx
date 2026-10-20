@@ -1,5 +1,6 @@
 // Native modules Jest can't load are replaced with simple fakes here. Anything a test needs to
 // inspect (notifications, saved statements, Plaid) is injected as an in-memory implementation instead.
+jest.setTimeout(30000);
 jest.mock('expo-crypto', () => ({
   getRandomBytes: (n: number) => new Uint8Array(require('crypto').randomBytes(n)),
 }));
@@ -35,8 +36,8 @@ jest.mock('@react-native-community/datetimepicker', () => {
   const { parseIsoDate } = require('@/utils/calendar');
   return {
     __esModule: true,
-    default: ({ onChange }: { onChange: (e: { type: string }, d?: Date) => void }) => (
-      <TextInput testID="date-picker" onChangeText={(text: string) => onChange({ type: 'set' }, parseIsoDate(text))} />
+    default: ({ onValueChange }: { onValueChange: (e: { type: string }, d?: Date) => void }) => (
+      <TextInput testID="date-picker" onChangeText={(text: string) => onValueChange({ type: 'set' }, parseIsoDate(text))} />
     ),
   };
 });

@@ -604,9 +604,9 @@ export function DateField({
           value={value ?? minimumDate ?? new Date()}
           mode="date"
           minimumDate={minimumDate}
-          onChange={(event, date) => {
+          onValueChange={(event, date) => {
             setPicking(false);
-            if (event.type === 'set' && date) onChange(date);
+            if (date) onChange(date);
           }}
         />
       )}

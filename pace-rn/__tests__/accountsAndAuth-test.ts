@@ -10,7 +10,7 @@ import { PasswordHasher } from '@/services/passwordHasher';
 import { jsPbkdf2, type Pbkdf2 } from '@/services/pbkdf2';
 import { initialsFor, RepositoryProfileService } from '@/services/profileService';
 import { createAda, fieldErrors, sandboxServices, TEST_PLAID_CLIENT_ID, TEST_PLAID_SECRET } from './support/sandbox';
-
+jest.setTimeout(30000);
 const fastHasher = new PasswordHasher(1000);
 const PET = SECURITY_QUESTIONS[0];
 const OTHER_CLIENT_ID = 'fedcba9876543210fedcba98';

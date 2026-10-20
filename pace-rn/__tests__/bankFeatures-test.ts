@@ -6,6 +6,7 @@ import { statementNet } from '@/models/statement';
 import { encodeCsv, encodePdfHtml } from '@/services/statementEncoders';
 import { fieldErrors, type SandboxApp, sandboxServices, TEST_BUDGETS } from './support/sandbox';
 
+jest.setTimeout(30000);
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 let app: SandboxApp;

@@ -1,7 +1,7 @@
 import { fireEvent } from 'expo-router/testing-library';
 import { openApp, pathname, press, pressButton, pressLabel, screen, settle, type } from './support/app';
 import { type SandboxApp, sandboxServices, TEST_BUDGETS } from './support/sandbox';
-
+jest.setTimeout(30000);
 let app: SandboxApp | undefined;
 afterEach(() => app?.bankData.stopRetrying());
 

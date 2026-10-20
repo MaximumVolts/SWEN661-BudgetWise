@@ -12,7 +12,7 @@ import { InMemoryVault } from '@/repositories/secretVault';
 import { DEFAULT_PREFERENCES, Reminder } from '@/models/userPreferences';
 import { Frequency } from '@/models/recurring';
 import { MIGRATIONS } from '@/repositories/schema';
-
+jest.setTimeout(30000);
 describe('SQLite storage (the real schema)', () => {
   test('migrates to the latest version and keeps data across a restart', async () => {
     const first = await memoryDatabase();

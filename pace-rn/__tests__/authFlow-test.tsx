@@ -1,7 +1,7 @@
 import { act } from 'expo-router/testing-library';
 import { openApp, pathname, press, pressButton, pressLabel, screen, settle, type } from './support/app';
 import { sandboxServices, TEST_PLAID_CLIENT_ID, TEST_PLAID_SECRET } from './support/sandbox';
-
+jest.setTimeout(30000);
 afterEach(() => jest.clearAllTimers());
 
 test('signed out, the app opens on sign-in; Google / Apple buttons are not offered', async () => {

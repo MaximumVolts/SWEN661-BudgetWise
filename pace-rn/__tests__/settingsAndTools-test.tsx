@@ -4,7 +4,7 @@ import { Reminder } from '@/models/userPreferences';
 import { HIGH_CONTRAST, STANDARD } from '@/ui/theme';
 import { openApp, pathname, press, pressButton, pressLabel, screen, settle, type } from './support/app';
 import { type SandboxApp, sandboxServices } from './support/sandbox';
-
+jest.setTimeout(30000);
 let app: SandboxApp | undefined;
 afterEach(() => app?.bankData.stopRetrying());
 

@@ -24,10 +24,10 @@ export function ChoiceChips<T>({
     <View style={{ marginTop: 22 }}>
       <Text style={{ fontSize: 16, fontWeight: '700', color: c.ink }}>{title}</Text>
       <View accessibilityRole="radiogroup" accessibilityLabel={title} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 10 }}>
-        {options.map((o) => {
+        {options.map((o, idx) => {
           const on = o.value === selected;
           return (
-            <Tap key={o.label} role="radio" selected={on} disabled={disabled} onPress={() => onSelect(o.value)}>
+            <Tap key={o.label + idx} role="radio" selected={on} disabled={disabled} onPress={() => onSelect(o.value)}>
               <View
                 style={{
                   flexDirection: 'row',
