@@ -262,3 +262,4 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 flutter/lib/screens/sample.dart
+.idea/**

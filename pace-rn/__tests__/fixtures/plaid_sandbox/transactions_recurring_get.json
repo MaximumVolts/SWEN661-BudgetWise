@@ -1,0 +1,288 @@
+{
+  "inflow_streams": [
+    {
+      "account_id": "VdlBpgkEwxSM1GwzezxPsKw5yGrNPMSq51dgp",
+      "average_amount": {
+        "amount": -4.22
+      },
+      "category": [
+        "Transfer",
+        "Credit"
+      ],
+      "category_id": "21005000",
+      "description": "INTRST PYMNT",
+      "first_date": "2026-08-07",
+      "frequency": "MONTHLY",
+      "is_active": true,
+      "is_user_modified": false,
+      "last_amount": {
+        "amount": -4.22
+      },
+      "last_date": "2026-10-06",
+      "last_user_modified_datetime": "0001-01-01T00:00:00Z",
+      "merchant_name": "",
+      "personal_finance_category": {
+        "confidence_level": "UNKNOWN",
+        "detailed": "TRANSFER_IN_ACCOUNT_TRANSFER",
+        "primary": "TRANSFER_IN"
+      },
+      "predicted_next_date": "2026-11-06",
+      "status": "MATURE",
+      "stream_id": "qKNvlj4ZqBI9BKXlJl6oHElB5vnZqjUdRW4LE",
+      "transaction_ids": [
+        "pqavgXkQlzuP7qblAlDkhy8gb3VqGzHEqmDbL",
+        "1zPQJw7gLGSaGpl1L1kohAvR5PW64GCZavQNb",
+        "GWjJwkK4RptrmZaglgVMc3nRkJr95yuGpV34P"
+      ]
+    }
+  ],
+  "outflow_streams": [
+    {
+      "account_id": "5dLk7VyAJrS8zeJjnjgAiAPnpK8rvBTG4ldKg",
+      "average_amount": {
+        "amount": 2078.5
+      },
+      "category": [
+        "Payment"
+      ],
+      "category_id": "16000000",
+      "description": "AUTOMATIC PAYMENT - THANK",
+      "first_date": "2026-07-22",
+      "frequency": "MONTHLY",
+      "is_active": true,
+      "is_user_modified": false,
+      "last_amount": {
+        "amount": 2078.5
+      },
+      "last_date": "2026-09-20",
+      "last_user_modified_datetime": "0001-01-01T00:00:00Z",
+      "merchant_name": "",
+      "personal_finance_category": {
+        "confidence_level": "UNKNOWN",
+        "detailed": "TRANSFER_OUT_ACCOUNT_TRANSFER",
+        "primary": "TRANSFER_OUT"
+      },
+      "predicted_next_date": "2026-10-20",
+      "status": "MATURE",
+      "stream_id": "PKmJrEN1jqIP4zejajV3hvKPXNgmVWC7Adp8o",
+      "transaction_ids": [
+        "Jn1JkbBjQ8H3Ln8araBlT57z8GpQ6xfoGNbnq",
+        "6aopXByGLzupmLX767rAIwomENgKLZtbqArmw",
+        "RzRqB1jpZrS7v38yNyadh483Gx79nkuPq64QV"
+      ]
+    },
+    {
+      "account_id": "5dLk7VyAJrS8zeJjnjgAiAPnpK8rvBTG4ldKg",
+      "average_amount": {
+        "amount": 500
+      },
+      "category": [
+        "Shops",
+        "Sporting Goods"
+      ],
+      "category_id": "19046000",
+      "description": "Madison Bicycle Shop",
+      "first_date": "2026-07-22",
+      "frequency": "MONTHLY",
+      "is_active": true,
+      "is_user_modified": false,
+      "last_amount": {
+        "amount": 500
+      },
+      "last_date": "2026-09-20",
+      "last_user_modified_datetime": "0001-01-01T00:00:00Z",
+      "merchant_name": "Madison Bicycle Center",
+      "personal_finance_category": {
+        "confidence_level": "UNKNOWN",
+        "detailed": "GENERAL_MERCHANDISE_SPORTING_GOODS",
+        "primary": "GENERAL_MERCHANDISE"
+      },
+      "predicted_next_date": "2026-10-20",
+      "status": "MATURE",
+      "stream_id": "4xM16VyWpKHLV4GmZm9ocEKzXMGrn8UdL5j9g",
+      "transaction_ids": [
+        "wdgv35QkxNSl9Lx818mytpG8mVga9XtqadgQ5",
+        "vxpvBReo34Hg5NA6e6kKTwyvlp7PGetnP7og9",
+        "9PGJkwym5xHzvVRXgXwAHpBRXekJ5Puqv7Dmy"
+      ]
+    },
+    {
+      "account_id": "5dLk7VyAJrS8zeJjnjgAiAPnpK8rvBTG4ldKg",
+      "average_amount": {
+        "amount": 500
+      },
+      "category": [
+        "Food and Drink",
+        "Restaurants"
+      ],
+      "category_id": "13005000",
+      "description": "Tectra Inc",
+      "first_date": "2026-07-23",
+      "frequency": "MONTHLY",
+      "is_active": true,
+      "is_user_modified": false,
+      "last_amount": {
+        "amount": 500
+      },
+      "last_date": "2026-09-21",
+      "last_user_modified_datetime": "0001-01-01T00:00:00Z",
+      "merchant_name": "",
+      "personal_finance_category": {
+        "confidence_level": "UNKNOWN",
+        "detailed": "FOOD_AND_DRINK_RESTAURANT",
+        "primary": "FOOD_AND_DRINK"
+      },
+      "predicted_next_date": "2026-10-21",
+      "status": "MATURE",
+      "stream_id": "jGwvpgr4kAUgELdZeZP7TGNWjwDg3zT1a4rxv",
+      "transaction_ids": [
+        "VdlBpgkEwxSM1GwzezxPsKwg9rlqE7ipvA6Dz",
+        "9PGJkwym5xHzvVRXgXwAHpBv43najdtV3Jlk7",
+        "y4AwdbJEDjS8aPWJnJqBiVBvjeKNbpuKaJAQP"
+      ]
+    },
+    {
+      "account_id": "5dLk7VyAJrS8zeJjnjgAiAPnpK8rvBTG4ldKg",
+      "average_amount": {
+        "amount": 500
+      },
+      "category": [
+        "Travel",
+        "Airlines and Aviation Services"
+      ],
+      "category_id": "22001000",
+      "description": "United Airlines",
+      "first_date": "2026-07-28",
+      "frequency": "MONTHLY",
+      "is_active": true,
+      "is_user_modified": false,
+      "last_amount": {
+        "amount": 500
+      },
+      "last_date": "2026-09-26",
+      "last_user_modified_datetime": "0001-01-01T00:00:00Z",
+      "merchant_name": "United Airlines",
+      "personal_finance_category": {
+        "confidence_level": "UNKNOWN",
+        "detailed": "TRAVEL_FLIGHTS",
+        "primary": "TRAVEL"
+      },
+      "predicted_next_date": "2026-10-26",
+      "status": "MATURE",
+      "stream_id": "748oPVynLBSx3V51g1dAca4xX7ybveUgxQ76M",
+      "transaction_ids": [
+        "DgxJowyk4MHl9ZXgegBbtLa9yrGobKiErpzZV",
+        "y4AwdbJEDjS8aPWJnJqBiVBqk97JZWiWZvroL",
+        "mmrvJ93jaqUrGdVeaeX6cGwzJXWpMKf4oGJ5Q"
+      ]
+    },
+    {
+      "account_id": "DgxJowyk4MHl9ZXgegBbtLakqWrdElC4lDQW4",
+      "average_amount": {
+        "amount": 89.40000000000002
+      },
+      "category": [
+        "Food and Drink",
+        "Restaurants"
+      ],
+      "category_id": "13005000",
+      "description": "SparkFun",
+      "first_date": "2026-08-08",
+      "frequency": "MONTHLY",
+      "is_active": true,
+      "is_user_modified": false,
+      "last_amount": {
+        "amount": 89.4
+      },
+      "last_date": "2026-10-07",
+      "last_user_modified_datetime": "0001-01-01T00:00:00Z",
+      "merchant_name": "FUN",
+      "personal_finance_category": {
+        "confidence_level": "UNKNOWN",
+        "detailed": "FOOD_AND_DRINK_RESTAURANT",
+        "primary": "FOOD_AND_DRINK"
+      },
+      "predicted_next_date": "2026-11-07",
+      "status": "MATURE",
+      "stream_id": "33QMPvkELqCogLGpXpj1hJ6EkngxdoCqEJdQx",
+      "transaction_ids": [
+        "748oPVynLBSx3V51g1dAca43zLBXDpTMaVN6Q",
+        "doG1gJ7zNpUyA1ELnLelHGqzrmoBxeFDqAPl3",
+        "E8aJ7rldn1sqlyJXAXVGHa47QDqXxgTgBalL1"
+      ]
+    },
+    {
+      "account_id": "5dLk7VyAJrS8zeJjnjgAiAPnpK8rvBTG4ldKg",
+      "average_amount": {
+        "amount": 78.5
+      },
+      "category": [
+        "Recreation",
+        "Gyms and Fitness Centers"
+      ],
+      "category_id": "17018000",
+      "description": "Touchstone Climbing",
+      "first_date": "2026-08-10",
+      "frequency": "MONTHLY",
+      "is_active": true,
+      "is_user_modified": false,
+      "last_amount": {
+        "amount": 78.5
+      },
+      "last_date": "2026-10-09",
+      "last_user_modified_datetime": "0001-01-01T00:00:00Z",
+      "merchant_name": "Touchstone Climbing",
+      "personal_finance_category": {
+        "confidence_level": "UNKNOWN",
+        "detailed": "PERSONAL_CARE_GYMS_AND_FITNESS_CENTERS",
+        "primary": "PERSONAL_CARE"
+      },
+      "predicted_next_date": "2026-11-09",
+      "status": "MATURE",
+      "stream_id": "egbL6JeByoH9eznLJLaPHrkXlKZnjWfLmDoJV",
+      "transaction_ids": [
+        "X4zxowKAQaSLzNV5Z5n7cvV9raZ1epiPrl5De",
+        "mmrvJ93jaqUrGdVeaeX6cGwxaQolEVFMl3793",
+        "bL8ZpjPKw1H5RnWLALbQhlmdMQzEN9iokRqw7"
+      ]
+    },
+    {
+      "account_id": "VdlBpgkEwxSM1GwzezxPsKw5yGrNPMSq51dgp",
+      "average_amount": {
+        "amount": 25
+      },
+      "category": [
+        "Payment",
+        "Credit Card"
+      ],
+      "category_id": "16001000",
+      "description": "CREDIT CARD 3333 PAYMENT *//",
+      "first_date": "2026-08-12",
+      "frequency": "MONTHLY",
+      "is_active": true,
+      "is_user_modified": false,
+      "last_amount": {
+        "amount": 25
+      },
+      "last_date": "2026-10-11",
+      "last_user_modified_datetime": "0001-01-01T00:00:00Z",
+      "merchant_name": "",
+      "personal_finance_category": {
+        "confidence_level": "UNKNOWN",
+        "detailed": "LOAN_PAYMENTS_CREDIT_CARD_PAYMENT",
+        "primary": "LOAN_PAYMENTS"
+      },
+      "predicted_next_date": "2026-11-11",
+      "status": "MATURE",
+      "stream_id": "a1oQk3NqPMCnX1lbWb4dTdPWkNmGbvC7D4Aop",
+      "transaction_ids": [
+        "LmgJMbxeQWUdJlZVBV9KiaZlbmKe7MTlmzLqL",
+        "MyEJlZdQRACaEqk131DrhyVQ95p43RHe5ZDNA",
+        "ALqJ19yz4eHzV6EGJG4AHQx9d3yMNaU4pbPvE"
+      ]
+    }
+  ],
+  "personal_finance_category_version": "v2",
+  "request_id": "a736cd8e4e82dff",
+  "updated_datetime": "2026-10-12T17:54:05Z"
+}
