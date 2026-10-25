@@ -18,7 +18,7 @@ export function BillsScreen({ controller }: { controller: BillsController }) {
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20, paddingRight: 8, paddingTop: 8 }}>
         <Heading style={{ flex: 1, fontSize: 24, fontWeight: '500', color: c.ink }}>Bills</Heading>
         <Tap onPress={addBill} label="Add bill or subscription">
-          <Icon name="add" size={30} color={c.ink} />
+          <Icon name="add" size={48} color={c.ink} />
         </Tap>
       </View>
       <View style={{ paddingHorizontal: 20, paddingVertical: 12 }}>
@@ -128,7 +128,7 @@ function SubRow({ item, onMenu }: { item: RecurringItem; onMenu: () => void }) {
       <Icon name={active ? 'check-circle-outline' : 'pause-circle-outline'} size={18} color={active ? c.ink : c.muted} />
       <Text style={{ fontSize: 14, fontWeight: '700', color: active ? c.ink : c.muted, marginLeft: 6 }}>{active ? 'Active' : 'Paused'}</Text>
       <Tap onPress={onMenu} label={`Options for ${item.name}`}>
-        <Icon name="more-vert" size={20} color={c.ink} />
+        <Icon name="more-vert" size={48} color={c.ink} />
       </Tap>
     </View>
   );

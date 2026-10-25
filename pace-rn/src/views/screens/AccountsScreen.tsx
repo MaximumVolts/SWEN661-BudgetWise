@@ -15,11 +15,11 @@ export function AccountsScreen({ controller }: { controller: AccountsController 
     <Screen>
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingTop: 8 }}>
         <Tap onPress={back} label="Back">
-          <Icon name="arrow-back" size={26} color={c.ink} />
+          <Icon name="arrow-back" size={48} color={c.ink} />
         </Tap>
         <Heading style={{ flex: 1, fontSize: 24, fontWeight: '500', color: c.ink }}>Accounts</Heading>
         <Tap onPress={openOptions} label="Account options">
-          <Icon name="more-vert" color={c.ink} />
+          <Icon name="more-vert" size={48} color={c.ink} />
         </Tap>
       </View>
       <AsyncView state={state} onRetry={reload}>

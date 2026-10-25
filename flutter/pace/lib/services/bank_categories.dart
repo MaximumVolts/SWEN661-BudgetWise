@@ -16,7 +16,7 @@ class BankCategories {
   static const medical = CategoryInfo(id: 'medical', name: 'Medical', iconKey: 'shield');
   static const home = CategoryInfo(id: 'home', name: 'Home', iconKey: 'home');
   static const fees = CategoryInfo(id: 'fees', name: 'Bank fees', iconKey: 'bank');
-  static const loans = CategoryInfo(id: 'loans', name: 'Loan & card payments', iconKey: 'bills');
+  static const loans = CategoryInfo(id: 'loans', name: 'Loans', iconKey: 'bills');
   static const transfers = CategoryInfo(id: 'transfers', name: 'Transfers', iconKey: 'bank');
   static const income = CategoryInfo(id: 'income', name: 'Income', iconKey: 'payroll');
   static const other = CategoryInfo(id: 'other', name: 'Other', iconKey: 'store');

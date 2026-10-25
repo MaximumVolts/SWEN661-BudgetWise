@@ -39,11 +39,11 @@ class SavingsGoalsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Row(
               children: [
-                Tap(onTap: onBack, semanticLabel: 'Back', child: const Icon(Icons.arrow_back, size: 28)),
+                Tap(onTap: onBack, semanticLabel: 'Back', child: const Icon(Icons.arrow_back, size: 48)),
                 const SizedBox(width: 16),
                 const Heading('Savings Goals', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
                 const Spacer(),
-                Tap(onTap: onAddGoal, semanticLabel: 'Add savings goal', child: const Icon(Icons.add, size: 30)),
+                Tap(onTap: onAddGoal, semanticLabel: 'Add savings goal', child: const Icon(Icons.add, size: 48)),
               ],
             ),
             const SizedBox(height: 20),
@@ -120,7 +120,7 @@ class _GoalBlock extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Tap(onTap: onEdit == null ? null : () => onEdit!(goal), semanticLabel: 'Edit $name', child: const Icon(Icons.edit_note, size: 26)),
+                  Tap(onTap: onEdit == null ? null : () => onEdit!(goal), semanticLabel: 'Edit $name', child: const Icon(Icons.edit_note, size: 48)),
                 ],
               ),
               const SizedBox(height: 14),

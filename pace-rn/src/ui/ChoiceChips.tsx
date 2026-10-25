@@ -41,8 +41,8 @@ export function ChoiceChips<T>({
                   backgroundColor: on ? c.ink : c.surface,
                 }}
               >
-                {o.icon && <Icon name={o.icon} size={18} color={on ? '#FFFFFF' : c.ink} />}
-                <Text style={{ fontSize: 14, fontWeight: '600', color: on ? '#FFFFFF' : c.ink }}>{o.label}</Text>
+                {o.icon && <Icon name={o.icon} size={48} color={on ? '#FFFFFF' : c.ink} />}
+                <Text style={{ fontSize: 36, fontWeight: '600', color: on ? '#FFFFFF' : c.ink }}>{o.label}</Text>
               </View>
             </Tap>
           );

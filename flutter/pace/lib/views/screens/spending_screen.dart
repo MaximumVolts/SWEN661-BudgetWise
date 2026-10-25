@@ -42,7 +42,7 @@ class SpendingScreen extends StatelessWidget {
               children: [
                 const Heading('Spending', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                 const Spacer(),
-                Tap(onTap: onCalendar, semanticLabel: 'Choose date range', child: const Icon(Icons.calendar_today_outlined, size: 26)),
+                Tap(onTap: onCalendar, semanticLabel: 'Choose date range', child: const Icon(Icons.calendar_today_outlined, size: 48)),
               ],
             ),
             const SizedBox(height: 16),

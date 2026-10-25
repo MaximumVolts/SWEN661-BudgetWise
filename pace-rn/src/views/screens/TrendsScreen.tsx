@@ -17,7 +17,7 @@ export function TrendsScreen({ controller }: { controller: TrendsController }) {
           <Scroll>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: -12, paddingTop: 8 }}>
               <Tap onPress={back} label="Back">
-                <Icon name="arrow-back" size={28} color={c.ink} />
+                <Icon name="arrow-back" size={48} color={c.ink} />
               </Tap>
               <Text style={{ fontSize: 18, fontWeight: '500', color: c.ink, marginLeft: 4 }}>Plaid TrendScore</Text>
             </View>

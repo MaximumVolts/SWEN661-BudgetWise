@@ -109,10 +109,10 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                     const SizedBox(height: 16),
                     Align(
-                      alignment: Alignment.centerRight,
+                      alignment: Alignment.center,
                       child: Tap(
                         onTap: widget.onForgotPassword,
-                        child: const Text('Forgot password?', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                        child: const Text('Forgot password?', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 36)),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -139,17 +139,15 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
               ),
             ),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 12, top: 4),
+              child: Text('New to Pace?', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700))
+            ),
             Padding(
               padding: const EdgeInsets.only(bottom: 12, top: 4),
               child: Tap(
                 onTap: widget.onCreateAccount,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('New to Pace?   ', style: TextStyle(fontSize: 16, color: C.muted)),
-                    const Text('Create account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                  ],
-                ),
+                child: const Text('New account', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700))
               ),
             ),
           ],

@@ -75,7 +75,7 @@ class DashboardScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
               child: Row(
                 children: [
-                  Tap(onTap: onSettings, semanticLabel: 'Settings', child: const Icon(Icons.settings_outlined)),
+                  Tap(onTap: onSettings, semanticLabel: 'Settings', child: const Icon(Icons.settings_outlined, size: 48)),
                   const Spacer(),
                   Text(data.dateLabel, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
                   const Spacer(),
@@ -85,7 +85,7 @@ class DashboardScreen extends StatelessWidget {
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        const Icon(Icons.notifications_none, size: 28),
+                        const Icon(Icons.notifications_none, size: 48),
                         if (data.hasUnreadNotifications)
                           Positioned(
                             right: 2,
@@ -108,7 +108,7 @@ class DashboardScreen extends StatelessWidget {
                     decoration: BoxDecoration(color: C.lime, borderRadius: BorderRadius.circular(10)),
                     child: Row(
                       children: [
-                        const Icon(Icons.receipt_long_outlined, size: 24),
+                        const Icon(Icons.receipt_long_outlined, size: 48),
                         const SizedBox(width: 14),
                         Expanded(
                           child: Column(
@@ -184,7 +184,7 @@ class DashboardScreen extends StatelessWidget {
                       const SizedBox(width: 12),
                       Text(data.paydayLabel!, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                       const Spacer(),
-                      Tap(onTap: onPaydayInfo, semanticLabel: 'About payday estimate', child: const Icon(Icons.info_outline, size: 20)),
+                      Tap(onTap: onPaydayInfo, semanticLabel: 'About payday estimate', child: const Icon(Icons.info_outline, size: 48)),
                     ],
                   ),
                 ),
@@ -207,7 +207,7 @@ class DashboardScreen extends StatelessWidget {
                       const Icon(Icons.sync, size: 16),
                       const SizedBox(width: 6),
                       Text('${data.lastSyncLabel}  ', style: TextStyle(fontSize: 12, color: C.muted)),
-                      Tap(onTap: onSyncNow, child: Text('Sync now', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: C.olive))),
+                      Tap(onTap: onSyncNow, child: Text('Sync now', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700, color: C.olive))),
                     ],
                   ),
                 ),
@@ -228,7 +228,7 @@ class DashboardScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), border: Border.all(color: C.outline)),
-                    child: const Text('See more', style: TextStyle(fontWeight: FontWeight.w500)),
+                    child: const Text('See more', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w500)),
                   ),
                 ),
               ),
@@ -286,7 +286,7 @@ class DashboardScreen extends StatelessWidget {
     final red = a.tone == AccountTone.alert;
     return ListRow(
       leading: IconBadge(AppIcons.of(a.iconKey),
-          bg: red ? C.redBg : (a.tone == AccountTone.accent ? C.lime : C.chip), fg: red ? C.red : C.ink, size: 38, square: true),
+          bg: red ? C.redBg : (a.tone == AccountTone.accent ? C.lime : C.chip), fg: red ? C.red : C.ink, size: 48, square: true),
       title: a.name,
       titleStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       subtitle: a.subtitle == null ? null : Text(a.subtitle!, style: TextStyle(fontSize: 12, color: red ? C.red : C.muted)),
@@ -294,7 +294,7 @@ class DashboardScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(Fmt.money(a.balance), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: red ? C.red : C.ink)),
-          if (a.hasInfo) ...[const SizedBox(width: 6), const Icon(Icons.info_outline, size: 18)],
+          if (a.hasInfo) ...[const SizedBox(width: 6), const Icon(Icons.info_outline, size: 48)],
           const SizedBox(width: 10),
           const Icon(Icons.keyboard_arrow_down),
         ],
@@ -305,7 +305,7 @@ class DashboardScreen extends StatelessWidget {
   Widget _txn(TransactionItem t) {
     final income = t.amount > 0;
     return ListRow(
-      leading: IconBadge(AppIcons.of(t.iconKey), bg: t.highlight ? C.lime : C.chip, size: 38),
+      leading: IconBadge(AppIcons.of(t.iconKey), bg: t.highlight ? C.lime : C.chip, size: 48),
       title: t.title,
       titleStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       subtitle: Text(t.subtitle, style: TextStyle(fontSize: 12, color: C.muted)),
@@ -352,7 +352,7 @@ class DashboardScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconBadge(over ? Icons.cancel_outlined : AppIcons.of(c.iconKey), bg: over ? C.redBg : C.chip, fg: over ? C.red : C.ink, size: 38, square: true),
+          IconBadge(over ? Icons.cancel_outlined : AppIcons.of(c.iconKey), bg: over ? C.redBg : C.chip, fg: over ? C.red : C.ink, size: 48, square: true),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -392,7 +392,7 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _bill(BillItem b) {
     return ListRow(
-      leading: IconBadge(AppIcons.of(b.iconKey), bg: b.isOverdue ? C.redBg : C.chip, fg: b.isOverdue ? C.red : C.ink, size: 38, square: true),
+      leading: IconBadge(AppIcons.of(b.iconKey), bg: b.isOverdue ? C.redBg : C.chip, fg: b.isOverdue ? C.red : C.ink, size: 48, square: true),
       title: b.title,
       titleStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       subtitle: Text(b.subtitle, style: TextStyle(fontSize: 12, color: b.isOverdue ? C.red : C.muted)),
@@ -429,7 +429,7 @@ class DashboardScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), border: Border.all(color: C.outline)),
-              child: Text(t.actionLabel, style: const TextStyle(fontWeight: FontWeight.w500)),
+              child: Text(t.actionLabel, style: const TextStyle(fontSize: 36,fontWeight: FontWeight.w500)),
             ),
           ),
           if (data.featuredTrendSource != null) ...[
@@ -447,7 +447,7 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _tool(ToolLink t) {
     return ListRow(
-      leading: IconBadge(AppIcons.of(t.iconKey), bg: t.accent ? C.lime : C.chip, size: 38, square: true),
+      leading: IconBadge(AppIcons.of(t.iconKey), bg: t.accent ? C.lime : C.chip, size: 48, square: true),
       title: t.title,
       titleStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       subtitle: Text(t.subtitle, style: TextStyle(fontSize: 12, color: C.muted)),

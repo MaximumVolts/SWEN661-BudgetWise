@@ -78,7 +78,7 @@ export function TopBar({ title, onBack, trailing }: { title: string; onBack?: ()
     <View style={styles.topBar}>
       {onBack && (
         <Tap onPress={onBack} label="Back" style={{ marginRight: 8, marginLeft: -12 }}>
-          <Icon name="arrow-back" size={26} color={c.ink} />
+          <Icon name="arrow-back" size={48} color={c.ink} />
         </Tap>
       )}
       <Heading style={[t.appBar, { fontSize: onBack ? 20 : 24, flex: 1 }]}>{title}</Heading>
@@ -106,7 +106,7 @@ export function SectionHeader({ title, action, onAction, big }: { title: string;
       </Heading>
       {action && (
         <Tap onPress={onAction}>
-          <Text style={t.link}>{action}</Text>
+          <Text style={t.link, {fontSize: 36}}>{action}</Text>
         </Tap>
       )}
     </View>
@@ -247,9 +247,9 @@ export function Chip({
           { backgroundColor: selected ? fill : c.surface, borderColor: selected ? fill : c.outline },
         ]}
       >
-        {showCheck && selected && <Icon name="check" size={18} color={fg} />}
-        {icon && <Icon name={icon} size={18} color={fg} />}
-        <Text style={{ fontSize: 14, fontWeight: '600', color: fg }}>{label}</Text>
+        {showCheck && selected && <Icon name="check" size={48} color={fg} />}
+        {icon && <Icon name={icon} size={48} color={fg} />}
+        <Text style={{ fontSize: 36, fontWeight: '600', color: fg }}>{label}</Text>
       </View>
     </Tap>
   );
@@ -503,7 +503,7 @@ export function Field({
         />
         {secure && (
           <Tap onPress={() => setHidden(!hidden)} label={hidden ? `Show ${label.toLowerCase()}` : `Hide ${label.toLowerCase()}`}>
-            <Icon name={hidden ? 'visibility' : 'visibility-off'} color={c.ink} />
+            <Icon name={hidden ? 'visibility' : 'visibility-off'} color={c.ink} size={48} />
           </Tap>
         )}
       </View>
@@ -589,13 +589,13 @@ export function DateField({
         onPress={() => setPicking(true)}
         style={[styles.field, { borderColor: error ? c.red : c.outline, borderWidth: error ? 2 : 1, backgroundColor: c.surface, minHeight: 56 }]}
       >
-        <Icon name="event" color={c.ink} />
+        <Icon name="event" color={c.ink} size={48} />
         <Text style={{ flex: 1, fontSize: 18, marginLeft: 10, color: value ? c.ink : c.muted }}>
           {value ? DateLabels.long(value) : placeholder}
         </Text>
         {value && (
           <Tap onPress={() => onChange(undefined)} label={`Clear ${label.toLowerCase()}`}>
-            <Icon name="close" color={c.muted} />
+            <Icon name="close" color={c.muted} size={48} />
           </Tap>
         )}
       </Pressable>

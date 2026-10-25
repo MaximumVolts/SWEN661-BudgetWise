@@ -28,7 +28,7 @@ export function TransactionsScreen({ controller }: { controller: TransactionsCon
             backgroundColor: active ? c.ink : c.surface,
           }}
         >
-          <Icon name="expand-more" size={20} color={active ? '#FFFFFF' : c.ink} />
+          <Icon name="expand-more" size={48} color={active ? '#FFFFFF' : c.ink} />
           <Text style={{ fontWeight: '700', fontSize: 14, color: active ? '#FFFFFF' : c.ink }}>{label}</Text>
         </View>
       </Tap>
@@ -55,7 +55,7 @@ export function TransactionsScreen({ controller }: { controller: TransactionsCon
           />
           {searchText.length > 0 && (
             <Tap onPress={clearSearch} label="Clear search">
-              <Icon name="close" color={c.ink} />
+              <Icon name="close" color={c.ink} size={48} />
             </Tap>
           )}
         </View>

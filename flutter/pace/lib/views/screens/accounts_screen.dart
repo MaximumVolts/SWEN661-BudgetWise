@@ -46,7 +46,7 @@ class AccountsScreen extends StatelessWidget {
                 children: [
                   const Heading('Accounts', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                   const Spacer(),
-                  Tap(onTap: onMenu, semanticLabel: 'Account options', child: const Icon(Icons.more_vert)),
+                  Tap(onTap: onMenu, semanticLabel: 'Account options', child: const Icon(Icons.more_vert, size:48)),
                 ],
               ),
               const SizedBox(height: 24),
@@ -115,7 +115,7 @@ class AccountsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Tap(onTap: onDismissBanner, child: const Text('Not now', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16))),
+              Tap(onTap: onDismissBanner, child: const Text('Not now', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 36))),
               const SizedBox(width: 28),
               PressFeedback(
                 enabled: true,

@@ -51,8 +51,8 @@ function BudgetFormBody({ categories, controller }: { categories: CategoryInfo[]
                   backgroundColor: on ? c.ink : c.surface,
                 }}
               >
-                <Icon name={iconFor(cat.iconKey)} size={18} color={on ? '#FFFFFF' : c.ink} />
-                <Text style={{ fontSize: 14, fontWeight: '700', color: on ? '#FFFFFF' : c.ink }}>{cat.name}</Text>
+                <Icon name={iconFor(cat.iconKey)} size={48} color={on ? '#FFFFFF' : c.ink} />
+                <Text style={{ fontSize: 36, fontWeight: '700', color: on ? '#FFFFFF' : c.ink }}>{cat.name}</Text>
               </View>
             </Tap>
           );

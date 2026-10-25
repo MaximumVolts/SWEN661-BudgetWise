@@ -182,7 +182,7 @@ class PaceChip extends StatelessWidget {
         children: [
           if (showCheck && selected) ...[Icon(Icons.check, size: 18, color: fg), const SizedBox(width: 8)],
           if (icon != null) ...[Icon(icon, size: 18, color: fg), const SizedBox(width: 8)],
-          Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: fg)),
+          Text(label, style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600, color: fg)),
         ],
       ),
     ));

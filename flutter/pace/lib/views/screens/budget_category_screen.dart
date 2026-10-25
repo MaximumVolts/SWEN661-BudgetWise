@@ -32,11 +32,11 @@ class BudgetCategoryScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Row(
               children: [
-                Tap(onTap: onBack, semanticLabel: 'Back', child: const Icon(Icons.arrow_back, size: 28)),
+                Tap(onTap: onBack, semanticLabel: 'Back', child: const Icon(Icons.arrow_back, size: 48)),
                 const SizedBox(width: 16),
                 Text(data.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
                 const Spacer(),
-                Tap(onTap: onEdit, child: const Text('Edit', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14))),
+                Tap(onTap: onEdit, child: const Text('Edit', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 36))),
               ],
             ),
             const SizedBox(height: 18),

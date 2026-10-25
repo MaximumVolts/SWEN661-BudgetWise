@@ -50,7 +50,7 @@ class BillsRecurringScreen extends StatelessWidget {
               children: [
                 const Heading('Bills', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                 const Spacer(),
-                Tap(onTap: onAdd, semanticLabel: 'Add bill or subscription', child: const Icon(Icons.add, size: 30)),
+                Tap(onTap: onAdd, semanticLabel: 'Add bill or subscription', child: const Icon(Icons.add, size: 48)),
               ],
             ),
             const SizedBox(height: 16),
@@ -169,7 +169,7 @@ class _Sub extends StatelessWidget {
           const SizedBox(width: 6),
           Text(active ? 'Active' : 'Paused', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: active ? C.ink : C.muted)),
           const SizedBox(width: 6),
-          Tap(onTap: onMenu == null ? null : () => onMenu!(item), semanticLabel: 'Options for ${item.name}', child: const Icon(Icons.more_vert, size: 20)),
+          Tap(onTap: onMenu == null ? null : () => onMenu!(item), semanticLabel: 'Options for ${item.name}', child: const Icon(Icons.more_vert, size: 48)),
         ],
       ),
     );

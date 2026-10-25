@@ -123,12 +123,12 @@ class _BudgetRow extends StatelessWidget {
           Tap(
             onTap: onEdit,
             semanticLabel: 'Edit ${budget.name} budget',
-            child: const Icon(Icons.edit_outlined, size: 22),
+            child: const Icon(Icons.edit_outlined, size: 48),
           ),
           Tap(
             onTap: onDelete,
             semanticLabel: 'Delete ${budget.name} budget',
-            child: Icon(Icons.delete_outline, size: 22, color: C.red),
+            child: Icon(Icons.delete_outline, size: 48, color: C.red),
           ),
         ],
       ),

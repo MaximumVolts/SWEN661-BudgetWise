@@ -149,8 +149,8 @@ class T {
   static TextStyle get body => TextStyle(fontSize: 16, height: 1.4, color: C.muted);
   static TextStyle get row => TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: C.ink);
   static TextStyle get sub => TextStyle(fontSize: 13, color: C.muted);
-  static TextStyle get amount => TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: C.ink);
+  static TextStyle get amount => TextStyle(fontSize: 36, fontWeight: FontWeight.w700, color: C.ink);
   static TextStyle get label => TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 0.4, color: C.ink);
-  static TextStyle get link => TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: C.olive);
+  static TextStyle get link => TextStyle(fontSize: 36, fontWeight: FontWeight.w700, color: C.olive);
   static TextStyle get big => TextStyle(fontSize: 44, fontWeight: FontWeight.w300, height: 1.1, color: C.ink);
 }

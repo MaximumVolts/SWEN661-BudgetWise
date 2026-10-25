@@ -20,7 +20,7 @@ export function CashFlowScreen({ controller }: { controller: CashFlowController 
           <Scroll>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: -12, paddingTop: 8 }}>
               <Tap onPress={back} label="Back">
-                <Icon name="arrow-back" size={28} color={c.ink} />
+                <Icon name="arrow-back" size={48} color={c.ink} />
               </Tap>
               <Heading style={{ fontSize: 22, fontWeight: '500', color: c.ink, marginLeft: 4 }}>Cash Flow Projection</Heading>
             </View>
@@ -107,7 +107,7 @@ function Line({ line, onRemove }: { line: BreakdownLine; onRemove?: () => void }
       <Text style={{ fontSize: 15, fontWeight: '700', color }}>{text}</Text>
       {onRemove && (
         <Tap onPress={onRemove} label={`Remove ${line.title}`}>
-          <Icon name="close" size={20} color={c.muted} />
+          <Icon name="close" size={48} color={c.muted} />
         </Tap>
       )}
     </View>

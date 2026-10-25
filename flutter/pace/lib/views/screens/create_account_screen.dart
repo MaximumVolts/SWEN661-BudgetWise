@@ -207,15 +207,13 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 12, top: 4),
+              child:Text('Existing account?', style: TextStyle(fontSize: 36, color: C.muted)),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12, top: 4),
               child: Tap(
                 onTap: widget.onSignIn,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Already have an account?   ', style: TextStyle(fontSize: 16, color: C.muted)),
-                    const Text('Sign in', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                  ],
-                ),
+                child: const Text('Sign in', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700)),
               ),
             ),
           ],
