@@ -1,7 +1,7 @@
 // End-to-end tests of the app's major features: each opens the real app (services, controllers,
 // views, navigation) on the Plaid sandbox replay and uses a feature the way a person would.
 import 'dart:convert' show jsonDecode;
-import 'package:flutter/material.dart' show AxisDirection, Element, FocusManager, Icons, Scrollable, SnackBar, Switch, Text, TextField;
+import 'package:flutter/material.dart' show AxisDirection, Element, FocusManager, Icons, ListView, Offset, Scrollable, SnackBar, Switch, Text, TextField;
 import 'package:flutter_test/flutter_test.dart' show Finder;
 import 'package:flutter_test/flutter_test.dart'
     show
@@ -261,7 +261,9 @@ void main() {
     await tapText(tester, 'Add goal');
     expect(app.router.delegate.current, AppRoute.goalNew);
 
-    //await tester.scrollUntilVisible(find.widgetWithText(TextField, 'Name').first, 200);
+    // Submitting scrolled the form down; scroll back to the top so the Name field is built.
+    await tester.drag(find.byType(ListView).first, const Offset(0, 2000));
+    await tester.pumpAndSettle();
     await tester.enterText(find.widgetWithText(TextField, 'Name'), 'Trip to Japan');
     //await tester.scrollUntilVisible(find.widgetWithText(TextField, 'Target').first, 200);
     await tester.enterText(find.widgetWithText(TextField, 'Target').first, '3000');

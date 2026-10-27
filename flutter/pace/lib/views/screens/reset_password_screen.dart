@@ -154,12 +154,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 ),
               ),
             ),
-            Text('Remembered it?   ', style: TextStyle(fontSize: 16, color: C.muted)),
             Padding(
               padding: const EdgeInsets.only(bottom: 12, top: 4),
               child: Tap(
                 onTap: widget.onSignIn,
-                child: const Text('Sign in', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700))
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Remembered it?   ', style: TextStyle(fontSize: 16, color: C.muted)),
+                    const Text('Sign in', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  ],
+                ),
               ),
             ),
           ],

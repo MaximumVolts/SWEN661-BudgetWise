@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart'
     show Border, BorderRadius, BoxDecoration, BoxShape, Builder, BuildContext, Center, Clip, Color, Colors, Column, Container,
-        CrossAxisAlignment, EdgeInsets, Expanded, FontWeight, Icon, Icons, ListView, MainAxisAlignment, MainAxisSize, Padding, Positioned,
-        Row, SafeArea, Scaffold, SizedBox, Spacer, Stack, StatelessWidget, Text, TextStyle, ValueChanged, VoidCallback,
+        CrossAxisAlignment, EdgeInsets, ExcludeSemantics, Expanded, FontWeight, GestureDetector, Icon, Icons, ListView, MainAxisAlignment, MainAxisSize, Padding, Positioned,
+        Row, SafeArea, Scaffold, Semantics, SizedBox, Spacer, Stack, StatelessWidget, Text, TextStyle, ValueChanged, VoidCallback,
         Widget;
 import '../widgets/charts.dart' show SpendAreaChart;
 import '../widgets/display_options.dart' show PaceDisplay;
@@ -24,6 +24,7 @@ class DashboardScreen extends StatelessWidget {
   final VoidCallback? onNotifications;
   final VoidCallback? onReviewTransactions;
   final VoidCallback? onPaydayInfo;
+  final ValueChanged<DashboardAccount>? onAccountInfo;
   final VoidCallback? onAddAccount;
   final ValueChanged<DashboardAccount>? onAccountTap;
   final VoidCallback? onSyncNow;
@@ -45,6 +46,7 @@ class DashboardScreen extends StatelessWidget {
     this.onNotifications,
     this.onReviewTransactions,
     this.onPaydayInfo,
+    this.onAccountInfo,
     this.onAddAccount,
     this.onAccountTap,
     this.onSyncNow,
@@ -108,7 +110,7 @@ class DashboardScreen extends StatelessWidget {
                     decoration: BoxDecoration(color: C.lime, borderRadius: BorderRadius.circular(10)),
                     child: Row(
                       children: [
-                        const Icon(Icons.receipt_long_outlined, size: 48),
+                        const Icon(Icons.receipt_long_outlined, size: 24),
                         const SizedBox(width: 14),
                         Expanded(
                           child: Column(
@@ -182,9 +184,13 @@ class DashboardScreen extends StatelessWidget {
                     children: [
                       Icon(Icons.account_balance_wallet_outlined, size: 20, color: C.olive),
                       const SizedBox(width: 12),
-                      Text(data.paydayLabel!, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                      // Separate screen reader stops for the text and the info button.
+                      Semantics(container: true, child: Text(data.paydayLabel!, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))),
                       const Spacer(),
-                      Tap(onTap: onPaydayInfo, semanticLabel: 'About payday estimate', child: const Icon(Icons.info_outline, size: 48)),
+                      Semantics(
+                        container: true,
+                        child: Tap(onTap: onPaydayInfo, semanticLabel: 'About payday estimate', child: const Icon(Icons.info_outline, size: 22)),
+                      ),
                     ],
                   ),
                 ),
@@ -196,7 +202,7 @@ class DashboardScreen extends StatelessWidget {
               SectionHeader('ACCOUNTS', action: 'Add account', big: true, onAction: onAddAccount),
               const HairLine(),
               for (final a in data.accounts) ...[
-                Tap(onTap: onAccountTap == null ? null : () => onAccountTap!(a), child: _acct(a)),
+                _accountRow(a),
                 const HairLine(),
               ],
               if (data.lastSyncLabel != null)
@@ -207,7 +213,7 @@ class DashboardScreen extends StatelessWidget {
                       const Icon(Icons.sync, size: 16),
                       const SizedBox(width: 6),
                       Text('${data.lastSyncLabel}  ', style: TextStyle(fontSize: 12, color: C.muted)),
-                      Tap(onTap: onSyncNow, child: Text('Sync now', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700, color: C.olive))),
+                      Tap(onTap: onSyncNow, child: Text('Sync now', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: C.olive))),
                     ],
                   ),
                 ),
@@ -228,7 +234,7 @@ class DashboardScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), border: Border.all(color: C.outline)),
-                    child: const Text('See more', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w500)),
+                    child: const Text('See more', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                   ),
                 ),
               ),
@@ -282,9 +288,10 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _acct(DashboardAccount a) {
+  Widget _acct(DashboardAccount a, {bool chevron = true, double rightPadding = 20}) {
     final red = a.tone == AccountTone.alert;
     return ListRow(
+      padding: EdgeInsets.fromLTRB(20, 10, rightPadding, 10),
       leading: IconBadge(AppIcons.of(a.iconKey),
           bg: red ? C.redBg : (a.tone == AccountTone.accent ? C.lime : C.chip), fg: red ? C.red : C.ink, size: 48, square: true),
       title: a.name,
@@ -294,11 +301,32 @@ class DashboardScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(Fmt.money(a.balance), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: red ? C.red : C.ink)),
-          if (a.hasInfo) ...[const SizedBox(width: 6), const Icon(Icons.info_outline, size: 48)],
-          const SizedBox(width: 10),
-          const Icon(Icons.keyboard_arrow_down),
+          if (chevron) ...[const SizedBox(width: 10), const Icon(Icons.keyboard_arrow_down)],
         ],
       ),
+    );
+  }
+
+  /// An account row. When the account has an ⓘ, the ⓘ is its own button so screen readers
+  /// and the keyboard can reach it (it would be hidden inside the row's button otherwise).
+  Widget _accountRow(DashboardAccount a) {
+    final open = onAccountTap == null ? null : () => onAccountTap!(a);
+    if (!a.hasInfo) return Tap(onTap: open, child: _acct(a));
+    return Row(
+      children: [
+        Expanded(child: Tap(onTap: open, child: _acct(a, chevron: false, rightPadding: 0))),
+        Tap(
+          onTap: onAccountInfo == null ? null : () => onAccountInfo!(a),
+          semanticLabel: 'About ${a.name.toLowerCase()}',
+          child: const Icon(Icons.info_outline, size: 20),
+        ),
+        ExcludeSemantics(
+          child: GestureDetector(
+            onTap: open,
+            child: const Padding(padding: EdgeInsets.only(right: 20), child: Icon(Icons.keyboard_arrow_down)),
+          ),
+        ),
+      ],
     );
   }
 
@@ -429,7 +457,7 @@ class DashboardScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), border: Border.all(color: C.outline)),
-              child: Text(t.actionLabel, style: const TextStyle(fontSize: 36,fontWeight: FontWeight.w500)),
+              child: Text(t.actionLabel, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
             ),
           ),
           if (data.featuredTrendSource != null) ...[

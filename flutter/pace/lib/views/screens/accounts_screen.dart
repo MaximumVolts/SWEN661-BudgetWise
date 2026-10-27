@@ -115,7 +115,7 @@ class AccountsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Tap(onTap: onDismissBanner, child: const Text('Not now', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 36))),
+              Tap(onTap: onDismissBanner, child: const Text('Not now', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16))),
               const SizedBox(width: 28),
               PressFeedback(
                 enabled: true,

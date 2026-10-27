@@ -74,9 +74,9 @@ class TrendsScreen extends StatelessWidget {
                       Tap(
                         onTap: onTrendAction == null ? null : () => onTrendAction!(t),
                         child: Row(children: [
-                          Text(t.actionLabel, style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w500, decoration: TextDecoration.underline)),
+                          Text(t.actionLabel, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.underline)),
                           const SizedBox(width: 6),
-                          const Icon(Icons.arrow_forward, size: 48),
+                          const Icon(Icons.arrow_forward, size: 16),
                         ]),
                       ),
                     ],

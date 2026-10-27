@@ -129,7 +129,7 @@ class SettingsScreen extends StatelessWidget {
             Center(
               child: Tap(
                 onTap: onDeleteAccount,
-                child: Text('Delete account', style: TextStyle(color: C.red, fontSize: 36, decoration: TextDecoration.underline)),
+                child: Text('Delete account', style: TextStyle(color: C.red, fontSize: 16, decoration: TextDecoration.underline)),
               ),
             ),
             const SizedBox(height: 14),
