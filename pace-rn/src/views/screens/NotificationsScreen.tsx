@@ -19,7 +19,7 @@ export function NotificationsScreen({ controller }: { controller: NotificationsC
           <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 24, paddingRight: 8, paddingVertical: 8 }}>
             <Heading style={{ flex: 1, fontSize: 22, fontWeight: '500', color: c.ink }}>Notifications</Heading>
             <Tap onPress={markAllRead} style={{ padding: 12 }}>
-              <Text style={t.link, {fontSize: 36}}>Mark all read</Text>
+              <Text style={t.link}>Mark all read</Text>
             </Tap>
             <Tap onPress={close} label="Close notifications">
               <Icon name="cancel" size={48} color={c.ink} />

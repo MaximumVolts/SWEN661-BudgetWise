@@ -59,7 +59,7 @@ function Detail({ bundle, controller }: { bundle: TransactionDetailBundle; contr
                     backgroundColor: on ? c.ink : c.surface,
                   }}
                 >
-                  <Icon name={iconFor(cat.iconKey)} size={48} color={on ? '#FFFFFF' : c.ink} />
+                  <Icon name={iconFor(cat.iconKey)} size={18} color={on ? '#FFFFFF' : c.ink} />
                   <Text style={{ fontSize: 14, fontWeight: '700', color: on ? '#FFFFFF' : c.ink }}>{cat.name}</Text>
                   {isPrimary && (
                     <View style={{ backgroundColor: c.lime, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 }}>
@@ -72,7 +72,7 @@ function Detail({ bundle, controller }: { bundle: TransactionDetailBundle; contr
           })}
           <Tap onPress={newCategory}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 12, borderRadius: 10, borderWidth: 1, borderColor: c.outline, backgroundColor: c.surface }}>
-              <Icon name="add" size={48} color={c.ink} />
+              <Icon name="add" size={18} color={c.ink} />
               <Text style={{ fontSize: 14, fontWeight: '700', color: c.ink }}>New category</Text>
             </View>
           </Tap>

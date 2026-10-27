@@ -106,7 +106,7 @@ export function SectionHeader({ title, action, onAction, big }: { title: string;
       </Heading>
       {action && (
         <Tap onPress={onAction}>
-          <Text style={t.link, {fontSize: 36}}>{action}</Text>
+          <Text style={t.link}>{action}</Text>
         </Tap>
       )}
     </View>
@@ -135,6 +135,11 @@ export function HairLine({ indent = 0 }: { indent?: number }) {
  * Tap target with press feedback (a slight shrink and overlay). Icon-only targets must pass a
  * [label] and get a 48×48 minimum size; with text inside, the text is the label.
  */
+/** Clear keyboard focus outline (WCAG 2.4.7). An outline does not shift the layout. */
+export function focusRing(color: string): ViewStyle {
+  return { outlineColor: color, outlineWidth: 3, outlineStyle: 'solid', outlineOffset: 2, borderRadius: 8 };
+}
+
 export function Tap({
   onPress,
   children,
@@ -156,6 +161,7 @@ export function Tap({
 }) {
   const { colors: c } = useDisplay();
   const enabled = !!onPress && !disabled;
+  const [focused, setFocused] = useState(false);
   return (
     <Pressable
       // Handlers may await dialogs; the press itself never waits for them.
@@ -165,10 +171,15 @@ export function Tap({
       accessibilityLabel={label}
       accessibilityHint={hint}
       accessibilityState={{ disabled: !enabled, selected }}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
       style={({ pressed }) => [
-        label && { minWidth: 48, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
+        // Every tap target is at least 48x48 (WCAG 2.5.5), without making the text bigger.
+        { minWidth: 48, minHeight: 48, justifyContent: 'center' },
+        label && { alignItems: 'center' },
         style,
         pressed && enabled && { transform: [{ scale: 0.97 }], backgroundColor: `${c.ink}1F`, borderRadius: 8 },
+        focused && focusRing(c.ink),
       ]}
     >
       {children}
@@ -247,9 +258,9 @@ export function Chip({
           { backgroundColor: selected ? fill : c.surface, borderColor: selected ? fill : c.outline },
         ]}
       >
-        {showCheck && selected && <Icon name="check" size={48} color={fg} />}
-        {icon && <Icon name={icon} size={48} color={fg} />}
-        <Text style={{ fontSize: 36, fontWeight: '600', color: fg }}>{label}</Text>
+        {showCheck && selected && <Icon name="check" size={18} color={fg} />}
+        {icon && <Icon name={icon} size={18} color={fg} />}
+        <Text style={{ fontSize: 14, fontWeight: '600', color: fg }}>{label}</Text>
       </View>
     </Tap>
   );
@@ -503,7 +514,7 @@ export function Field({
         />
         {secure && (
           <Tap onPress={() => setHidden(!hidden)} label={hidden ? `Show ${label.toLowerCase()}` : `Hide ${label.toLowerCase()}`}>
-            <Icon name={hidden ? 'visibility' : 'visibility-off'} color={c.ink} size={48} />
+            <Icon name={hidden ? 'visibility' : 'visibility-off'} color={c.ink} />
           </Tap>
         )}
       </View>
@@ -589,13 +600,13 @@ export function DateField({
         onPress={() => setPicking(true)}
         style={[styles.field, { borderColor: error ? c.red : c.outline, borderWidth: error ? 2 : 1, backgroundColor: c.surface, minHeight: 56 }]}
       >
-        <Icon name="event" color={c.ink} size={48} />
+        <Icon name="event" color={c.ink} />
         <Text style={{ flex: 1, fontSize: 18, marginLeft: 10, color: value ? c.ink : c.muted }}>
           {value ? DateLabels.long(value) : placeholder}
         </Text>
         {value && (
           <Tap onPress={() => onChange(undefined)} label={`Clear ${label.toLowerCase()}`}>
-            <Icon name="close" color={c.muted} size={48} />
+            <Icon name="close" color={c.muted} />
           </Tap>
         )}
       </Pressable>

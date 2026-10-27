@@ -52,10 +52,11 @@ export function SpendingScreen({ controller }: { controller: SpendingController 
                   >
                     <View style={{ paddingVertical: 14 }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
-                        <IconBadge icon={iconFor(cat.iconKey)} size={48} />
+                        <IconBadge icon={iconFor(cat.iconKey)} />
                         <Text style={{ flex: 1, fontSize: 17, color: c.ink }}>{cat.name}</Text>
-                        <Text style={{ fontSize: 16, fontWeight: '700', color: c.ink }}>{Fmt.money(cat.amount)}</Text>
-                        <View style={{ width: 92, alignItems: 'flex-end' }}>
+                        {/* Amount and change stack on the right so long names like "Transportation" keep room. */}
+                        <View style={{ alignItems: 'flex-end', gap: 2 }}>
+                          <Text style={{ fontSize: 16, fontWeight: '700', color: c.ink }}>{Fmt.money(cat.amount)}</Text>
                           {cat.changePercent === undefined ? (
                             <Text style={{ fontSize: 13, color: c.muted }}>No change</Text>
                           ) : (

@@ -44,15 +44,15 @@ export function SignInScreen({ controller }: { controller: SignInController }) {
         />
         <View style={{ alignItems: 'flex-end' }}>
           <Tap onPress={forgotPassword} style={{ alignItems: 'center', padding: 12 }}>
-            <Text style={{  fontWeight: '700', fontSize: 18, color: c.ink }}>Forgot password?</Text>
+            <Text style={{ fontWeight: '700', fontSize: 18, color: c.ink }}>Forgot password?</Text>
           </Tap>
         </View>
         <Gap h={20} />
         <PillButton label={submitting ? 'Signing in…' : 'Sign in'} onPress={signIn} disabled={submitting} />
       </Scroll>
-      <Text style={{alignItems: 'center', fontSize: 16, color: c.muted }}>New to Pace? </Text>
-      <Tap onPress={createAccount} style={{ alignItems: 'center', paddingVertical: 12 }}>
-        <View style={{  alignItems: 'center', flexDirection: 'row' }}>
+      <Tap onPress={createAccount} label="New to Pace? Create account" style={{ alignItems: 'center', paddingVertical: 12 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', paddingHorizontal: 20 }}>
+          <Text style={{ fontSize: 16, color: c.muted }}>New to Pace? </Text>
           <Text style={{ fontSize: 18, fontWeight: '700', color: c.ink }}>Create account</Text>
         </View>
       </Tap>

@@ -40,6 +40,14 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
       </View>
     );
 
+  const spendSummary = [
+    spend.title,
+    Fmt.money(spend.amount, 0),
+    spend.deltaAmount !== undefined && `${Fmt.money(spend.deltaAmount)} ${spend.deltaIsAbove ? 'above' : 'below'}${spend.deltaPeriodLabel ? ` ${spend.deltaPeriodLabel}` : ''}`,
+  ]
+    .filter(Boolean)
+    .join(', ');
+
   return (
     <Scroll padded={false}>
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4 }}>
@@ -64,12 +72,12 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
         <View style={{ paddingHorizontal: 20, paddingBottom: 14 }}>
           <Tap onPress={ctl.openTransactions}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: c.lime, borderRadius: 10, paddingHorizontal: 16, paddingVertical: 12 }}>
-              <Icon name="receipt-long" color="#1A1A1A" size={48} />
+              <Icon name="receipt-long" color="#1A1A1A" />
               <View style={{ flex: 1 }}>
                 <Text style={{ fontWeight: '700', fontSize: 15, color: '#1A1A1A' }}>{data.reviewBanner.title}</Text>
                 <Text style={{ fontSize: 12.5, color: '#1A1A1A' }}>{data.reviewBanner.subtitle}</Text>
               </View>
-              <Icon name="chevron-right" color="#1A1A1A" size={48} />
+              <Icon name="chevron-right" color="#1A1A1A" />
             </View>
           </Tap>
         </View>
@@ -77,18 +85,21 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
 
       <View style={{ paddingHorizontal: 20 }}>
         <Card style={{ borderRadius: 20 }} padding={20}>
+          {/* TalkBack/VoiceOver read the title, total and change as one item. */}
+          <View accessible accessibilityLabel={spendSummary}>
           <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
             <Text style={{ flex: 1, fontSize: 14, color: c.muted }}>{spend.title}</Text>
             {spend.deltaAmount !== undefined && (
               <>
-                <Icon name={spend.deltaIsAbove ? 'arrow-upward' : 'arrow-downward'} size={48} color={spend.deltaIsAbove ? c.red : c.olive} />
+                <Icon name={spend.deltaIsAbove ? 'arrow-upward' : 'arrow-downward'} size={15} color={spend.deltaIsAbove ? c.red : c.olive} />
                 <Text style={{ fontSize: 12, fontWeight: '700', color: spend.deltaIsAbove ? c.red : c.olive }}>
-                  {` ${Fmt.money(spend.deltaAmount)} ${spend.deltaIsAbove ? 'above' : 'below'} ${spend.deltaPeriodLabel}`}
+                  {` ${Fmt.money(spend.deltaAmount)} ${spend.deltaIsAbove ? 'above' : 'below'} ${spend.deltaPeriodLabel ?? ''}`}
                 </Text>
               </>
             )}
           </View>
           <Text style={t.big}>{Fmt.money(spend.amount, 0)}</Text>
+          </View>
           <SpendAreaChart data={spend.chart} />
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 }}>
             {legendKey(c.ink)}
@@ -132,7 +143,7 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
                   <Icon name="sync" size={16} color={c.ink} />
                   <Text style={{ fontSize: 12, color: c.muted }}>{data.lastSyncLabel}</Text>
                   <Tap onPress={ctl.sync} style={{ padding: 10 }}>
-                    <Text style={{ fontSize: 36, fontWeight: '700', color: c.olive }}>Sync now</Text>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: c.olive }}>Sync now</Text>
                   </Tap>
                 </View>
               )}
@@ -152,7 +163,7 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
               <View style={{ alignItems: 'center', marginVertical: 14 }}>
                 <Tap onPress={ctl.openTransactions}>
                   <View style={{ paddingHorizontal: 24, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: c.outline }}>
-                    <Text style={{ fontSize: 36, fontWeight: '500', color: c.ink }}>See more</Text>
+                    <Text style={{ fontSize: 14, fontWeight: '500', color: c.ink }}>See more</Text>
                   </View>
                 </Tap>
               </View>
@@ -226,7 +237,7 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
                 <View style={{ alignItems: 'flex-start', marginTop: 14 }}>
                   <Tap onPress={() => ctl.openTrendTransactions(data.featuredTrend!.id)}>
                     <View style={{ paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: c.outline }}>
-                      <Text style={{ fontSize: 36, fontWeight: '500', color: c.ink }}>{data.featuredTrend.actionLabel}</Text>
+                      <Text style={{ fontSize: 14, fontWeight: '500', color: c.ink }}>{data.featuredTrend.actionLabel}</Text>
                     </View>
                   </Tap>
                 </View>

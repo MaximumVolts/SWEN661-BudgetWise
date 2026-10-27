@@ -79,8 +79,8 @@ export function ForgotPasswordScreen({ controller }: { controller: ForgotPasswor
       </Scroll>
       <Tap onPress={signIn} style={{ alignItems: 'center', paddingVertical: 12 }}>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={{ fontSize: 36, color: c.muted }}>Remembered it? </Text>
-          <Text style={{ fontSize: 36, fontWeight: '700', color: c.ink }}>Sign in</Text>
+          <Text style={{ fontSize: 16, color: c.muted }}>Remembered it? </Text>
+          <Text style={{ fontSize: 16, fontWeight: '700', color: c.ink }}>Sign in</Text>
         </View>
       </Tap>
     </Screen>
