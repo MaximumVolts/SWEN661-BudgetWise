@@ -83,11 +83,10 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
               <>
                 <Icon name={spend.deltaIsAbove ? 'arrow-upward' : 'arrow-downward'} size={48} color={spend.deltaIsAbove ? c.red : c.olive} />
                 <Text style={{ fontSize: 12, fontWeight: '700', color: spend.deltaIsAbove ? c.red : c.olive }}>
-                  {` ${Fmt.money(spend.deltaAmount)} ${spend.deltaIsAbove ? 'above' : 'below'}`}
+                  {` ${Fmt.money(spend.deltaAmount)} ${spend.deltaIsAbove ? 'above' : 'below'} ${spend.deltaPeriodLabel}`}
                 </Text>
               </>
             )}
-            {spend.deltaPeriodLabel && <Text style={{ fontSize: 12, color: c.muted }}>{`  ${spend.deltaPeriodLabel}`}</Text>}
           </View>
           <Text style={t.big}>{Fmt.money(spend.amount, 0)}</Text>
           <SpendAreaChart data={spend.chart} />
