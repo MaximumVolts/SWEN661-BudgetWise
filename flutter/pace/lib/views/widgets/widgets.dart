@@ -267,8 +267,12 @@ class _SegTabsState extends State<SegTabs> {
       height: 48,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(21),
-        border: Border.all(color: C.outline),
         color: Colors.white,
+      ),
+      // The outline is drawn on top, so the selected segment's fill can't hide its rounded edge.
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(21),
+        border: Border.all(color: C.outline),
       ),
       clipBehavior: Clip.antiAlias,
       child: Row(
