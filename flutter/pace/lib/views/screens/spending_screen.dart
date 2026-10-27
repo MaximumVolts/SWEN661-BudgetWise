@@ -57,7 +57,7 @@ class SpendingScreen extends StatelessWidget {
                   Text(data.periodTitle, style: TextStyle(fontSize: 13, color: C.muted)),
                   Row(
                     children: [
-                      Text(Fmt.money(data.total), style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w500)),
+                      Text(Fmt.money(data.total), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                       const Spacer(),
                       if (data.changePercent != null) _Change(data.changePercent!, big: true),
                     ],

@@ -770,7 +770,7 @@ exports[`Snapshots settings screen 1`] = `
                         [
                           {
                             "color": "#1A1A1A",
-                            "fontSize": 26,
+                            "fontSize": 48,
                           },
                           undefined,
                           {
@@ -2727,7 +2727,7 @@ exports[`Snapshots settings screen 1`] = `
                           style={
                             {
                               "color": "#C0281E",
-                              "fontSize": 14,
+                              "fontSize": 21,
                               "textDecorationLine": "underline",
                             }
                           }
@@ -2977,9 +2977,7 @@ exports[`Snapshots shared components 1`] = `
             <Text
               style={
                 {
-                  "color": "#4A5400",
-                  "fontSize": 14,
-                  "fontWeight": "700",
+                  "fontSize": 36,
                 }
               }
             >
@@ -3965,7 +3963,7 @@ exports[`Snapshots sign in screen 1`] = `
                               [
                                 {
                                   "color": "#1A1A1A",
-                                  "fontSize": 24,
+                                  "fontSize": 48,
                                 },
                                 undefined,
                                 {
@@ -4034,7 +4032,7 @@ exports[`Snapshots sign in screen 1`] = `
                           style={
                             {
                               "color": "#1A1A1A",
-                              "fontSize": 15,
+                              "fontSize": 24,
                               "fontWeight": "700",
                             }
                           }
@@ -4117,6 +4115,16 @@ exports[`Snapshots sign in screen 1`] = `
                     </View>
                   </View>
                 </RCTScrollView>
+                <Text
+                  style={
+                    {
+                      "color": "#5B5A55",
+                      "fontSize": 16,
+                    }
+                  }
+                >
+                  New to Pace? 
+                </Text>
                 <View
                   accessibilityRole="button"
                   accessibilityState={
@@ -4169,18 +4177,8 @@ exports[`Snapshots sign in screen 1`] = `
                     <Text
                       style={
                         {
-                          "color": "#5B5A55",
-                          "fontSize": 16,
-                        }
-                      }
-                    >
-                      New to Pace? 
-                    </Text>
-                    <Text
-                      style={
-                        {
                           "color": "#1A1A1A",
-                          "fontSize": 16,
+                          "fontSize": 36,
                           "fontWeight": "700",
                         }
                       }

@@ -182,7 +182,7 @@ class PaceChip extends StatelessWidget {
         children: [
           if (showCheck && selected) ...[Icon(Icons.check, size: 18, color: fg), const SizedBox(width: 8)],
           if (icon != null) ...[Icon(icon, size: 18, color: fg), const SizedBox(width: 8)],
-          Text(label, style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600, color: fg)),
+          Text(label, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: fg)),
         ],
       ),
     ));
@@ -263,7 +263,7 @@ class _SegTabsState extends State<SegTabs> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 42,
+      height: 48,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(21),
         border: Border.all(color: C.outline),
@@ -297,7 +297,7 @@ class _SegTabsState extends State<SegTabs> {
                     border: k == 0 ? null : Border(left: BorderSide(color: C.outline)),
                   ),
                   child: Text(widget.labels[k],
-                      style: TextStyle(fontSize: 15, fontWeight: _i == k ? FontWeight.w700 : FontWeight.w500)),
+                      style: TextStyle(fontSize: 14, fontWeight: _i == k ? FontWeight.w700 : FontWeight.w500)),
                 ),
               ),
               ),

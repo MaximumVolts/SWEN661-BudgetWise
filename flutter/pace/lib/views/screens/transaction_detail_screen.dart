@@ -140,9 +140,9 @@ class _CatChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 48, color: selected ? Colors.white : C.ink),
+          Icon(icon, size: 24, color: selected ? Colors.white : C.ink),
           const SizedBox(width: 8),
-          Text(label, style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700, color: selected ? Colors.white : C.ink)),
+          Text(label, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: selected ? Colors.white : C.ink)),
           if (primary) ...[
             const SizedBox(width: 8),
             Container(

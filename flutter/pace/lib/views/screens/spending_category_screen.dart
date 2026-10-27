@@ -144,10 +144,10 @@ class _Txn extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListRow(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-        leading: IconBadge(AppIcons.of(t.iconKey), size: 48),
+        leading: IconBadge(AppIcons.of(t.iconKey), size: 24),
         title: t.title,
-        titleStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
-        subtitle: Text(t.subtitle, style: TextStyle(fontSize: 13, color: C.muted)),
-        trailing: Text(Fmt.signed(t.amount), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+        titleStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        subtitle: Text(t.subtitle, style: TextStyle(fontSize: 12, color: C.muted)),
+        trailing: Text(Fmt.signed(t.amount), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
       );
 }

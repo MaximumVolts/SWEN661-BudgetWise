@@ -38,13 +38,34 @@ import 'package:pace_app/views/screens/statement_export_screen.dart';
 import 'package:pace_app/views/screens/transaction_detail_screen.dart';
 import 'package:pace_app/views/screens/transactions_screen.dart';
 import 'package:pace_app/views/screens/trends_screen.dart';
+import 'sandbox.dart' show openSandboxApp, SandboxReplay;
+import 'package:flutter_test/flutter_test.dart'
+    show
+        ChainedFinder,
+        closeTo,
+        Plurality,
+        WidgetTester,
+        contains,
+        expect,
+        find,
+        findsNothing,
+        findsOneWidget,
+        findsWidgets,
+        isEmpty,
+        isNotEmpty,
+        startsWith,
+        setUp,
+        testWidgets;
 
 void main() {
+    late SandboxReplay plaid;
+  setUp(() => plaid = SandboxReplay());
+
     group('AndroidTapTargetGuideline', () {
   testWidgets('App meets androidTapTargetGuideline', (WidgetTester tester) async {
+          final app = await openSandboxApp(tester, plaid, const [AppRoute.home]);
     final SemanticsHandle handle = tester.ensureSemantics();
-    final router = AppRouter.create(services: demoServices());
-    await tester.pumpWidget(PaceApp(router: router));
+    await tester.pumpWidget(PaceApp(router: app.router));
     await tester.pumpAndSettle();
     await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
     handle.dispose();

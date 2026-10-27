@@ -767,21 +767,20 @@ void main() {
     expect(router.delegate.current, AppRoute.statementExport);
     await tester.scrollUntilVisible(find.text('Download PDF statement'), 200);
     expect(find.text('All accounts · October 2026'), findsOneWidget); // the summary of what's in it
-    await tester.scrollUntilVisible(find.text('September 2026'), -200);
 
-    await tester.tap(find.text('September 2026'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('CSV (for spreadsheets)'), 200);
     await tester.tap(find.text('CSV (for spreadsheets)'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Download CSV statement'), 200);
-    expect(find.text('All accounts · September 2026'), findsOneWidget);
+    expect(find.text('All accounts · October 2026'), findsOneWidget);
     expect(find.textContaining('posted transactions'), findsOneWidget);
     await tester.tap(find.text('Download CSV statement'));
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50))); // encoding
     await tester.pumpAndSettle();
 
-    expect(saver.saved.single.fileName, 'pace-statement-2026-09-all-accounts.csv');
-    expect(find.text('Statement saved as pace-statement-2026-09-all-accounts.csv'), findsOneWidget);
+    expect(saver.saved.single.fileName, 'pace-statement-2026-10-all-accounts.csv');
+    expect(find.text('Statement saved as pace-statement-2026-10-all-accounts.csv'), findsOneWidget);
     router.dispose();
   });
 }
