@@ -1,3 +1,10 @@
-# Runs every flow in this folder, in name order. Subflows are only run from other flows.
+# Runs every flow in this folder. Subflows are only run from other flows.
+# The signed-in flow runs last so the others always start on the Sign in screen.
 flows:
   - "*.yaml"
+executionOrder:
+  continueOnFailure: true
+  flowsOrder:
+    - "React Native: sign in errors are shown in text"
+    - "React Native: create account and reset password links"
+    - "React Native: home info buttons and bottom tabs"

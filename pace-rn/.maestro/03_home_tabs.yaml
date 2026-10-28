@@ -10,7 +10,9 @@ tags:
     stopApp: true
 - runFlow: subflows/sign_in.yaml
 # Icon-only buttons are announced by name (WCAG 1.1.1, 4.1.2).
-- assertVisible: "Settings"
+- scrollUntilVisible:
+    element: "Settings"
+    direction: UP
 - assertVisible: "About payday estimate"
 - tapOn: "Budgets(, Tab . of 5)?"
 - assertVisible: "New budget"
@@ -20,4 +22,6 @@ tags:
 - assertVisible: "Upcoming"
 - tapOn: "Transactions(, Tab . of 5)?"
 - tapOn: "Home(, Tab . of 5)?"
-- assertVisible: "Settings"
+- scrollUntilVisible:
+    element: "Settings"
+    direction: UP

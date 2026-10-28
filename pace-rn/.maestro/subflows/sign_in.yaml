@@ -12,8 +12,13 @@ appId: com.example.pace.rn
 - inputText: ${PACE_USERNAME}
 - tapOn: "Password"
 - inputText: ${PACE_PASSWORD}
-- hideKeyboard
-- tapOn: "Sign in"
+# Enter in the password box submits the form. (hideKeyboard can act as Back and close the app.)
+- pressKey: Enter
+# Closing the keyboard can already submit the form (React Native), so this tap may not be needed.
+- tapOn:
+    text: "Sign in"
+    optional: true
+# The bottom Home tab is always on screen once signed in.
 - extendedWaitUntil:
-    visible: "Settings"
+    visible: "Home(, Tab . of 5)?"
     timeout: 30000
