@@ -10,6 +10,7 @@ tags:
 - extendedWaitUntil:
     visible: "Forgot password\\?"
     timeout: 30000
+- waitForAnimationToEnd
 - tapOn: "New to Pace\\? Create account"
 - assertVisible: "Create account"
 - back

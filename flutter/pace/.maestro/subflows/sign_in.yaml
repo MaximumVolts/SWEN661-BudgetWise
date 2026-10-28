@@ -12,3 +12,4 @@ appId: com.example.pace
 - extendedWaitUntil:
     visible: "Settings"
     timeout: 30000
+- waitForAnimationToEnd

@@ -3,6 +3,7 @@
 # Never commit real credentials.
 appId: com.example.pace.rn
 ---
+- waitForAnimationToEnd
 - tapOn: "Username"
 - inputText: ${PACE_USERNAME}
 - tapOn: "Password"

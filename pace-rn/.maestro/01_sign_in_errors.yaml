@@ -10,6 +10,7 @@ tags:
 - extendedWaitUntil:
     visible: "Your money, at your pace."
     timeout: 30000
+- waitForAnimationToEnd
 - tapOn: "Sign in"
 - assertVisible: "Enter your username"
 - assertVisible: "Enter your password"
