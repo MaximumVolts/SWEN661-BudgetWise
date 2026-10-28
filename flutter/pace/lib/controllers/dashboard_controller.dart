@@ -35,4 +35,5 @@ class DashboardController extends ScreenController {
   void openTrend(TrendItem t) => navigator.openTrendDetail(t.id);
   void openTool(ToolLink t) => navigator.openTool(t.id);
   void paydayInfo() => navigator.openMenu('payday_info');
+  void accountInfo(DashboardAccount a) => navigator.openMenu('account_info_${a.id}');
 }

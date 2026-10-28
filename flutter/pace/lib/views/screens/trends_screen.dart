@@ -37,7 +37,7 @@ class TrendsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Row(
               children: [
-                Tap(onTap: onBack, semanticLabel: 'Back', child: const Icon(Icons.arrow_back, size: 28)),
+                Tap(onTap: onBack, semanticLabel: 'Back', child: const Icon(Icons.arrow_back, size: 48)),
                 const SizedBox(width: 16),
                 const Text('Plaid TrendScore', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
               ],

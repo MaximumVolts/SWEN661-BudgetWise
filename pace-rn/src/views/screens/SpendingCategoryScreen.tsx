@@ -23,7 +23,7 @@ export function SpendingCategoryScreen({ controller }: { controller: SpendingCat
           <Scroll>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginLeft: -12, paddingTop: 8 }}>
               <Tap onPress={back} label="Back">
-                <Icon name="arrow-back" size={28} color={c.ink} />
+                <Icon name="arrow-back" size={48} color={c.ink} />
               </Tap>
               <IconBadge icon={iconFor(data.iconKey)} size={36} />
               <Heading style={{ flex: 1, fontSize: 22, fontWeight: '500', color: c.ink }}>{data.name}</Heading>

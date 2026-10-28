@@ -44,7 +44,7 @@ class CashFlowScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Row(
               children: [
-                Tap(onTap: onBack, semanticLabel: 'Back', child: const Icon(Icons.arrow_back, size: 28)),
+                Tap(onTap: onBack, semanticLabel: 'Back', child: const Icon(Icons.arrow_back, size: 48)),
                 const SizedBox(width: 16),
                 const Heading('Cash Flow Projection', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
               ],
@@ -56,7 +56,9 @@ class CashFlowScreen extends StatelessWidget {
               children: [
                 Text('Income', style: TextStyle(fontSize: 14, color: C.muted)),
                 const SizedBox(width: 10),
-                for (var i = 0; i < data.scenarioLabels.length; i++) ...[
+              ],
+            ),
+            for (var i = 0; i < data.scenarioLabels.length; i++) ...[
                   if (i > 0) const SizedBox(width: 8),
                   Tap(
                     onTap: onScenarioChanged == null ? null : () => onScenarioChanged!(i),
@@ -69,8 +71,6 @@ class CashFlowScreen extends StatelessWidget {
                     ),
                   ),
                 ],
-              ],
-            ),
             const SizedBox(height: 16),
             Text(data.projectedDateLabel, style: TextStyle(fontSize: 13, color: C.muted)),
             Text(Fmt.money(total), style: const TextStyle(fontSize: 40, fontWeight: FontWeight.w400)),
@@ -213,7 +213,7 @@ class _Line extends StatelessWidget {
               Text(text, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: color)),
               if (l.expectedIncomeId != null && onRemove != null) ...[
                 const SizedBox(width: 4),
-                Tap(onTap: () => onRemove!(l), semanticLabel: 'Remove ${l.title}', child: Icon(Icons.close, size: 20, color: C.muted)),
+                Tap(onTap: () => onRemove!(l), semanticLabel: 'Remove ${l.title}', child: Icon(Icons.close, size: 48, color: C.muted)),
               ],
             ],
           ),

@@ -16,7 +16,7 @@ export function SettingsScreen({ controller }: { controller: SettingsController 
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 68, paddingRight: 8, paddingTop: 6 }}>
         <Heading style={{ flex: 1, textAlign: 'center', fontSize: 22, fontWeight: '500', color: c.ink }}>Settings</Heading>
         <Tap onPress={controller.close} label="Close settings">
-          <Icon name="cancel" size={26} color={c.ink} />
+          <Icon name="cancel" size={48} color={c.ink} />
         </Tap>
       </View>
       <AsyncView state={controller.state} onRetry={controller.reload}>
@@ -76,7 +76,7 @@ function SettingsBody({ data, controller: ctl }: { data: SettingsData; controlle
       <Gap h={18} />
       <View style={{ alignItems: 'center' }}>
         <Tap onPress={ctl.deleteAccount} style={{ padding: 10 }}>
-          <Text style={{ color: c.red, fontSize: 14, textDecorationLine: 'underline' }}>Delete account</Text>
+          <Text style={{ color: c.red, fontSize: 21, textDecorationLine: 'underline' }}>Delete account</Text>
         </Tap>
       </View>
       <Gap h={14} />

@@ -148,7 +148,7 @@ class _DemoOnboarding implements OnboardingService {
   @override
   Future<OnboardingOptions> loadOptions() async => const OnboardingOptions(
         priorities: [
-          PriorityOption(id: 'spend', label: 'See where my money goes'),
+          PriorityOption(id: 'spend', label: 'See where my\nmoney goes'),
           PriorityOption(id: 'bills', label: 'Stay on top of bills'),
           PriorityOption(id: 'budget', label: 'Stick to a budget'),
           PriorityOption(id: 'subs', label: 'Track subscriptions'),

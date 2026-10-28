@@ -22,7 +22,7 @@ export function NotificationsScreen({ controller }: { controller: NotificationsC
               <Text style={t.link}>Mark all read</Text>
             </Tap>
             <Tap onPress={close} label="Close notifications">
-              <Icon name="cancel" size={26} color={c.ink} />
+              <Icon name="cancel" size={48} color={c.ink} />
             </Tap>
           </View>
           <View>
@@ -84,7 +84,7 @@ function Item({ n, onOpen, onPrimary }: { n: NotificationItem; onOpen: () => voi
   return (
     <Tap onPress={onOpen}>
       <View style={{ flexDirection: 'row', gap: 14, paddingHorizontal: 20, paddingVertical: 14 }}>
-        <IconBadge icon={icon} bg={bg} fg={fg} />
+        <IconBadge icon={icon} bg={bg} fg={fg} size={48} />
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             {n.isNew && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: c.ink }} />}

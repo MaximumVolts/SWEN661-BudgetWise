@@ -47,7 +47,7 @@ class BudgetsScreen extends StatelessWidget {
               children: [
                 const Heading('Budgets', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                 const Spacer(),
-                Tap(onTap: onMenu, semanticLabel: 'Budget options', child: const Icon(Icons.more_vert)),
+                Tap(onTap: onMenu, semanticLabel: 'Budget options', child: const Icon(Icons.more_vert, size: 48)),
               ],
             ),
             const SizedBox(height: 16),

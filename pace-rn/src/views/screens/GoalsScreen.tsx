@@ -19,11 +19,11 @@ export function GoalsScreen({ controller }: { controller: GoalsController }) {
           <Scroll>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: -12, paddingTop: 8 }}>
               <Tap onPress={back} label="Back">
-                <Icon name="arrow-back" size={28} color={c.ink} />
+                <Icon name="arrow-back" size={48} color={c.ink} />
               </Tap>
               <Heading style={{ flex: 1, fontSize: 22, fontWeight: '500', color: c.ink, marginLeft: 4 }}>Savings Goals</Heading>
               <Tap onPress={addGoal} label="Add savings goal">
-                <Icon name="add" size={30} color={c.ink} />
+                <Icon name="add" size={48} color={c.ink} />
               </Tap>
             </View>
             <Gap h={20} />
@@ -84,7 +84,7 @@ function GoalBlock({ goal, controller }: { goal: SavingsGoal; controller: GoalsC
             <Text style={{ fontSize: 12.5, color: c.muted }}>{goal.subtitle ?? 'No details available'}</Text>
           </View>
           <Tap onPress={controller.editGoal} label={`Edit ${name}`}>
-            <Icon name="edit-note" size={26} color={c.ink} />
+            <Icon name="edit-note" size={48} color={c.ink} />
           </Tap>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6, marginTop: 14 }}>

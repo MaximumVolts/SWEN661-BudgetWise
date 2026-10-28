@@ -56,6 +56,13 @@ exports[`Snapshots bottom navigation bar 1`] = `
           }
         >
           <View
+            accessibilityActions={
+              [
+                {
+                  "name": "activate",
+                },
+              ]
+            }
             accessibilityHint="Tab 1 of 5"
             accessibilityLabel="Home"
             accessibilityRole="tab"
@@ -79,6 +86,7 @@ exports[`Snapshots bottom navigation bar 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            onAccessibilityAction={[Function]}
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -92,8 +100,10 @@ exports[`Snapshots bottom navigation bar 1`] = `
               [
                 {
                   "alignItems": "center",
+                  "minHeight": 48,
                   "minWidth": 56,
                 },
+                false,
                 false,
               ]
             }
@@ -152,6 +162,13 @@ exports[`Snapshots bottom navigation bar 1`] = `
             </Text>
           </View>
           <View
+            accessibilityActions={
+              [
+                {
+                  "name": "activate",
+                },
+              ]
+            }
             accessibilityHint="Tab 2 of 5"
             accessibilityLabel="Transactions"
             accessibilityRole="tab"
@@ -175,6 +192,7 @@ exports[`Snapshots bottom navigation bar 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            onAccessibilityAction={[Function]}
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -188,8 +206,10 @@ exports[`Snapshots bottom navigation bar 1`] = `
               [
                 {
                   "alignItems": "center",
+                  "minHeight": 48,
                   "minWidth": 56,
                 },
+                false,
                 false,
               ]
             }
@@ -248,6 +268,13 @@ exports[`Snapshots bottom navigation bar 1`] = `
             </Text>
           </View>
           <View
+            accessibilityActions={
+              [
+                {
+                  "name": "activate",
+                },
+              ]
+            }
             accessibilityHint="Tab 3 of 5"
             accessibilityLabel="Spending"
             accessibilityRole="tab"
@@ -271,6 +298,7 @@ exports[`Snapshots bottom navigation bar 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            onAccessibilityAction={[Function]}
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -284,8 +312,10 @@ exports[`Snapshots bottom navigation bar 1`] = `
               [
                 {
                   "alignItems": "center",
+                  "minHeight": 48,
                   "minWidth": 56,
                 },
+                false,
                 false,
               ]
             }
@@ -344,6 +374,13 @@ exports[`Snapshots bottom navigation bar 1`] = `
             </Text>
           </View>
           <View
+            accessibilityActions={
+              [
+                {
+                  "name": "activate",
+                },
+              ]
+            }
             accessibilityHint="Tab 4 of 5"
             accessibilityLabel="Budgets"
             accessibilityRole="tab"
@@ -367,6 +404,7 @@ exports[`Snapshots bottom navigation bar 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            onAccessibilityAction={[Function]}
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -380,8 +418,10 @@ exports[`Snapshots bottom navigation bar 1`] = `
               [
                 {
                   "alignItems": "center",
+                  "minHeight": 48,
                   "minWidth": 56,
                 },
+                false,
                 false,
               ]
             }
@@ -440,6 +480,13 @@ exports[`Snapshots bottom navigation bar 1`] = `
             </Text>
           </View>
           <View
+            accessibilityActions={
+              [
+                {
+                  "name": "activate",
+                },
+              ]
+            }
             accessibilityHint="Tab 5 of 5"
             accessibilityLabel="Bills"
             accessibilityRole="tab"
@@ -463,6 +510,7 @@ exports[`Snapshots bottom navigation bar 1`] = `
             accessible={true}
             collapsable={false}
             focusable={true}
+            onAccessibilityAction={[Function]}
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}
@@ -476,8 +524,10 @@ exports[`Snapshots bottom navigation bar 1`] = `
               [
                 {
                   "alignItems": "center",
+                  "minHeight": 48,
                   "minWidth": 56,
                 },
+                false,
                 false,
               ]
             }
@@ -751,12 +801,15 @@ exports[`Snapshots settings screen 1`] = `
                     style={
                       [
                         {
-                          "alignItems": "center",
                           "justifyContent": "center",
                           "minHeight": 48,
                           "minWidth": 48,
                         },
+                        {
+                          "alignItems": "center",
+                        },
                         undefined,
+                        false,
                         false,
                       ]
                     }
@@ -770,7 +823,7 @@ exports[`Snapshots settings screen 1`] = `
                         [
                           {
                             "color": "#1A1A1A",
-                            "fontSize": 26,
+                            "fontSize": 48,
                           },
                           undefined,
                           {
@@ -842,8 +895,14 @@ exports[`Snapshots settings screen 1`] = `
                       onStartShouldSetResponder={[Function]}
                       style={
                         [
+                          {
+                            "justifyContent": "center",
+                            "minHeight": 48,
+                            "minWidth": 48,
+                          },
                           undefined,
                           undefined,
+                          false,
                           false,
                         ]
                       }
@@ -1007,8 +1066,14 @@ exports[`Snapshots settings screen 1`] = `
                           onStartShouldSetResponder={[Function]}
                           style={
                             [
+                              {
+                                "justifyContent": "center",
+                                "minHeight": 48,
+                                "minWidth": 48,
+                              },
                               undefined,
                               undefined,
+                              false,
                               false,
                             ]
                           }
@@ -1158,8 +1223,14 @@ exports[`Snapshots settings screen 1`] = `
                           onStartShouldSetResponder={[Function]}
                           style={
                             [
+                              {
+                                "justifyContent": "center",
+                                "minHeight": 48,
+                                "minWidth": 48,
+                              },
                               undefined,
                               undefined,
+                              false,
                               false,
                             ]
                           }
@@ -1298,8 +1369,14 @@ exports[`Snapshots settings screen 1`] = `
                           onStartShouldSetResponder={[Function]}
                           style={
                             [
+                              {
+                                "justifyContent": "center",
+                                "minHeight": 48,
+                                "minWidth": 48,
+                              },
                               undefined,
                               undefined,
+                              false,
                               false,
                             ]
                           }
@@ -1471,8 +1548,14 @@ exports[`Snapshots settings screen 1`] = `
                           onStartShouldSetResponder={[Function]}
                           style={
                             [
+                              {
+                                "justifyContent": "center",
+                                "minHeight": 48,
+                                "minWidth": 48,
+                              },
                               undefined,
                               undefined,
+                              false,
                               false,
                             ]
                           }
@@ -2150,8 +2233,14 @@ exports[`Snapshots settings screen 1`] = `
                           onStartShouldSetResponder={[Function]}
                           style={
                             [
+                              {
+                                "justifyContent": "center",
+                                "minHeight": 48,
+                                "minWidth": 48,
+                              },
                               undefined,
                               undefined,
+                              false,
                               false,
                             ]
                           }
@@ -2301,8 +2390,14 @@ exports[`Snapshots settings screen 1`] = `
                           onStartShouldSetResponder={[Function]}
                           style={
                             [
+                              {
+                                "justifyContent": "center",
+                                "minHeight": 48,
+                                "minWidth": 48,
+                              },
                               undefined,
                               undefined,
+                              false,
                               false,
                             ]
                           }
@@ -2567,8 +2662,14 @@ exports[`Snapshots settings screen 1`] = `
                           onStartShouldSetResponder={[Function]}
                           style={
                             [
+                              {
+                                "justifyContent": "center",
+                                "minHeight": 48,
+                                "minWidth": 48,
+                              },
                               undefined,
                               undefined,
+                              false,
                               false,
                             ]
                           }
@@ -2715,10 +2816,16 @@ exports[`Snapshots settings screen 1`] = `
                         onStartShouldSetResponder={[Function]}
                         style={
                           [
+                            {
+                              "justifyContent": "center",
+                              "minHeight": 48,
+                              "minWidth": 48,
+                            },
                             undefined,
                             {
                               "padding": 10,
                             },
+                            false,
                             false,
                           ]
                         }
@@ -2727,7 +2834,7 @@ exports[`Snapshots settings screen 1`] = `
                           style={
                             {
                               "color": "#C0281E",
-                              "fontSize": 14,
+                              "fontSize": 21,
                               "textDecorationLine": "underline",
                             }
                           }
@@ -2968,8 +3075,14 @@ exports[`Snapshots shared components 1`] = `
             onStartShouldSetResponder={[Function]}
             style={
               [
+                {
+                  "justifyContent": "center",
+                  "minHeight": 48,
+                  "minWidth": 48,
+                },
                 undefined,
                 undefined,
+                false,
                 false,
               ]
             }
@@ -3946,12 +4059,15 @@ exports[`Snapshots sign in screen 1`] = `
                           style={
                             [
                               {
-                                "alignItems": "center",
                                 "justifyContent": "center",
                                 "minHeight": 48,
                                 "minWidth": 48,
                               },
+                              {
+                                "alignItems": "center",
+                              },
                               undefined,
+                              false,
                               false,
                             ]
                           }
@@ -4022,10 +4138,17 @@ exports[`Snapshots sign in screen 1`] = `
                         onStartShouldSetResponder={[Function]}
                         style={
                           [
+                            {
+                              "justifyContent": "center",
+                              "minHeight": 48,
+                              "minWidth": 48,
+                            },
                             undefined,
                             {
-                              "padding": 8,
+                              "alignItems": "center",
+                              "padding": 12,
                             },
+                            false,
                             false,
                           ]
                         }
@@ -4034,7 +4157,7 @@ exports[`Snapshots sign in screen 1`] = `
                           style={
                             {
                               "color": "#1A1A1A",
-                              "fontSize": 15,
+                              "fontSize": 18,
                               "fontWeight": "700",
                             }
                           }
@@ -4118,6 +4241,7 @@ exports[`Snapshots sign in screen 1`] = `
                   </View>
                 </RCTScrollView>
                 <View
+                  accessibilityLabel="New to Pace? Create account"
                   accessibilityRole="button"
                   accessibilityState={
                     {
@@ -4150,11 +4274,19 @@ exports[`Snapshots sign in screen 1`] = `
                   onStartShouldSetResponder={[Function]}
                   style={
                     [
-                      undefined,
+                      {
+                        "justifyContent": "center",
+                        "minHeight": 48,
+                        "minWidth": 48,
+                      },
+                      {
+                        "alignItems": "center",
+                      },
                       {
                         "alignItems": "center",
                         "paddingVertical": 12,
                       },
+                      false,
                       false,
                     ]
                   }
@@ -4163,6 +4295,9 @@ exports[`Snapshots sign in screen 1`] = `
                     style={
                       {
                         "flexDirection": "row",
+                        "flexWrap": "wrap",
+                        "justifyContent": "center",
+                        "paddingHorizontal": 20,
                       }
                     }
                   >
@@ -4180,7 +4315,7 @@ exports[`Snapshots sign in screen 1`] = `
                       style={
                         {
                           "color": "#1A1A1A",
-                          "fontSize": 16,
+                          "fontSize": 18,
                           "fontWeight": "700",
                         }
                       }

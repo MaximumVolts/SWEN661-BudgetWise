@@ -1,0 +1,21 @@
+# The sign-in links are reachable by their accessibility labels and open the right screens.
+appId: com.example.pace.rn
+name: "React Native: create account and reset password links"
+tags:
+  - auth
+  - accessibility
+---
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: "Forgot password\\?"
+    timeout: 30000
+- waitForAnimationToEnd
+- tapOn: "New to Pace\\? Create account"
+- assertVisible: "Create account"
+- back
+- assertVisible: "Your money, at your pace."
+- tapOn: "Forgot password\\?"
+- assertVisible: "Reset password"
+- back
+- assertVisible: "Your money, at your pace."

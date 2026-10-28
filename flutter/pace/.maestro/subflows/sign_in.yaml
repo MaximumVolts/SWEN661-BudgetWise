@@ -1,0 +1,24 @@
+# Signs in with the test account passed on the command line:
+#   maestro test -e PACE_USERNAME=... -e PACE_PASSWORD=... .maestro
+# Never commit real credentials.
+appId: com.example.pace
+---
+- extendedWaitUntil:
+    visible: "Forgot password\\?"
+    timeout: 30000
+- waitForAnimationToEnd
+- tapOn: "Username"
+- waitForAnimationToEnd
+- inputText: ${PACE_USERNAME}
+- tapOn: "Password"
+- inputText: ${PACE_PASSWORD}
+- hideKeyboard
+# Closing the keyboard can already submit the form (React Native), so this tap may not be needed.
+- tapOn:
+    text: "Sign in"
+    optional: true
+# The bottom Home tab is always on screen once signed in.
+- extendedWaitUntil:
+    visible: "Home(, Tab . of 5)?"
+    timeout: 30000
+- waitForAnimationToEnd

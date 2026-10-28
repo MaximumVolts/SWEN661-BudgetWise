@@ -78,7 +78,7 @@ export function TopBar({ title, onBack, trailing }: { title: string; onBack?: ()
     <View style={styles.topBar}>
       {onBack && (
         <Tap onPress={onBack} label="Back" style={{ marginRight: 8, marginLeft: -12 }}>
-          <Icon name="arrow-back" size={26} color={c.ink} />
+          <Icon name="arrow-back" size={48} color={c.ink} />
         </Tap>
       )}
       <Heading style={[t.appBar, { fontSize: onBack ? 20 : 24, flex: 1 }]}>{title}</Heading>
@@ -135,6 +135,11 @@ export function HairLine({ indent = 0 }: { indent?: number }) {
  * Tap target with press feedback (a slight shrink and overlay). Icon-only targets must pass a
  * [label] and get a 48×48 minimum size; with text inside, the text is the label.
  */
+/** Clear keyboard focus outline (WCAG 2.4.7). An outline does not shift the layout. */
+export function focusRing(color: string): ViewStyle {
+  return { outlineColor: color, outlineWidth: 3, outlineStyle: 'solid', outlineOffset: 2, borderRadius: 8 };
+}
+
 export function Tap({
   onPress,
   children,
@@ -156,6 +161,7 @@ export function Tap({
 }) {
   const { colors: c } = useDisplay();
   const enabled = !!onPress && !disabled;
+  const [focused, setFocused] = useState(false);
   return (
     <Pressable
       // Handlers may await dialogs; the press itself never waits for them.
@@ -165,10 +171,15 @@ export function Tap({
       accessibilityLabel={label}
       accessibilityHint={hint}
       accessibilityState={{ disabled: !enabled, selected }}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
       style={({ pressed }) => [
-        label && { minWidth: 48, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
+        // Every tap target is at least 48x48 (WCAG 2.5.5), without making the text bigger.
+        { minWidth: 48, minHeight: 48, justifyContent: 'center' },
+        label && { alignItems: 'center' },
         style,
         pressed && enabled && { transform: [{ scale: 0.97 }], backgroundColor: `${c.ink}1F`, borderRadius: 8 },
+        focused && focusRing(c.ink),
       ]}
     >
       {children}

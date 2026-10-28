@@ -21,7 +21,7 @@ export function SpendingScreen({ controller }: { controller: SpendingController 
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20, paddingRight: 8, paddingTop: 8 }}>
         <Heading style={{ flex: 1, fontSize: 24, fontWeight: '500', color: c.ink }}>Spending</Heading>
         <Tap onPress={chooseDateRange} label="Choose date range">
-          <Icon name="calendar-today" size={26} color={c.ink} />
+          <Icon name="calendar-today" size={48} color={c.ink} />
         </Tap>
       </View>
       <View style={{ paddingHorizontal: 20, paddingVertical: 12 }}>
@@ -54,8 +54,9 @@ export function SpendingScreen({ controller }: { controller: SpendingController 
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
                         <IconBadge icon={iconFor(cat.iconKey)} />
                         <Text style={{ flex: 1, fontSize: 17, color: c.ink }}>{cat.name}</Text>
-                        <Text style={{ fontSize: 16, fontWeight: '700', color: c.ink }}>{Fmt.money(cat.amount)}</Text>
-                        <View style={{ width: 92, alignItems: 'flex-end' }}>
+                        {/* Amount and change stack on the right so long names like "Transportation" keep room. */}
+                        <View style={{ alignItems: 'flex-end', gap: 2 }}>
+                          <Text style={{ fontSize: 16, fontWeight: '700', color: c.ink }}>{Fmt.money(cat.amount)}</Text>
                           {cat.changePercent === undefined ? (
                             <Text style={{ fontSize: 13, color: c.muted }}>No change</Text>
                           ) : (

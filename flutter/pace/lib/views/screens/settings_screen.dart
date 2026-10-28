@@ -61,7 +61,7 @@ class SettingsScreen extends StatelessWidget {
                 const SizedBox(width: 26),
                 const Heading('Settings', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
                 const Spacer(),
-                Tap(onTap: onClose, semanticLabel: 'Close settings', child: const Icon(Icons.cancel_outlined, size: 26)),
+                Tap(onTap: onClose, semanticLabel: 'Close settings', child: const Icon(Icons.cancel_outlined, size: 48)),
               ],
             ),
             const SizedBox(height: 16),
@@ -129,7 +129,7 @@ class SettingsScreen extends StatelessWidget {
             Center(
               child: Tap(
                 onTap: onDeleteAccount,
-                child: Text('Delete account', style: TextStyle(color: C.red, fontSize: 14, decoration: TextDecoration.underline)),
+                child: Text('Delete account', style: TextStyle(color: C.red, fontSize: 16, decoration: TextDecoration.underline)),
               ),
             ),
             const SizedBox(height: 14),

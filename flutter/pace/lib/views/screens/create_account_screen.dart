@@ -1,14 +1,53 @@
 import 'package:flutter/material.dart'
-    show AutofillGroup, AutofillHints, BuildContext, Column, CrossAxisAlignment,
-        DropdownButtonFormField, DropdownMenuItem, EdgeInsets, Expanded, FontWeight, MainAxisAlignment, Padding, Row, SafeArea, Scaffold, SingleChildScrollView,
-        SizedBox, State, StatefulWidget, Text, TextCapitalization, TextEditingController, TextField, TextInputAction,
-        TextInputType, TextOverflow, TextStyle, VoidCallback, Widget;
+    show
+        AutofillGroup,
+        AutofillHints,
+        BuildContext,
+        Column,
+        CrossAxisAlignment,
+        DropdownButtonFormField,
+        DropdownMenuItem,
+        EdgeInsets,
+        Expanded,
+        FontWeight,
+        MainAxisAlignment,
+        Padding,
+        Row,
+        SafeArea,
+        Scaffold,
+        SingleChildScrollView,
+        SizedBox,
+        State,
+        StatefulWidget,
+        Text,
+        TextCapitalization,
+        TextEditingController,
+        TextField,
+        TextInputAction,
+        TextInputType,
+        TextOverflow,
+        TextStyle,
+        VoidCallback,
+        Widget;
 import '../theme.dart' show C, T;
-import '../widgets/widgets.dart' show paceInputDecoration, PaceTopBar, PasswordVisibilityToggle, PillButton, Tap;
+import '../widgets/widgets.dart'
+    show
+        paceInputDecoration,
+        PaceTopBar,
+        PasswordVisibilityToggle,
+        PillButton,
+        Tap;
 
 /// Called with the raw form values; the service validates them.
-typedef CreateAccountSubmit = void Function(String name, String username, String password, String confirmPassword,
-    String securityQuestion, String securityAnswer, String plaidClientId, String plaidSecret);
+typedef CreateAccountSubmit = void Function(
+    String name,
+    String username,
+    String password,
+    String confirmPassword,
+    String securityQuestion,
+    String securityAnswer,
+    String plaidClientId,
+    String plaidSecret);
 
 /// 01b - Create Account
 class CreateAccountScreen extends StatefulWidget {
@@ -20,6 +59,7 @@ class CreateAccountScreen extends StatefulWidget {
   final String? securityAnswerError;
   final String? plaidClientIdError;
   final String? plaidSecretError;
+
   /// Choices for the security question picker.
   final List<String> securityQuestions;
   final bool isLoading;
@@ -72,8 +112,15 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     super.dispose();
   }
 
-  void _submit() => widget.onSubmit?.call(_name.text, _username.text, _password.text, _confirm.text, _question ?? '',
-      _answer.text, _plaidClientId.text, _plaidSecret.text);
+  void _submit() => widget.onSubmit?.call(
+      _name.text,
+      _username.text,
+      _password.text,
+      _confirm.text,
+      _question ?? '',
+      _answer.text,
+      _plaidClientId.text,
+      _plaidSecret.text);
 
   @override
   Widget build(BuildContext context) {
@@ -93,14 +140,16 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       const SizedBox(height: 8),
                       Text('Start your Pace account', style: T.h1),
                       const SizedBox(height: 10),
-                      Text('Your account is stored only on this device.', style: T.body),
+                      Text('Your account is stored only on this device.',
+                          style: T.body),
                       const SizedBox(height: 24),
                       TextField(
                         controller: _name,
                         textCapitalization: TextCapitalization.words,
                         textInputAction: TextInputAction.next,
                         autofillHints: const [AutofillHints.name],
-                        decoration: paceInputDecoration(label: 'Name', error: widget.nameError),
+                        decoration: paceInputDecoration(
+                            label: 'Name', error: widget.nameError),
                         style: field,
                       ),
                       const SizedBox(height: 18),
@@ -111,7 +160,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         enableSuggestions: false,
                         textInputAction: TextInputAction.next,
                         autofillHints: const [AutofillHints.username],
-                        decoration: paceInputDecoration(label: 'Username', error: widget.usernameError, helper: '3–30 letters, numbers, dots, dashes or underscores'),
+                        decoration: paceInputDecoration(
+                            label: 'Username',
+                            error: widget.usernameError,
+                            helper:
+                                '3–30 letters, numbers, dots, dashes or underscores'),
                         style: field,
                       ),
                       const SizedBox(height: 18),
@@ -120,11 +173,15 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         obscureText: _obscure,
                         textInputAction: TextInputAction.next,
                         autofillHints: const [AutofillHints.newPassword],
-                        decoration: paceInputDecoration(label: 
-                          'Password',
+                        decoration: paceInputDecoration(
+                          label: 'Password',
                           error: widget.passwordError,
-                          helper: 'At least 8 characters, with a letter and a number',
-                          suffix: PasswordVisibilityToggle(obscured: _obscure, onToggle: () => setState(() => _obscure = !_obscure)),
+                          helper:
+                              'At least 8 characters, with a letter and a number',
+                          suffix: PasswordVisibilityToggle(
+                              obscured: _obscure,
+                              onToggle: () =>
+                                  setState(() => _obscure = !_obscure)),
                         ),
                         style: field,
                       ),
@@ -134,22 +191,32 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         obscureText: _obscure,
                         textInputAction: TextInputAction.next,
                         autofillHints: const [AutofillHints.newPassword],
-                        decoration: paceInputDecoration(label: 'Confirm password', error: widget.confirmPasswordError),
+                        decoration: paceInputDecoration(
+                            label: 'Confirm password',
+                            error: widget.confirmPasswordError),
                         style: field,
                       ),
                       const SizedBox(height: 28),
-                      const Text('Security question', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                      const Text('Security question',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 4),
-                      Text('Used to reset your password if you forget it.', style: T.body),
+                      Text('Used to reset your password if you forget it.',
+                          style: T.body),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
                         initialValue: _question,
                         isExpanded: true,
-                        decoration: paceInputDecoration(label: 'Question', error: widget.securityQuestionError),
+                        decoration: paceInputDecoration(
+                            label: 'Question',
+                            error: widget.securityQuestionError),
                         style: field.copyWith(color: C.ink),
                         items: [
                           for (final q in widget.securityQuestions)
-                            DropdownMenuItem(value: q, child: Text(q, overflow: TextOverflow.ellipsis)),
+                            DropdownMenuItem(
+                                value: q,
+                                child:
+                                    Text(q, overflow: TextOverflow.ellipsis)),
                         ],
                         onChanged: (q) => setState(() => _question = q),
                       ),
@@ -157,11 +224,16 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       TextField(
                         controller: _answer,
                         textInputAction: TextInputAction.next,
-                        decoration: paceInputDecoration(label: 'Answer', error: widget.securityAnswerError, helper: 'Not case-sensitive'),
+                        decoration: paceInputDecoration(
+                            label: 'Answer',
+                            error: widget.securityAnswerError,
+                            helper: 'Not case-sensitive'),
                         style: field,
                       ),
                       const SizedBox(height: 28),
-                      const Text('Plaid sandbox keys', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                      const Text('Plaid sandbox keys',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 4),
                       Text(
                         "Pace links Plaid's test bank with your own free sandbox keys. Find them at "
@@ -174,7 +246,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         textInputAction: TextInputAction.next,
                         autocorrect: false,
                         enableSuggestions: false,
-                        decoration: paceInputDecoration(label: 'Client ID', error: widget.plaidClientIdError),
+                        decoration: paceInputDecoration(
+                            label: 'Client ID',
+                            error: widget.plaidClientIdError),
                         style: field,
                       ),
                       const SizedBox(height: 18),
@@ -188,33 +262,42 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         decoration: paceInputDecoration(
                           label: 'Sandbox secret',
                           error: widget.plaidSecretError,
-                          helper: 'Stored only on this device, with your account',
+                          helper:
+                              'Stored only on this device, with your account',
                           suffix: PasswordVisibilityToggle(
-                              obscured: _obscureSecret, onToggle: () => setState(() => _obscureSecret = !_obscureSecret)),
+                              obscured: _obscureSecret,
+                              onToggle: () => setState(
+                                  () => _obscureSecret = !_obscureSecret)),
                         ),
                         style: field,
                       ),
                       const SizedBox(height: 28),
                       PillButton(
-                        widget.isLoading ? 'Creating account…' : 'Create account',
+                        widget.isLoading
+                            ? 'Creating account…'
+                            : 'Create account',
                         onPressed: widget.isLoading ? null : _submit,
                       ),
                       const SizedBox(height: 24),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12, top: 4),
+                        child: Tap(
+                          onTap: widget.onSignIn,
+                          semanticLabel: 'Existing account? Sign in',
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('Existing account?   ',
+                                  style: TextStyle(fontSize: 16, color: C.muted)),
+                              const Text('Sign in',
+                                  style: TextStyle(
+                                      fontSize: 16, fontWeight: FontWeight.w700)),
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12, top: 4),
-              child: Tap(
-                onTap: widget.onSignIn,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Already have an account?   ', style: TextStyle(fontSize: 16, color: C.muted)),
-                    const Text('Sign in', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                  ],
                 ),
               ),
             ),

@@ -23,7 +23,7 @@ export const BankCategories = {
   medical: category('medical', 'Medical', 'shield'),
   home: category('home', 'Home', 'home'),
   fees: category('fees', 'Bank fees', 'bank'),
-  loans: category('loans', 'Loan & card payments', 'bills'),
+  loans: category('loans', 'Loans', 'bills'),
   transfers: category('transfers', 'Transfers', 'bank'),
   income: category('income', 'Income', 'payroll'),
   other: category('other', 'Other', 'store'),

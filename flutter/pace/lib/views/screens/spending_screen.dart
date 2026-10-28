@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'
-    show Align, Alignment, BoxFit, BuildContext, Column, CrossAxisAlignment, EdgeInsets, Expanded, FittedBox, FontWeight,
+    show Align, Alignment, BuildContext, Column, CrossAxisAlignment, EdgeInsets, Expanded, FontWeight,
         FractionallySizedBox, Icon, Icons, ListView, MainAxisSize, Padding, Row, SafeArea, Scaffold, SizedBox, Spacer,
         StatelessWidget, Text, TextStyle, ValueChanged, VoidCallback, Widget;
 import '../widgets/charts.dart' show PaceBarChart;
@@ -42,7 +42,7 @@ class SpendingScreen extends StatelessWidget {
               children: [
                 const Heading('Spending', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                 const Spacer(),
-                Tap(onTap: onCalendar, semanticLabel: 'Choose date range', child: const Icon(Icons.calendar_today_outlined, size: 26)),
+                Tap(onTap: onCalendar, semanticLabel: 'Choose date range', child: const Icon(Icons.calendar_today_outlined, size: 48)),
               ],
             ),
             const SizedBox(height: 16),
@@ -57,7 +57,7 @@ class SpendingScreen extends StatelessWidget {
                   Text(data.periodTitle, style: TextStyle(fontSize: 13, color: C.muted)),
                   Row(
                     children: [
-                      Text(Fmt.money(data.total), style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w500)),
+                      Text(Fmt.money(data.total), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                       const Spacer(),
                       if (data.changePercent != null) _Change(data.changePercent!, big: true),
                     ],
@@ -117,16 +117,16 @@ class _CatRow extends StatelessWidget {
               IconBadge(AppIcons.of(c.iconKey), size: 44),
               const SizedBox(width: 16),
               Expanded(child: Text(c.name, style: const TextStyle(fontSize: 17))),
-              Text(Fmt.money(c.amount), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-              SizedBox(
-                width: 92,
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: c.changePercent == null
+              // Amount and change stack on the right so long names like "Transportation" keep room.
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(Fmt.money(c.amount), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 2),
+                  c.changePercent == null
                       ? Text('No change', style: TextStyle(fontSize: 13, color: C.muted))
-                      // Large changes ("1234.5%") shrink to fit rather than overflow.
-                      : FittedBox(fit: BoxFit.scaleDown, child: _Change(c.changePercent!)),
-                ),
+                      : _Change(c.changePercent!),
+                ],
               ),
             ],
           ),

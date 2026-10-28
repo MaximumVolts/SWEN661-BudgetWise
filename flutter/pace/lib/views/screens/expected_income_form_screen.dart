@@ -98,7 +98,7 @@ class _ExpectedIncomeFormScreenState extends State<ExpectedIncomeFormScreen> {
                         radius: 10,
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         child: Row(mainAxisSize: MainAxisSize.min, children: [
-                          Icon(Icons.event_outlined, color: C.ink),
+                          Icon(Icons.event_outlined, size: 48, color: C.ink),
                           const SizedBox(width: 10),
                           Text(w.date == null ? 'Choose a date' : Fmt.date(w.date!),
                               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),

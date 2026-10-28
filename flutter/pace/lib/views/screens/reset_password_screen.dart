@@ -158,6 +158,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               padding: const EdgeInsets.only(bottom: 12, top: 4),
               child: Tap(
                 onTap: widget.onSignIn,
+                semanticLabel: 'Remembered it? Sign in',
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

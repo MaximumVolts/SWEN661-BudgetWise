@@ -17,7 +17,7 @@ export function BudgetsScreen({ controller }: { controller: BudgetsController })
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20, paddingRight: 8, paddingTop: 8 }}>
         <Heading style={{ flex: 1, fontSize: 24, fontWeight: '500', color: c.ink }}>Budgets</Heading>
         <Tap onPress={openManageBudgets} label="Budget options">
-          <Icon name="more-vert" color={c.ink} />
+          <Icon name="more-vert" color={c.ink} size={48} />
         </Tap>
       </View>
       <AsyncView state={periods.state} onRetry={periods.reload}>

@@ -35,10 +35,10 @@ export function ManageBudgetsScreen({ controller }: { controller: ManageBudgetsC
                         <Text style={[t.sub, { marginTop: 2 }]}>{deleting === b.categoryId ? 'Deleting…' : `${Fmt.money(b.monthlyLimit)} a month`}</Text>
                       </View>
                       <Tap onPress={() => edit(b.categoryId)} label={`Edit ${b.name} budget`}>
-                        <Icon name="edit" size={22} color={c.ink} />
+                        <Icon name="edit" size={48} color={c.ink} />
                       </Tap>
                       <Tap onPress={() => remove(b.categoryId, b.name)} disabled={deleting !== undefined} label={`Delete ${b.name} budget`}>
-                        <Icon name="delete-outline" size={22} color={c.red} />
+                        <Icon name="delete-outline" size={48} color={c.red} />
                       </Tap>
                     </View>
                   </Fragment>

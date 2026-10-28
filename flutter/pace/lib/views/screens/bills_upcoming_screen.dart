@@ -45,7 +45,7 @@ class BillsUpcomingScreen extends StatelessWidget {
               children: [
                 const Heading('Bills', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                 const Spacer(),
-                Tap(onTap: onAdd, semanticLabel: 'Add bill', child: const Icon(Icons.add, size: 30)),
+                Tap(onTap: onAdd, semanticLabel: 'Add bill', child: const Icon(Icons.add, size: 48)),
               ],
             ),
             const SizedBox(height: 16),

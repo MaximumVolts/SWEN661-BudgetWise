@@ -173,7 +173,7 @@ class _Filter extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.keyboard_arrow_down, size: 20, color: dark ? Colors.white : C.ink),
+          Icon(Icons.keyboard_arrow_down, size: 34, color: dark ? Colors.white : C.ink),
           const SizedBox(width: 8),
           Text(label, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: dark ? Colors.white : C.ink)),
         ],
@@ -193,7 +193,7 @@ class _TxnCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       child: Row(
         children: [
-          IconBadge(AppIcons.of(t.iconKey), bg: t.highlight ? C.lime : C.chip, size: 44),
+          IconBadge(AppIcons.of(t.iconKey), bg: t.highlight ? C.lime : C.chip, size: 48),
           const SizedBox(width: 14),
           Expanded(
             child: Column(

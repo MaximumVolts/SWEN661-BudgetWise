@@ -59,16 +59,15 @@ class NotificationsScreen extends StatelessWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(24, 20, 20, 16),
-                          child: Row(
-                            children: [
-                              const Heading('Notifications', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
-                              const Spacer(),
-                              Tap(onTap: onMarkAllRead, child: Text('Mark all read', style: T.link)),
-                              const SizedBox(width: 16),
-                              Tap(onTap: onClose, semanticLabel: 'Close notifications', child: const Icon(Icons.cancel_outlined, size: 26)),
-                            ],
-                          ),
+                          child:  Row(children:[
+                            const Heading('Notifications', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
+                            const Spacer(),
+                            Tap(onTap: onClose, semanticLabel: 'Close notifications', child: const Icon(Icons.cancel_outlined, size: 48)),
+                          ]
+                          )
                         ),
+                        Tap(onTap: onMarkAllRead, child: Text('Mark all read', style: T.link)),
+                       
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -152,7 +151,7 @@ class NotificationsScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconBadge(icon, bg: bg, fg: fg, size: 44),
+          IconBadge(icon, bg: bg, fg: fg, size: 48),
           const SizedBox(width: 14),
           Expanded(
             child: Column(

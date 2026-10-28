@@ -40,11 +40,19 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
       </View>
     );
 
+  const spendSummary = [
+    spend.title,
+    Fmt.money(spend.amount, 0),
+    spend.deltaAmount !== undefined && `${Fmt.money(spend.deltaAmount)} ${spend.deltaIsAbove ? 'above' : 'below'}${spend.deltaPeriodLabel ? ` ${spend.deltaPeriodLabel}` : ''}`,
+  ]
+    .filter(Boolean)
+    .join(', ');
+
   return (
     <Scroll padded={false}>
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4 }}>
         <Tap onPress={ctl.openSettings} label="Settings">
-          <Icon name="settings" color={c.ink} />
+          <Icon name="settings" color={c.ink} size={48} />
         </Tap>
         <Text style={{ flex: 1, textAlign: 'center', fontSize: 22, fontWeight: '500', color: c.ink }}>{data.dateLabel}</Text>
         <Tap
@@ -52,7 +60,7 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
           label={data.hasUnreadNotifications ? 'Notifications, you have unread notifications' : 'Notifications'}
         >
           <View>
-            <Icon name="notifications-none" size={28} color={c.ink} />
+            <Icon name="notifications-none" size={48} color={c.ink} />
             {data.hasUnreadNotifications && (
               <View style={{ position: 'absolute', right: 2, top: 0, width: 8, height: 8, borderRadius: 4, backgroundColor: c.red }} />
             )}
@@ -77,19 +85,21 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
 
       <View style={{ paddingHorizontal: 20 }}>
         <Card style={{ borderRadius: 20 }} padding={20}>
+          {/* TalkBack/VoiceOver read the title, total and change as one item. */}
+          <View accessible accessibilityLabel={spendSummary}>
           <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
             <Text style={{ flex: 1, fontSize: 14, color: c.muted }}>{spend.title}</Text>
             {spend.deltaAmount !== undefined && (
               <>
                 <Icon name={spend.deltaIsAbove ? 'arrow-upward' : 'arrow-downward'} size={15} color={spend.deltaIsAbove ? c.red : c.olive} />
                 <Text style={{ fontSize: 12, fontWeight: '700', color: spend.deltaIsAbove ? c.red : c.olive }}>
-                  {` ${Fmt.money(spend.deltaAmount)} ${spend.deltaIsAbove ? 'above' : 'below'}`}
+                  {` ${Fmt.money(spend.deltaAmount)} ${spend.deltaIsAbove ? 'above' : 'below'} ${spend.deltaPeriodLabel ?? ''}`}
                 </Text>
               </>
             )}
-            {spend.deltaPeriodLabel && <Text style={{ fontSize: 12, color: c.muted }}>{`  ${spend.deltaPeriodLabel}`}</Text>}
           </View>
           <Text style={t.big}>{Fmt.money(spend.amount, 0)}</Text>
+          </View>
           <SpendAreaChart data={spend.chart} />
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 }}>
             {legendKey(c.ink)}
@@ -110,7 +120,7 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
           <Icon name="account-balance-wallet" size={20} color={c.olive} />
           <Text style={{ flex: 1, fontSize: 14, fontWeight: '500', color: c.ink }}>{data.paydayLabel}</Text>
           <Tap onPress={ctl.paydayInfo} label="About payday estimate">
-            <Icon name="info-outline" size={20} color={c.ink} />
+            <Icon name="info-outline" size={48} color={c.ink} />
           </Tap>
         </View>
       )}
@@ -133,7 +143,7 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
                   <Icon name="sync" size={16} color={c.ink} />
                   <Text style={{ fontSize: 12, color: c.muted }}>{data.lastSyncLabel}</Text>
                   <Tap onPress={ctl.sync} style={{ padding: 10 }}>
-                    <Text style={{ fontSize: 12, fontWeight: '700', color: c.olive }}>Sync now</Text>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: c.olive }}>Sync now</Text>
                   </Tap>
                 </View>
               )}
@@ -153,7 +163,7 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
               <View style={{ alignItems: 'center', marginVertical: 14 }}>
                 <Tap onPress={ctl.openTransactions}>
                   <View style={{ paddingHorizontal: 24, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: c.outline }}>
-                    <Text style={{ fontWeight: '500', color: c.ink }}>See more</Text>
+                    <Text style={{ fontSize: 14, fontWeight: '500', color: c.ink }}>See more</Text>
                   </View>
                 </Tap>
               </View>
@@ -227,7 +237,7 @@ function Dashboard({ data, controller: ctl }: { data: DashboardData; controller:
                 <View style={{ alignItems: 'flex-start', marginTop: 14 }}>
                   <Tap onPress={() => ctl.openTrendTransactions(data.featuredTrend!.id)}>
                     <View style={{ paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: c.outline }}>
-                      <Text style={{ fontWeight: '500', color: c.ink }}>{data.featuredTrend.actionLabel}</Text>
+                      <Text style={{ fontSize: 14, fontWeight: '500', color: c.ink }}>{data.featuredTrend.actionLabel}</Text>
                     </View>
                   </Tap>
                 </View>

@@ -1,9 +1,9 @@
 import 'package:flutter/gestures.dart' show kTouchSlop;
 import 'package:flutter/material.dart'
-    show Align, Alignment, AnimatedContainer, AnimatedScale, Border, BorderRadius, BorderSide, BoxConstraints,
-        BoxDecoration, BoxShape, BuildContext, Canvas, Clip, Color, Colors, Column, ConstrainedBox, Container,
+    show ActivateIntent, Align, Alignment, AnimatedContainer, AnimatedScale, Border, BorderRadius, BorderSide, BoxConstraints,
+        BoxDecoration, BoxShape, BuildContext, CallbackAction, Canvas, Clip, Color, Colors, Column, ConstrainedBox, Container,
         CrossAxisAlignment, Curves, CustomPaint, CustomPainter, Divider, EdgeInsets, EdgeInsetsGeometry, ElevatedButton,
-        ExcludeSemantics, Expanded, Flexible, FontWeight, GestureDetector, HitTestBehavior, Icon, IconButton, IconData, Icons, InputDecoration, Listener,
+        ExcludeSemantics, Expanded, Flexible, FocusableActionDetector, FontWeight, GestureDetector, HitTestBehavior, Icon, IconButton, IconData, Icons, InputDecoration, Listener,
         MainAxisAlignment, MainAxisSize, MediaQuery, MergeSemantics, MouseCursor, MouseRegion, Offset, OutlineInputBorder, OutlinedButton,
         Padding, Paint, RRect, Radius, Rect, Row, SafeArea, Semantics, Size, SizedBox, Spacer, StadiumBorder, State,
         StatefulWidget, StatelessWidget, SystemMouseCursors, Text, TextOverflow, TextStyle, ValueChanged, VoidCallback, Widget;
@@ -182,7 +182,8 @@ class PaceChip extends StatelessWidget {
         children: [
           if (showCheck && selected) ...[Icon(Icons.check, size: 18, color: fg), const SizedBox(width: 8)],
           if (icon != null) ...[Icon(icon, size: 18, color: fg), const SizedBox(width: 8)],
-          Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: fg)),
+          // Flexible lets a long label wrap instead of overflowing the chip.
+          Flexible(child: Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: fg))),
         ],
       ),
     ));
@@ -263,11 +264,15 @@ class _SegTabsState extends State<SegTabs> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 42,
+      height: 48,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(21),
-        border: Border.all(color: C.outline),
         color: Colors.white,
+      ),
+      // The outline is drawn on top, so the selected segment's fill can't hide its rounded edge.
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(21),
+        border: Border.all(color: C.outline),
       ),
       clipBehavior: Clip.antiAlias,
       child: Row(
@@ -297,7 +302,7 @@ class _SegTabsState extends State<SegTabs> {
                     border: k == 0 ? null : Border(left: BorderSide(color: C.outline)),
                   ),
                   child: Text(widget.labels[k],
-                      style: TextStyle(fontSize: 15, fontWeight: _i == k ? FontWeight.w700 : FontWeight.w500)),
+                      style: TextStyle(fontSize: 14, fontWeight: _i == k ? FontWeight.w700 : FontWeight.w500)),
                 ),
               ),
               ),
@@ -540,6 +545,7 @@ class _PressFeedbackState extends State<PressFeedback> {
   static const _duration = Duration(milliseconds: 120);
   bool _hovered = false;
   bool _pressed = false;
+  bool _focused = false;
   Offset? _downAt;
 
   void _setPressed(bool v) {
@@ -582,6 +588,18 @@ class _PressFeedbackState extends State<PressFeedback> {
     }
     if (widget.onTap != null) {
       content = GestureDetector(behavior: HitTestBehavior.opaque, onTap: widget.onTap, child: content);
+      // Keyboard: Tab reaches it, Enter/Space presses it, and a clear outline shows focus (WCAG 2.1.1, 2.4.7).
+      content = FocusableActionDetector(
+        enabled: enabled,
+        onShowFocusHighlight: (v) => setState(() => _focused = v),
+        actions: {ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) => widget.onTap!())},
+        child: Container(
+          foregroundDecoration: _focused
+              ? BoxDecoration(border: Border.all(color: C.ink, width: 3), borderRadius: widget.borderRadius)
+              : null,
+          child: content,
+        ),
+      );
     }
     return MouseRegion(
       cursor: enabled ? SystemMouseCursors.click : MouseCursor.defer,
@@ -656,7 +674,14 @@ class Tap extends StatelessWidget {
         selected: selected,
         hint: hint,
         onTap: onTap,
-        child: PressFeedback(onTap: onTap, child: child),
+        child: PressFeedback(
+          onTap: onTap,
+          // Text links get the same 48x48 minimum tap area as icons, at normal text size.
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+            child: Align(widthFactor: 1, heightFactor: 1, child: child),
+          ),
+        ),
       ),
     );
   }

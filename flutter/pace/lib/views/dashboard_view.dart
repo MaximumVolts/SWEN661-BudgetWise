@@ -16,6 +16,7 @@ class DashboardView extends StatelessWidget {
           onNotifications: c.openNotifications,
           onReviewTransactions: c.openReviewTransactions,
           onPaydayInfo: c.paydayInfo,
+          onAccountInfo: c.accountInfo,
           onAddAccount: c.addAccount,
           onAccountTap: c.openAccount,
           onSyncNow: c.syncNow,
