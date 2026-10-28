@@ -1,0 +1,15 @@
+# Empty sign-in shows a clear error under each field (WCAG 3.3.1 Error Identification).
+appId: com.example.pace
+name: "Flutter: sign in errors are shown in text"
+tags:
+  - auth
+  - accessibility
+---
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: "Your money, at your pace."
+    timeout: 30000
+- tapOn: "Sign in"
+- assertVisible: "Enter your username"
+- assertVisible: "Enter your password"

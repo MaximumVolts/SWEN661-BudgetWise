@@ -1,0 +1,14 @@
+# Signs in with the test account passed on the command line:
+#   maestro test -e PACE_USERNAME=... -e PACE_PASSWORD=... .maestro
+# Never commit real credentials.
+appId: com.example.pace
+---
+- tapOn: "Username"
+- inputText: ${PACE_USERNAME}
+- tapOn: "Password"
+- inputText: ${PACE_PASSWORD}
+- hideKeyboard
+- tapOn: "Sign in"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 30000

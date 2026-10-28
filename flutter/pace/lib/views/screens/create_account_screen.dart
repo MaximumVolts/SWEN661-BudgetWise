@@ -283,6 +283,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         padding: const EdgeInsets.only(bottom: 12, top: 4),
                         child: Tap(
                           onTap: widget.onSignIn,
+                          semanticLabel: 'Existing account? Sign in',
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

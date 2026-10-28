@@ -1,0 +1,23 @@
+# Signed in: Home's info buttons have labels, and every bottom tab opens its screen.
+# Needs a test account: maestro test -e PACE_USERNAME=... -e PACE_PASSWORD=... .maestro
+appId: com.example.pace.rn
+name: "React Native: home info buttons and bottom tabs"
+tags:
+  - login
+  - accessibility
+---
+- launchApp:
+    stopApp: true
+- runFlow: subflows/sign_in.yaml
+# Icon-only buttons are announced by name (WCAG 1.1.1, 4.1.2).
+- assertVisible: "Settings"
+- assertVisible: "About payday estimate"
+- tapOn: "Budgets"
+- assertVisible: "New budget"
+- tapOn: "Spending"
+- assertVisible: "Month"
+- tapOn: "Bills"
+- assertVisible: "Upcoming"
+- tapOn: "Transactions"
+- tapOn: "Home"
+- assertVisible: "Settings"

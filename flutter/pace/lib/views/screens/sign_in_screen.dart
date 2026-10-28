@@ -143,6 +143,7 @@ class _SignInScreenState extends State<SignInScreen> {
               padding: const EdgeInsets.only(bottom: 12, top: 4),
               child: Tap(
                 onTap: widget.onCreateAccount,
+                semanticLabel: 'New to Pace? New account',
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
