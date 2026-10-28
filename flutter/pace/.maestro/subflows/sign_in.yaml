@@ -3,7 +3,12 @@
 # Never commit real credentials.
 appId: com.example.pace
 ---
+- extendedWaitUntil:
+    visible: "Forgot password\\?"
+    timeout: 30000
+- waitForAnimationToEnd
 - tapOn: "Username"
+- waitForAnimationToEnd
 - inputText: ${PACE_USERNAME}
 - tapOn: "Password"
 - inputText: ${PACE_PASSWORD}
