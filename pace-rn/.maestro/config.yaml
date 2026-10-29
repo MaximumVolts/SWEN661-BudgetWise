@@ -5,6 +5,6 @@ flows:
 executionOrder:
   continueOnFailure: true
   flowsOrder:
-    - "React Native: sign in errors are shown in text"
-    - "React Native: create account and reset password links"
-    - "React Native: home info buttons and bottom tabs"
+    - "React Native sign in errors are shown in text"
+    - "React Native create account and reset password links"
+    - "React Native home info buttons and bottom tabs"

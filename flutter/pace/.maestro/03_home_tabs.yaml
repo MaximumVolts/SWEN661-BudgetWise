@@ -1,7 +1,7 @@
 # Signed in: Home's info buttons have labels, and every bottom tab opens its screen.
 # Needs a test account: maestro test -e PACE_USERNAME=... -e PACE_PASSWORD=... .maestro
 appId: com.example.pace
-name: "Flutter: home info buttons and bottom tabs"
+name: "Flutter home info buttons and bottom tabs"
 tags:
   - login
   - accessibility
