@@ -1,6 +1,6 @@
 # Empty sign-in shows a clear error under each field (WCAG 3.3.1 Error Identification).
 appId: com.example.pace.rn
-name: "React Native: sign in errors are shown in text"
+name: "React Native sign in errors are shown in text"
 tags:
   - auth
   - accessibility

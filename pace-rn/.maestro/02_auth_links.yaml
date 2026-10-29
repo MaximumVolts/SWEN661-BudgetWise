@@ -1,6 +1,6 @@
 # The sign-in links are reachable by their accessibility labels and open the right screens.
 appId: com.example.pace.rn
-name: "React Native: create account and reset password links"
+name: "React Native create account and reset password links"
 tags:
   - auth
   - accessibility

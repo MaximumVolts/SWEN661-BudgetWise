@@ -5,6 +5,6 @@ flows:
 executionOrder:
   continueOnFailure: true
   flowsOrder:
-    - "Flutter: sign in errors are shown in text"
-    - "Flutter: create account and reset password links"
-    - "Flutter: home info buttons and bottom tabs"
+    - "Flutter sign in errors are shown in text"
+    - "Flutter create account and reset password links"
+    - "Flutter home info buttons and bottom tabs"

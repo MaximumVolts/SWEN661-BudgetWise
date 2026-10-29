@@ -1,7 +1,7 @@
 # Signed in: Home's info buttons have labels, and every bottom tab opens its screen.
 # Needs a test account: maestro test -e PACE_USERNAME=... -e PACE_PASSWORD=... .maestro
 appId: com.example.pace
-name: "Flutter: home info buttons and bottom tabs"
+name: "Flutter home info buttons and bottom tabs"
 tags:
   - login
   - accessibility
@@ -16,13 +16,80 @@ tags:
 - assertVisible: "About payday estimate"
 - assertVisible: "About available balance"
 - tapOn: "Budgets(, Tab . of 5)?"
+- assertVisible: "Budgets"
 - assertVisible: "New budget"
+- tapOn: "New budget"
+- assertVisible: "Monthly limit"
+- tapOn: "Create budget"
+- assertVisible: "Choose a category"
+- assertVisible: "Enter a monthly limit"
+- tapOn: "Back"
+- tapOn: "Budget options"
+- assertVisible: "Manage budgets"
+- assertVisible: "New budget"
+- tapOn: "Back"
+- assertVisible: "Budgets"
 - tapOn: "Spending(, Tab . of 5)?"
+- assertVisible: "Spending"
 - assertVisible: "Month"
+- tapOn: "3 months"
+- assertVisible: "3 months"
+- tapOn: "Year"
+- assertVisible: "Year"
+- tapOn: "Month"
+- assertVisible: "Choose date range"
 - tapOn: "Bills(, Tab . of 5)?"
+- assertVisible: "Bills"
 - assertVisible: "Upcoming"
+- assertVisible: "Recurring"
+- assertVisible: "Due in the next 30 days"
+- tapOn: "Recurring"
+- assertVisible: "Monthly"
+- assertVisible: "Yearly"
+- tapOn: "Upcoming"
+- assertVisible: "Due in the next 30 days"
 - tapOn: "Transactions(, Tab . of 5)?"
 - tapOn: "Home(, Tab . of 5)?"
 - scrollUntilVisible:
     element: "Settings"
     direction: UP
+- tapOn: "Settings"
+- assertVisible: "Settings"
+- scrollUntilVisible:
+    element:
+      text: "High contrast"
+    direction: DOWN
+- assertVisible: "High contrast"
+- scrollUntilVisible:
+    element:
+      text: "Colorblind mode"
+    direction: DOWN
+- assertVisible: "Colorblind mode"
+- scrollUntilVisible:
+    element:
+      text: "Preview: colorblind mode is off. Statuses use colored dots."
+    direction: DOWN
+- runFlow:
+    when:
+      visible: "Preview: colorblind mode is off. Statuses use colored dots."
+    commands:
+      - tapOn: "Colorblind mode"
+      - assertVisible: "Preview: colorblind mode is on. Statuses use shapes, stripes, blue and orange."
+      - tapOn: "Colorblind mode"
+      - assertVisible: "Preview: colorblind mode is off. Statuses use colored dots."
+- runFlow:
+    when:
+      visible: "Preview: colorblind mode is on. Statuses use shapes, stripes, blue and orange."
+    commands:
+      - tapOn: "Colorblind mode"
+      - assertVisible: "Preview: colorblind mode is off. Statuses use colored dots."
+      - tapOn: "Colorblind mode"
+      - assertVisible: "Preview: colorblind mode is on. Statuses use shapes, stripes, blue and orange."
+- scrollUntilVisible:
+    element:
+      text: "Show values on charts"
+    direction: DOWN
+- assertVisible: "Show values on charts"
+- tapOn: "Close settings"
+- assertVisible: "Spent this month"
+
