@@ -1,0 +1,10 @@
+{
+  "description": "PACE helps young professionals manage budgets, track spending and bills, and compare monthly finances with interactive tools and accessible desktop workflows.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
