@@ -1,0 +1,68 @@
+import { Text, View } from 'react-native';
+import type { SignInController } from '../../controllers/signInController';
+import { useDisplay } from '../../state/PreferencesContext';
+import { Field, Gap, PillButton, Screen, Scroll, Tap } from '../../ui/components';
+import { Icon } from '../../ui/icons';
+import { useDesktop } from '../../ui/responsive';
+import { SignInDesktop } from './desktop/JourneyPages';
+
+/** 01 - Sign In. Google / Apple sign-in isn't offered. */
+function SignInPhone({ controller }: { controller: SignInController }) {
+  const { username, setUsername, password, setPassword, submitting, fieldErrors, signIn, forgotPassword, createAccount } = controller;
+  const { colors: c, type: t } = useDisplay();
+
+  return (
+    <Screen>
+      <Scroll>
+        <Gap h={16} />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+          <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: c.lime, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="speed" color="#1A1A1A" />
+          </View>
+          <Text style={{ fontSize: 24, fontWeight: '700', color: c.ink }}>Pace</Text>
+        </View>
+        <Gap h={40} />
+        <Text style={t.display}>Your money, at your pace.</Text>
+        <Gap h={20} />
+        <Text style={t.body}>Connect your accounts once, and Pace automatically keeps track of your spending, budgets, and bills.</Text>
+        <Gap h={28} />
+        <Field
+          label="Username"
+          value={username}
+          onChangeText={setUsername}
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoComplete="username"
+          error={fieldErrors.username}
+        />
+        <Field
+          label="Password"
+          value={password}
+          onChangeText={setPassword}
+          secure
+          autoComplete="password"
+          error={fieldErrors.password}
+          onSubmitEditing={signIn}
+        />
+        <View style={{ alignItems: 'flex-end' }}>
+          <Tap onPress={forgotPassword} style={{ alignItems: 'center', padding: 12 }}>
+            <Text style={{ fontWeight: '700', fontSize: 18, color: c.ink }}>Forgot password?</Text>
+          </Tap>
+        </View>
+        <Gap h={20} />
+        <PillButton label={submitting ? 'Signing in…' : 'Sign in'} onPress={signIn} disabled={submitting} />
+      </Scroll>
+      <Tap onPress={createAccount} label="New to Pace? Create account" style={{ alignItems: 'center', paddingVertical: 12 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', paddingHorizontal: 20 }}>
+          <Text style={{ fontSize: 16, color: c.muted }}>New to Pace? </Text>
+          <Text style={{ fontSize: 18, fontWeight: '700', color: c.ink }}>Create account</Text>
+        </View>
+      </Tap>
+    </Screen>
+  );
+}
+
+/** Desktop windows get the desktop layout; phones and tablets the one above. */
+export function SignInScreen({ controller }: { controller: SignInController }) {
+  return useDesktop() ? <SignInDesktop controller={controller} /> : <SignInPhone controller={controller} />;
+}

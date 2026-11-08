@@ -1,0 +1,29 @@
+{
+  "appId": "com.example.pace.desktop",
+  "productName": "Pace",
+  "directories": {
+    "app": "build/desktop-app",
+    "output": "build/desktop-release",
+    "buildResources": "assets"
+  },
+  "icon": "assets/icon.png",
+  "files": ["**/*", "!node_modules{,/**/*}", "!dist{,/**/*}"],
+  "extraResources": [{ "from": "build/desktop-app/dist", "to": "dist", "filter": ["**/*"] }],
+  "asar": true,
+  "npmRebuild": false,
+  "win": {
+    "target": ["nsis"]
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true
+  },
+  "mac": {
+    "target": ["dmg"],
+    "category": "public.app-category.finance"
+  },
+  "linux": {
+    "target": ["AppImage"],
+    "category": "Finance"
+  }
+}
