@@ -33,13 +33,14 @@ export const params = () => rendered!.getSearchParams();
 
 /**
  * The app on [app]'s services (default: Ada signed in with the sandbox bank linked), opened at
- * [url]. Waits for the first screen to settle.
+ * [url]. Waits for the first screen to settle. [routeOverrides] replace route files (e.g. a test's own
+ * root '_layout').
  */
-export async function openApp(url = '/', app?: SandboxApp): Promise<SandboxApp> {
+export async function openApp(url = '/', app?: SandboxApp, routeOverrides: Record<string, unknown> = {}): Promise<SandboxApp> {
   const opened = app ?? (await sandboxServices());
   setAppServices(opened.services);
   // renderRouter's promise carries the route helpers (getPathname…).
-  const result = renderRouter(routes() as never, { initialUrl: url });
+  const result = renderRouter({ ...routes(), ...routeOverrides } as never, { initialUrl: url });
   await result;
   rendered = result as unknown as { getPathname(): string; getSearchParams(): Record<string, string> };
   await settle();

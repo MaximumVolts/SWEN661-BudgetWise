@@ -295,9 +295,7 @@ function CustomizeDrawer({ controller: ctl }: { controller: ComparisonController
   const { colors: c } = useDisplay();
   const d = ctl.draft;
   const set = ctl.updateDraft;
-  const rows = ctl.data.state.data?.rows ?? [];
-  // The categories worth offering: those with spending, plus any already chosen.
-  const offered = rows.filter((r) => r.a > 0 || r.b > 0 || d?.categoryIds?.includes(r.categoryId));
+  const offered = ctl.offeredCategories;
   return (
     <Drawer
       visible={!!d}

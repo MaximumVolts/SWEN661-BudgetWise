@@ -42,7 +42,7 @@ npm run desktop        # build the web bundle and open Pace in Electron
 | Type checking | TypeScript strict, `npm run typecheck` |
 | Security analysis | `npm run security`, see [Security analysis](#security-analysis) and [SECURITY.md](SECURITY.md) |
 | Android / iOS builds | `npm run build:android` / `npm run build:ios` (EAS), or a local APK with `npm run build:android:local` |
-| Jest + RNTL tests, 60%+ coverage | 167 tests in `__tests__/`, at about 88% statement coverage. `npm run test:coverage` writes the HTML report to `coverage/lcov-report/index.html`. |
+| Jest + RNTL tests, 60%+ coverage | 254 tests in `__tests__/`, at about 88% statement and 78% branch coverage (75% is enforced). `npm run test:coverage` writes the HTML report to `coverage/lcov-report/index.html`. |
 | Framework comparison | [`docs/framework-comparison.md`](docs/framework-comparison.md) (export it to PDF/Word to submit) |
 
 ## First-time setup
@@ -182,8 +182,13 @@ npm run test:coverage    # plus coverage: text summary, and HTML in coverage/lco
 | `settingsAndTools-test.tsx` | RNTL + navigation | settings toggles and reminders, profile, accounts, notifications, goals, cash flow, spending, statements |
 | `layoutAndSnapshots-test.tsx` | unit + RNTL + snapshot | phone/tablet layouts, snapshots of shared components and screens |
 | `keyboard-test.ts` | unit | keyboard shortcuts (keys per platform, menu commands, the shortcuts list), search destinations, page Save / New / Print actions |
+| `keyboardDom-test.tsx` | DOM (jsdom + react-native-web) | desktop keyboard support in a real DOM: arrow keys in tab lists / radio groups / list boxes, Space, focus helpers, the shortcut listener, mouse Back / Forward, Electron menu commands |
+| `comparison-test.ts` | unit | Monthly Comparison: months, totals, CSV / PDF export following the Customize choices, saved choices per user, category rules |
+| `desktop-test.ts` | unit | the Electron desktop repositories and bridge |
+| `desktopScreens-test.tsx` | RNTL + navigation | every page in the desktop layout; transactions, budgets, bills, notifications; Monthly Comparison rows, periods, downloads and the Customize panel |
+| `desktopShell-test.tsx` | RNTL + navigation | the desktop frame: sidebar, breadcrumb, top-bar search box, notifications, profile, the shortcuts list, and each keyboard command |
 
-Coverage at the time of writing: **about 88% statements, 77% branches, 87% functions, 91% lines** (the minimum is 60%).
+Coverage at the time of writing: **about 88% statements, 78% branches, 86% functions, 90% lines**. `npm run test:coverage` fails if any of the four drops below **75%** (`coverageThreshold` in `package.json`).
 
 Tests run the real services on an in-memory SQLite database (sql.js), with Plaid replayed from responses recorded from the sandbox (`__tests__/fixtures/plaid_sandbox`). "Today" is fixed to the recording date, 12 October 2026. Screen tests open the actual routes (`src/views/routes`) with Expo Router's `renderRouter`. Nothing in the tests calls Plaid.
 

@@ -76,6 +76,9 @@
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.tsx"
     ],
+    "coverageThreshold": {
+      "global": { "lines": 75, "statements": 75, "functions": 75, "branches": 75 }
+    },
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
       "!src/**/*.d.ts"

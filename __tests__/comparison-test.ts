@@ -136,6 +136,24 @@ describe('Customize panel (ComparisonService)', () => {
     expect(comparison.defaultOptions()).toEqual(DEFAULT_COMPARISON_OPTIONS);
   });
 
+  test('the panel offers categories with spending; unticking all of them leaves none chosen', async () => {
+    const comparison = app.services.comparison;
+    const data = await comparison.compare('2026-09', '2026-10');
+    const offered = comparison.offeredCategories(data, DEFAULT_COMPARISON_OPTIONS);
+    expect(offered.every((r) => r.a > 0 || r.b > 0)).toBe(true);
+    expect(offered.length).toBeLessThan(data.rows.length); // some categories had no spending
+    expect(comparison.offeredCategories(data, { ...DEFAULT_COMPARISON_OPTIONS, showEmpty: true })).toHaveLength(data.rows.length);
+    const empty = data.rows.find((r) => r.a === 0 && r.b === 0)!;
+    expect(comparison.offeredCategories(data, { ...DEFAULT_COMPARISON_OPTIONS, categoryIds: [empty.categoryId] }).map((r) => r.categoryId)).toContain(empty.categoryId);
+
+    // Every offered chip unticked: nothing is chosen (not the hidden empty ones), so it can't apply.
+    const ids = offered.map((r) => r.categoryId);
+    let o = DEFAULT_COMPARISON_OPTIONS;
+    for (const id of ids) o = comparison.toggleCategory(o, id, ids);
+    expect(o.categoryIds).toEqual([]);
+    expect(comparison.problemWith(o)).toBe('Choose at least one category.');
+  });
+
   test('the Categories field counts what is shown', async () => {
     const comparison = app.services.comparison;
     const data = await comparison.compare('2026-09', '2026-10');

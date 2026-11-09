@@ -56,7 +56,6 @@ export function useComparisonController() {
     if (id) setPicked((p) => ({ ...p, [which]: id }));
   };
 
-  const allCategoryIds = () => data.state.data?.rows.map((r) => r.categoryId) ?? [];
 
   /** Shows and keeps [next]; resolves true if they were kept. */
   const keep = (next: ComparisonOptions) =>
@@ -113,7 +112,10 @@ export function useComparisonController() {
       setDraft(options);
     },
     updateDraft: (patch: Partial<ComparisonOptions>) => setDraft((d) => d && { ...d, ...patch }),
-    toggleDraftCategory: (id: string) => setDraft((d) => d && comparison.toggleCategory(d, id, allCategoryIds())),
+    /** The categories the panel offers to choose from. */
+    offeredCategories: draft ? comparison.offeredCategories(data.state.data, draft) : [],
+    toggleDraftCategory: (id: string) =>
+      setDraft((d) => d && comparison.toggleCategory(d, id, comparison.offeredCategories(data.state.data, d).map((r) => r.categoryId))),
     selectAllCategories: () => setDraft((d) => d && comparison.selectAllCategories(d)),
     resetDraft: () => setDraft((d) => d && comparison.defaultOptions()),
     pickHighlight: async () => {

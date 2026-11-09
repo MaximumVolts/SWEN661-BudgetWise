@@ -50,7 +50,12 @@ export interface ComparisonService {
   defaultOptions(): ComparisonOptions;
   /** Why [options] can't be applied ("Choose at least one category."), or undefined if they can. */
   problemWith(options: ComparisonOptions): string | undefined;
-  /** [options] with [categoryId] chosen or not; choosing every one of [allIds] means "all categories". */
+  /**
+   * The categories the panel offers: those with spending (every one when empty categories are
+   * shown), plus any already chosen.
+   */
+  offeredCategories(data: ComparisonData | undefined, options: ComparisonOptions): ComparisonRow[];
+  /** [options] with [categoryId] chosen or not; choosing every one of [allIds] (those offered) means "all categories". */
   toggleCategory(options: ComparisonOptions, categoryId: string, allIds: string[]): ComparisonOptions;
   /** [options] with every category chosen. */
   selectAllCategories(options: ComparisonOptions): ComparisonOptions;
@@ -144,8 +149,13 @@ export class PlaidComparisonService extends BankDataService implements Compariso
     return undefined;
   }
 
+  offeredCategories(data: ComparisonData | undefined, options: ComparisonOptions): ComparisonRow[] {
+    return (data?.rows ?? []).filter((r) => options.showEmpty || r.a > 0 || r.b > 0 || options.categoryIds?.includes(r.categoryId));
+  }
+
   toggleCategory(options: ComparisonOptions, categoryId: string, allIds: string[]): ComparisonOptions {
-    const chosen = new Set(options.categoryIds ?? allIds);
+    // Chosen categories that aren't offered (no spending now) count as not chosen.
+    const chosen = new Set((options.categoryIds ?? allIds).filter((id) => allIds.includes(id)));
     if (chosen.has(categoryId)) chosen.delete(categoryId);
     else chosen.add(categoryId);
     const all = allIds.every((id) => chosen.has(id));
