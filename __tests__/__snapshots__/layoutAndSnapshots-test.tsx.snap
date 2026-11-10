@@ -3939,12 +3939,14 @@ exports[`Snapshots sign in screen 1`] = `
                               "backgroundColor": "#FFFFFF",
                               "borderColor": "#8C8A84",
                               "borderWidth": 1,
+                              "margin": 1,
                             },
                           ]
                         }
                       >
                         <TextInput
                           accessibilityLabel="Username"
+                          aria-invalid={false}
                           autoCapitalize="none"
                           autoComplete="username"
                           autoCorrect={false}
@@ -3953,12 +3955,15 @@ exports[`Snapshots sign in screen 1`] = `
                           onFocus={[Function]}
                           placeholderTextColor="#5B5A55"
                           style={
-                            {
-                              "color": "#1A1A1A",
-                              "flex": 1,
-                              "fontSize": 18,
-                              "paddingVertical": 14,
-                            }
+                            [
+                              {
+                                "color": "#1A1A1A",
+                                "flex": 1,
+                                "fontSize": 18,
+                                "paddingVertical": 14,
+                              },
+                              {},
+                            ]
                           }
                           value=""
                         />
@@ -4001,12 +4006,14 @@ exports[`Snapshots sign in screen 1`] = `
                               "backgroundColor": "#FFFFFF",
                               "borderColor": "#8C8A84",
                               "borderWidth": 1,
+                              "margin": 1,
                             },
                           ]
                         }
                       >
                         <TextInput
                           accessibilityLabel="Password"
+                          aria-invalid={false}
                           autoComplete="password"
                           onBlur={[Function]}
                           onChangeText={[Function]}
@@ -4015,12 +4022,15 @@ exports[`Snapshots sign in screen 1`] = `
                           placeholderTextColor="#5B5A55"
                           secureTextEntry={true}
                           style={
-                            {
-                              "color": "#1A1A1A",
-                              "flex": 1,
-                              "fontSize": 18,
-                              "paddingVertical": 14,
-                            }
+                            [
+                              {
+                                "color": "#1A1A1A",
+                                "flex": 1,
+                                "fontSize": 18,
+                                "paddingVertical": 14,
+                              },
+                              {},
+                            ]
                           }
                           value=""
                         />

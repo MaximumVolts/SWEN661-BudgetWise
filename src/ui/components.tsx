@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   type GestureResponderEvent,
@@ -23,7 +23,7 @@ import { useDisplay } from '../state/PreferencesContext';
 import { DateLabels } from '../utils/dateLabels';
 import { DatePicker } from './DatePicker';
 import { Icon, type IconName } from './icons';
-import { FocusPressable, focusRing, KeyGroup, spaceKeyProps } from './keyboard';
+import { bareInput, FocusPressable, focusRing, KeyGroup, spaceKeyProps, useRevealFirstError } from './keyboard';
 import { useResponsive } from './responsive';
 
 // ── Layout ────────────────────────────────────────────────────────────────────
@@ -501,18 +501,22 @@ export function Field({
   const { colors: c, type: t } = useDisplay();
   const [hidden, setHidden] = useState(true);
   const [focused, setFocused] = useState(false);
+  const ref = useRef<TextInput>(null);
+  useRevealFirstError(ref, error);
   const labelText = (
     <Text style={inset ? { fontSize: 12, color: error ? c.red : c.ink } : [t.sub, { marginBottom: 6, color: error ? c.red : c.ink, fontWeight: '600' }]}>{label}</Text>
   );
   const textInput = (
     <TextInput
+      ref={ref}
+      {...invalidProps(error)}
       accessibilityLabel={label}
       accessibilityHint={error ?? helper}
       placeholderTextColor={c.muted}
       secureTextEntry={secure && hidden}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
-      style={inset ? { fontSize: 16, color: c.ink, paddingVertical: 2 } : { flex: 1, fontSize: 18, color: c.ink, paddingVertical: 14 }}
+      style={[inset ? { fontSize: 16, color: c.ink, paddingVertical: 2 } : { flex: 1, fontSize: 18, color: c.ink, paddingVertical: 14 }, bareInput]}
       {...input}
     />
   );
@@ -522,7 +526,7 @@ export function Field({
       <View
         style={[
           styles.field,
-          { borderColor: error ? c.red : focused ? c.ink : c.outline, borderWidth: focused || error ? 2 : 1, backgroundColor: c.surface },
+          { ...boxBorder(error ? c.red : focused ? c.ink : c.outline, focused || !!error), backgroundColor: c.surface },
           ...(inset ? [{ borderRadius: 6, minHeight: 60, paddingLeft: 16 }] : []),
         ]}
       >
@@ -552,6 +556,31 @@ export function Field({
   );
 }
 
+/** Marks a form control invalid while it has an [error] (screen readers say so; see useRevealFirstError). */
+const invalidProps = (error: string | undefined): object => ({ 'aria-invalid': !!error });
+
+/**
+ * A form box's border: 2px when [thick] (focused or in error), else 1px, with the box's outer size
+ * and its contents kept still either way (a margin makes up the difference).
+ */
+export const boxBorder = (color: string, thick: boolean) => ({ borderColor: color, borderWidth: thick ? 2 : 1, margin: thick ? 0 : 1 });
+
+
+/**
+ * A bordered box around a text input and its icons or buttons (a search box). On desktop its border
+ * thickens while anything inside has focus; pair it with bareInput on the TextInput.
+ */
+export function InputBox({ style, children }: { style?: StyleProp<ViewStyle>; children: ReactNode }) {
+  const { colors: c } = useDisplay();
+  const [focused, setFocused] = useState(false);
+  // React's focus events bubble, so the box hears its input's (react-native-web passes them on).
+  const focusProps = { onFocus: () => setFocused(true), onBlur: () => setFocused(false) } as object;
+  return (
+    <View {...focusProps} style={[style, boxBorder(focused ? c.ink : c.outline, focused)]}>
+      {children}
+    </View>
+  );
+}
 /** A field whose value is picked from a list (opens a bottom sheet). */
 export function SelectField({
   label,
@@ -571,17 +600,21 @@ export function SelectField({
   const { colors: c, type: t } = useDisplay();
   const { choose } = useDialogs();
   const current = options.find((o) => o.id === value);
+  const ref = useRef<View>(null);
+  useRevealFirstError(ref, error);
   return (
     <View style={{ marginBottom: 18 }}>
       <Text style={[t.sub, { marginBottom: 6, color: error ? c.red : c.ink, fontWeight: '600' }]}>{label}</Text>
       <Pressable
+        ref={ref}
+        {...invalidProps(error)}
         accessibilityRole="button"
         accessibilityLabel={`${label}: ${current?.label ?? 'not chosen'}`}
         accessibilityHint={error}
         onPress={() =>
           void choose({ title: label, options, selectedId: value }).then((id) => id !== undefined && onChange(id))
         }
-        style={[styles.field, { borderColor: error ? c.red : c.outline, borderWidth: error ? 2 : 1, backgroundColor: c.surface, minHeight: 56 }]}
+        style={[styles.field, { ...boxBorder(error ? c.red : c.outline, !!error), backgroundColor: c.surface, minHeight: 56 }]}
       >
         <Text numberOfLines={1} style={{ flex: 1, fontSize: 18, color: current ? c.ink : c.muted }}>
           {current?.label ?? placeholder}
@@ -621,7 +654,7 @@ export function DateField({
         accessibilityLabel={`${label}: ${value ? DateLabels.long(value) : 'not chosen'}`}
         accessibilityHint={error ?? helper}
         onPress={() => setPicking(true)}
-        style={[styles.field, { borderColor: error ? c.red : c.outline, borderWidth: error ? 2 : 1, backgroundColor: c.surface, minHeight: 56 }]}
+        style={[styles.field, { ...boxBorder(error ? c.red : c.outline, !!error), backgroundColor: c.surface, minHeight: 56 }]}
       >
         <Icon name="event" color={c.ink} />
         <Text style={{ flex: 1, fontSize: 18, marginLeft: 10, color: value ? c.ink : c.muted }}>

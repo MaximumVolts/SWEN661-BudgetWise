@@ -39,6 +39,8 @@ test('create account → onboarding → connect the sandbox bank → Home', asyn
   await pressButton('Create account');
   expect(screen.getByText('Enter your name')).toBeTruthy();
   expect(screen.getByText('Enter your Plaid client ID')).toBeTruthy();
+  // Said where it shows too: the fields may be scrolled out of sight above the button.
+  expect(screen.getByText(/^Please fix the \d+ highlighted fields\.$/)).toBeTruthy();
 
   await type('Name', 'Ada');
   await type('Username', 'ada');
@@ -62,6 +64,31 @@ test('create account → onboarding → connect the sandbox bank → Home', asyn
   await settle(60);
   expect(pathname()).toBe('/');
   expect(app.plaid.calls('/sandbox/public_token/create')).toBe(1);
+  app.bankData.stopRetrying();
+});
+
+test('a username that is taken: the form says so, and nothing is saved', async () => {
+  const app = await sandboxServices({ linkBank: false });
+  await app.services.auth.signOut();
+  await openApp('/create-account', app);
+
+  await type('Name', 'Ada again');
+  await type('Username', 'ADA'); // usernames ignore case
+  await type('Password', 'secret123');
+  await type('Confirm password', 'secret123');
+  await pressLabel(/^Question:/);
+  await press('What city were you born in?');
+  await type('Answer', 'Paris');
+  await type('Client ID', TEST_PLAID_CLIENT_ID);
+  await type('Sandbox secret', TEST_PLAID_SECRET);
+  await pressButton('Create account');
+
+  expect(pathname()).toBe('/create-account');
+  expect(screen.getByText('An account with this username already exists')).toBeTruthy();
+  expect(screen.getByText('Please fix the highlighted field.')).toBeTruthy();
+  expect(screen.getByLabelText('Username').props['aria-invalid']).toBe(true);
+  expect(screen.getByLabelText('Name').props['aria-invalid']).toBe(false);
+  expect(app.services.auth.isSignedIn).toBe(false);
   app.bankData.stopRetrying();
 });
 

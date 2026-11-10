@@ -1,7 +1,7 @@
 import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Icon, type IconName } from '../ui/icons';
-import { FocusPressable, KeyGroup } from '../ui/keyboard';
+import { bareInput, FocusPressable, KeyGroup } from '../ui/keyboard';
 import { useDesktop } from '../ui/responsive';
 import { useDisplay } from './PreferencesContext';
 
@@ -32,6 +32,7 @@ const DialogContext = createContext<Dialogs | null>(null);
 export function DialogProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState<Open>();
   const [text, setText] = useState('');
+  const [typing, setTyping] = useState(false);
   const { colors: c, type: t } = useDisplay();
   // Desktop: pickers are a centred dialog instead of a bottom sheet.
   const desktop = useDesktop();
@@ -131,7 +132,10 @@ export function DialogProvider({ children }: { children: ReactNode }) {
                     value={text}
                     onChangeText={setText}
                     autoFocus
-                    style={[styles.input, { borderColor: c.outline, color: c.ink }]}
+                    onFocus={() => setTyping(true)}
+                    onBlur={() => setTyping(false)}
+                    // The input is its own box: its border (not a browser outline) shows focus.
+                    style={[styles.input, { borderColor: typing ? c.ink : c.outline, borderWidth: typing ? 2 : 1, padding: typing ? 13 : 14, color: c.ink }, bareInput]}
                   />
                 )}
                 <View style={styles.actions}>

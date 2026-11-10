@@ -3,8 +3,8 @@
  */
 // The desktop (web) keyboard support in a real DOM: React Native renders through react-native-web,
 // as it does in the desktop app, so focus, roles and key events are the browser's.
-import { act, type ReactNode } from 'react';
-import { Text } from 'react-native';
+import { act, type ReactNode, useRef } from 'react';
+import { Text, TextInput } from 'react-native';
 import type { ShortcutCommand } from '@/models/shortcuts';
 import {
   FocusPressable,
@@ -15,6 +15,7 @@ import {
   KeyGroup,
   MAIN_CONTENT_ID,
   spaceKeyProps,
+  useRevealFirstError,
   useShortcutListener,
 } from '@/ui/keyboard';
 
@@ -291,5 +292,33 @@ describe('the shortcut listener', () => {
     expect(unsubscribe).toHaveBeenCalled();
     press('k', { ctrlKey: true, code: 'KeyK' }, window);
     expect(commands).toEqual([]);
+  });
+});
+
+describe('a rejected form', () => {
+  function Input({ label, error }: { label: string; error?: string }) {
+    const ref = useRef<TextInput>(null);
+    useRevealFirstError(ref, error);
+    return <TextInput ref={ref} accessibilityLabel={label} {...({ 'aria-invalid': !!error } as object)} />;
+  }
+  const form = (errors: Record<string, string | undefined>) => (
+    <>
+      <Input label="Name" error={errors.name} />
+      <Input label="Username" error={errors.username} />
+      <Input label="Password" error={errors.password} />
+    </>
+  );
+
+  test('scrolls to the first field with an error and focuses it', () => {
+    jest.useFakeTimers();
+    const scrolled = jest.fn();
+    Element.prototype.scrollIntoView = scrolled;
+    render(form({}));
+    act(() => root!.render(form({ username: 'Taken', password: 'Too short' })));
+    act(() => void jest.advanceTimersByTime(10));
+    const username = host.querySelector<HTMLElement>('[aria-label="Username"]');
+    expect(document.activeElement).toBe(username);
+    expect(scrolled).toHaveBeenCalledTimes(1); // only the first one moves
+    jest.useRealTimers();
   });
 });

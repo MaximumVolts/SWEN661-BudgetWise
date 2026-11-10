@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, type RefObject, useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, type PressableProps, type StyleProp, View, type ViewProps, type ViewStyle } from 'react-native';
 import { commandFromId, matchShortcut, type ShortcutCommand } from '../models/shortcuts';
 
@@ -38,6 +38,25 @@ export function focusById(id: string): boolean {
 /** Moves focus to the page (main content) once a navigation has rendered, so Tab carries on there. */
 export function focusPageSoon() {
   if (web) setTimeout(() => focusById(MAIN_CONTENT_ID), 50);
+}
+
+/**
+ * When [error] appears on a form field (through [ref]) that is the page's first invalid one, scroll
+ * it into view and focus it, so a rejected form shows what to fix even when the field is scrolled
+ * out of sight. Fields mark themselves with aria-invalid. Nothing on phones.
+ */
+export function useRevealFirstError(ref: RefObject<unknown>, error: string | undefined) {
+  useEffect(() => {
+    if (!web || !error || typeof document === 'undefined') return undefined;
+    // Once every field has rendered its error, so the first one in the page wins.
+    const t = setTimeout(() => {
+      const el = ref.current as HTMLElement | null;
+      if (!el || document.querySelector('[aria-invalid="true"]') !== el) return;
+      el.scrollIntoView?.({ block: 'center' });
+      el.focus();
+    }, 0);
+    return () => clearTimeout(t);
+  }, [ref, error]);
 }
 
 /** A dialog, panel or picker is open (keyboard shortcuts leave it alone). */
@@ -112,6 +131,12 @@ export function spaceKeyProps(role: string | undefined, onPress: ((event: never)
     },
   };
 }
+
+/**
+ * For a text input drawn inside a bordered box: no browser outline on the bare input (it would
+ * ring only the text, not the box). The box shows focus instead, on its border.
+ */
+export const bareInput: object = web ? { outlineStyle: 'none' } : {};
 
 /** Clear keyboard focus outline (WCAG 2.4.7). An outline does not shift the layout. */
 export function focusRing(color: string): ViewStyle {

@@ -2,9 +2,10 @@ import { ScrollView, Text, TextInput, View } from 'react-native';
 import type { TransactionsController } from '../../controllers/transactionsController';
 import type { FilterKind } from '../../models/transaction';
 import { useDisplay } from '../../state/PreferencesContext';
-import { AsyncView, Card, Gap, Heading, IconBadge, Screen, Tap } from '../../ui/components';
+import { AsyncView, Card, Gap, Heading, IconBadge, InputBox, Screen, Tap } from '../../ui/components';
 import { Fmt } from '../../ui/format';
 import { Icon, iconFor } from '../../ui/icons';
+import { bareInput } from '../../ui/keyboard';
 import { useDesktop } from '../../ui/responsive';
 import { TransactionsDesktop } from './desktop/TransactionsDesktop';
 
@@ -44,7 +45,7 @@ function TransactionsPhone({ controller }: { controller: TransactionsController 
         <Gap h={16} />
         <Heading style={{ fontSize: 24, fontWeight: '500', color: c.ink }}>Transactions</Heading>
         <Gap h={14} />
-        <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: c.outline, borderRadius: 6, backgroundColor: c.surface, paddingLeft: 12 }}>
+        <InputBox style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 6, backgroundColor: c.surface, paddingLeft: 12 }}>
           <Icon name="search" color={c.ink} />
           <TextInput
             accessibilityLabel="Search transactions"
@@ -53,14 +54,14 @@ function TransactionsPhone({ controller }: { controller: TransactionsController 
             value={searchText}
             onChangeText={search}
             returnKeyType="search"
-            style={{ flex: 1, fontSize: 16, color: c.ink, paddingVertical: 14, paddingHorizontal: 10 }}
+            style={[{ flex: 1, fontSize: 16, color: c.ink, paddingVertical: 14, paddingHorizontal: 10 }, bareInput]}
           />
           {searchText.length > 0 && (
             <Tap onPress={clearSearch} label="Clear search">
               <Icon name="close" color={c.ink} />
             </Tap>
           )}
-        </View>
+        </InputBox>
         <Gap h={12} />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
           {filterButton('account', query.account?.label ?? 'All accounts')}
