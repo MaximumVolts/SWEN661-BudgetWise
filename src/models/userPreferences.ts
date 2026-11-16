@@ -30,6 +30,10 @@ export interface UserPreferences {
   budgetAlerts: boolean;
   /** When bill reminders come (in-app notifications and push notifications). */
   billReminder: BillReminder;
+  /** Messages at the top of the screen stay until closed, instead of going after a while (WCAG 2.2.1). */
+  keepNotices: boolean;
+  /** Shortcuts that are a single key (? for the shortcuts list); off, only Ctrl/⌘ shortcuts work (WCAG 2.1.4). */
+  singleKeyShortcuts: boolean;
 }
 
 /** What applies when nobody is signed in. */
@@ -39,6 +43,8 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   showChartValues: true,
   budgetAlerts: true,
   billReminder: Reminder.threeDays,
+  keepNotices: false,
+  singleKeyShortcuts: true,
 };
 
 export const samePreferences = (a: UserPreferences, b: UserPreferences) =>
@@ -46,4 +52,6 @@ export const samePreferences = (a: UserPreferences, b: UserPreferences) =>
   a.colorblindMode === b.colorblindMode &&
   a.showChartValues === b.showChartValues &&
   a.budgetAlerts === b.budgetAlerts &&
-  a.billReminder.id === b.billReminder.id;
+  a.billReminder.id === b.billReminder.id &&
+  a.keepNotices === b.keepNotices &&
+  a.singleKeyShortcuts === b.singleKeyShortcuts;

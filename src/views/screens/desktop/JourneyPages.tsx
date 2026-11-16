@@ -150,7 +150,7 @@ function Point({ icon, title, body }: { icon: IconName; title: string; body: str
   return (
     <Panel style={{ flexBasis: 360, flexGrow: 1 }}>
       <Icon name={icon} color={c.ink} />
-      <Text style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>{title}</Text>
+      <Heading style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>{title}</Heading>
       <Text style={[DText.body, { color: c.muted }]}>{body}</Text>
     </Panel>
   );

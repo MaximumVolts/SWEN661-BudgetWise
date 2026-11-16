@@ -11,5 +11,7 @@ export interface SettingsData {
   colorblindMode: boolean;
   showChartValues: boolean;
   budgetAlerts: boolean;
+  keepNotices: boolean;
+  singleKeyShortcuts: boolean;
   footerLabel: string;
 }

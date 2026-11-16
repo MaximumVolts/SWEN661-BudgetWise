@@ -161,6 +161,21 @@
 
 New automated tests cover each fix: `keyboardDom-test.tsx`, `desktopDatePicker-test.tsx`, `journeyController-test.tsx`, `asyncData-test.tsx` and `a11yDom-test.tsx`. The full suite passes: 289 tests in 19 suites. Lint and typecheck are clean.
 
+## Re-run after the accessibility remediation
+
+The [conformance report's](accessibility-conformance-report.md) remediation changed things that the keyboard touches:
+- data tables became ARIA tables, with each row's button inside its row header;
+- notices gained a Close button;
+- Settings gained **Keep messages on screen** and **Single-key shortcuts**;
+- the narrow Transactions filters now wrap and scroll with the list.
+
+The scripted run was repeated on the rebuilt app: **282 of 282 checks pass**, with no traps and a visible focus indicator at every stop. Additional checks:
+- [ ] → [x] With **Single-key shortcuts** off, `?` does nothing, and Ctrl+/ and F1 still open the list.
+- [ ] → [x] A notice's **Close message** button is reachable with Tab and closes on Enter. Focus then returns to the page, and the button has a light 3 px focus ring on the dark bar.
+- [ ] → [x] At 400% zoom (320 CSS px), Tab reaches the wrapped **Date** filter on Transactions, which scrolls into view.
+
+Details are in the [test evidence](accessibility-test-evidence.md#e13-re-test-after-remediation) (E13). The automated suite was 297 tests in 20 suites at the re-run, and is now 453 tests in 22 suites with the added accessibility suites ([coverage report](test-coverage-report.md)).
+
 ## Not covered by this test
 
 - **The browser's calendar pop-up**, which only opens when a date field is clicked. It is Chromium's own control, outside the page, so key presses couldn't be sent to it. From the keyboard, dates are typed instead.

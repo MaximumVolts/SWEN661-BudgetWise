@@ -55,7 +55,7 @@ export function TransactionsDesktop({ controller }: { controller: TransactionsCo
               <Text style={[DText.small, { color: c.muted }]}>
                 {items.length} transaction{items.length === 1 ? '' : 's'} · {Fmt.money(spent)} spent
               </Text>
-              <DTable
+              <DTable label="Transactions"
                 columns={[
                   { label: 'Date', flex: 0.9 },
                   { label: 'Merchant', flex: 1.6 },

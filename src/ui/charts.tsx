@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 import Svg, { Circle, Line, Path, Text as SvgText } from 'react-native-svg';
 import type { CashFlowChartData } from '../models/cashFlow';
 import type { SpendChartData } from '../models/dashboard';
@@ -91,8 +91,11 @@ export function BarChart({
           return (
             <Pressable
               key={i}
-              accessibilityRole={onBarPress ? 'button' : undefined}
+              // A bar that does nothing on a press is a named image (a plain element may not have a name).
+              accessibilityRole={onBarPress ? 'button' : 'image'}
               accessibilityState={{ selected }}
+              // react-native-web ignores accessibilityState: on desktop the chosen bar is a pressed button.
+              {...(Platform.OS === 'web' && onBarPress ? { 'aria-pressed': selected } : {})}
               accessibilityLabel={`${b.semanticLabel ?? (b.label || `Bar ${i + 1}`)}: ${Fmt.money(b.value)}`}
               onPress={onBarPress ? () => onBarPress(i) : undefined}
               style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-end', height }}
@@ -122,7 +125,8 @@ export function BarChart({
           );
         })}
       </View>
-      <View style={{ flexDirection: 'row', marginTop: 10 }} importantForAccessibility="no-hide-descendants">
+      {/* The axis labels repeat the bars' names, so screen readers skip them (aria-hidden on the web). */}
+      <View style={{ flexDirection: 'row', marginTop: 10 }} aria-hidden importantForAccessibility="no-hide-descendants">
         {bars.map((b, i) => (
           <Text key={i} style={{ flex: 1, textAlign: 'center', fontSize: 12, color: c.muted }}>
             {b.label}

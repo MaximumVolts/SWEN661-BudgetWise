@@ -170,9 +170,10 @@ describe('dialogs', () => {
 describe('tables', () => {
   const columns = [{ label: 'Name' }, { label: 'Amount' }, { label: 'Actions' }];
 
-  test('rows are list items; the column titles sit outside the list', () => {
+  test('a table to screen readers: column headers, then rows of a row header and cells', () => {
     render(
       <DTable
+        label="Transactions"
         columns={columns.slice(0, 2)}
         rows={[
           { key: 'a', cells: ['Uber', '$5.40'], onPress: () => {} },
@@ -180,13 +181,18 @@ describe('tables', () => {
         ]}
       />,
     );
-    const list = one('[role="list"]');
-    expect([...list.children].map((c) => c.getAttribute('role'))).toEqual(['listitem', 'listitem']);
-    expect(list.textContent).not.toContain('Amount');
-    // A row that opens is a button named by its cells.
+    const table = one('[role="table"]');
+    expect(table.getAttribute('aria-label')).toBe('Transactions');
+    expect(all('[role="columnheader"]').map((h) => h.textContent)).toEqual(['Name', 'Amount']);
+    const rows = all('[role="rowgroup"]')[1].children;
+    expect([...rows].map((r) => r.getAttribute('role'))).toEqual(['row', 'row']);
+    // Every child of a row is a row header or a cell, so each value is read with its column name.
+    for (const r of rows) expect([...r.children].map((c) => c.getAttribute('role'))).toEqual(['rowheader', 'cell']);
+    expect(rows[0].textContent).toBe('Uber$5.40');
+    // A row that opens: its button sits in the row header, named by the cells with their columns.
     const row = one('[role="button"]');
-    expect(row.getAttribute('aria-label')).toBeNull();
-    expect(row.textContent).toBe('Uber$5.40');
+    expect(row.getAttribute('aria-label')).toBe('Uber, Amount: $5.40');
+    expect(row.parentElement!.getAttribute('role')).toBe('rowheader');
   });
 
   test('a row with actions: the row and its menu button are side by side, not one inside the other', () => {
@@ -215,9 +221,9 @@ describe('tables', () => {
     expect(options.getAttribute('aria-label')).toBe('Options for Netflix');
     expect(row.contains(options)).toBe(false);
     expect(row.querySelector('[tabindex]')).toBeNull();
-    // The cells are read by the row's label, so not twice.
-    const hidden = all('[aria-hidden="true"]');
-    expect(hidden.map((h) => h.textContent)).toEqual(['Netflix', '$15.49']);
+    // The menu has a cell of its own, under the Actions column.
+    expect(options.closest('[role="cell"]')).not.toBeNull();
+    expect(all('[role="row"]')[1].children.length).toBe(3);
 
     click(options);
     expect(menu).toHaveBeenCalled();

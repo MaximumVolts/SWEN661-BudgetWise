@@ -176,7 +176,7 @@ function Results({ data, controller: ctl }: { data: ComparisonData; controller: 
 
   const later = monthOnly(data.periodB.label);
   const table = (
-    <DTable
+    <DTable label="Spending by category"
       bare
       compact={compact}
       columns={columns}

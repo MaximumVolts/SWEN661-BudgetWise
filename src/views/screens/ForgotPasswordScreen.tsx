@@ -45,6 +45,7 @@ export function ForgotPasswordScreen({ controller }: { controller: ForgotPasswor
               onChangeText={setUsername}
               autoCapitalize="none"
               autoCorrect={false}
+              autoComplete="username"
               error={e.username}
               onSubmitEditing={lookUp}
             />
@@ -68,10 +69,11 @@ export function ForgotPasswordScreen({ controller }: { controller: ForgotPasswor
               value={password}
               onChangeText={setPassword}
               secure
+              autoComplete="new-password"
               error={e.password}
               helper="At least 8 characters, with a letter and a number"
             />
-            <Field label="Confirm new password" value={confirm} onChangeText={setConfirm} secure error={e.confirmPassword} onSubmitEditing={reset} />
+            <Field label="Confirm new password" value={confirm} onChangeText={setConfirm} secure autoComplete="new-password" error={e.confirmPassword} onSubmitEditing={reset} />
             <Gap h={10} />
             <PillButton label={submitting ? 'Resetting…' : 'Reset password'} onPress={reset} disabled={submitting} />
           </>

@@ -184,12 +184,15 @@ async function saveStatement(file) {
   return true;
 }
 
-/** Prints [html] to PDF in a hidden, script-free window. */
+/**
+ * Prints [html] to PDF in a hidden, script-free window. The PDF is tagged, so
+ * screen readers get its headings, table structure, reading order and language.
+ */
 async function printToPdf(html) {
   const win = new BrowserWindow({ show: false, webPreferences: { sandbox: true, javascript: false, contextIsolation: true } });
   try {
     await win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
-    return await win.webContents.printToPDF({ printBackground: true, pageSize: 'Letter' });
+    return await win.webContents.printToPDF({ printBackground: true, pageSize: 'Letter', generateTaggedPDF: true, generateDocumentOutline: true });
   } finally {
     win.destroy();
   }

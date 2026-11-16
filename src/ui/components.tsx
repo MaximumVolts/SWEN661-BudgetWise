@@ -745,7 +745,7 @@ export function SwitchRow({ title, subtitle, value, onChange, icon }: { title: s
         accessibilityLabel={title}
         value={value}
         onValueChange={onChange}
-        trackColor={{ true: c.ink, false: c.chip }}
+        trackColor={{ true: c.ink, false: c.outline }}
         thumbColor={value ? c.lime : '#FFFFFF'}
       />
     </View>

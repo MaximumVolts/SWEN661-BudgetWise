@@ -1,8 +1,10 @@
 # Accessibility test evidence: Pace desktop 1.0.0
 
-This document supports the [Accessibility Conformance Report](accessibility-conformance-report.md). It records how each part of the evaluation was carried out and what it found. The section numbers (E1–E10) are cited from the report's Remarks column.
+This document supports the [Accessibility Conformance Report](accessibility-conformance-report.md). It records how each part of the evaluation was carried out and what it found. The section numbers (E1–E13) are cited from the report's Remarks column.
 
-**Product tested:** Pace 1.0.0, Windows desktop app (Electron 45.2.3, Chromium engine). Build from branch `electron`, base commit `559933f`, with the accessibility fixes described below applied.
+**Product tested:** Pace 1.0.0, Windows desktop app (Electron 45.2.3, Chromium engine). Build from branch `electron`, base commit `4d6819a`, with the accessibility fixes described below applied.
+
+**How to read this document:** sections E1–E11 record the first evaluation. Each problem it found has since been fixed. Where a section reports a problem, a **Fixed** note follows it, and [E13](#e13-re-test-after-remediation) records the re-test of every fix.
 **Test platform:** Windows 11 Pro (10.0.26200), 1400 × 950 window at 100% scale.
 **Dates:** 14–15 November 2026.
 **Test data:** a copy of the app's data with a sandbox bank connection (Plaid sandbox), so tables and charts were populated. No real user data was used.
@@ -48,6 +50,8 @@ Per page, with AAA rules included (counts of elements):
 | Trends | 0 | 4 | 40 | 0 |
 | Settings | 0 | 8 | 42 | 5 |
 
+The A/AA scan of all 10 pages was repeated after the fixes in E13: still 0 violations. The AAA counts were unchanged, except Settings, which went from 8 to 9 because of the captions on its two new switches.
+
 ## E2. Keyboard-only testing
 
 Full method and results are in the [keyboard testing checklist](keyboard-testing-checklist.md).
@@ -90,7 +94,7 @@ Contrast ratios of the colour pairs the interface uses, worked out from the desi
 | Progress-bar fill on its track | 14.44 | 15.89 | Budget progress |
 | Narrow-layout switch, off track on background | **1.15** | **1.32** | Settings switches at 200% zoom or more (phone layout) |
 
-**Colour-blind mode:** blue positive (#0B5FA5) is 6.29:1 and orange negative (#B34700) is 5.27:1. In this mode status is also shown with shapes and patterns.
+**Colour-blind mode:** blue positive (#0B5FA5) is 6.29:1 and orange negative (#A64200) is 5.91:1 on the page and 5.00:1 on its pale-orange badge (darkened from #B34700, which was 4.45:1 on the badge — found by the contrast test in `__tests__/a11yContrast-test.ts`). In this mode status is also shown with shapes and patterns.
 
 **Conclusions:**
 - **AA text contrast (1.4.3):** met everywhere.
@@ -99,6 +103,11 @@ Contrast ratios of the colour pairs the interface uses, worked out from the desi
   - the "previous period" chart line in the standard theme (1.69:1). The chart has a text alternative that gives the previous period's total, and the high-contrast theme makes the line 5.49:1;
   - the off state of the switches in the narrow layout used at 200% zoom or more (1.15:1, or 1.32:1 in high contrast).
 
+**Fixed (E13):**
+- The "previous period" token is now `#8C8A84`, the same as the field-border colour. It measures 3.45:1 on white, 3.31:1 on the page background and 3.08:1 on panels. It is still clearly lighter than the current-period line (5.04:1 between the two).
+- The narrow layout's switches now use the outline colour for the off track: 3.31:1 in the standard theme and 13.77:1 in high contrast.
+- Non-text contrast (1.4.11) is now met everywhere.
+
 ## E5. Resize, zoom and reflow
 
 The window was emulated at the viewport sizes that browser zoom produces: 640 CSS px for 200% and 320 CSS px for 400%. Home, Transactions and Monthly Comparison were checked at each size.
@@ -106,7 +115,7 @@ The window was emulated at the viewport sizes that browser zoom produces: 640 CS
 | Size | Result |
 | --- | --- |
 | 200% (640 CSS px) | The layout switches to the single-column tablet/phone layout with a bottom tab bar. Nothing is lost and there's no horizontal page scrolling. Keyboard and axe results were clean (E1, E2). [Screenshot](acr-evidence/zoom-200-home.png). |
-| 400% (320 CSS px) | Content reflows to one column with no horizontal page scrolling ([Monthly Comparison](acr-evidence/reflow-320-comparison.png)). Two areas scroll sideways inside their own box:<br>• the Monthly Comparison **data table** (5 columns, 760 px wide), which WCAG 1.4.10 exempts because a data table needs two dimensions;<br>• the **filter buttons** on Transactions (All accounts, Category, Date), which sit in one row that scrolls sideways ([screenshot](acr-evidence/reflow-320-transactions.png)). This one isn't exempt. |
+| 400% (320 CSS px) | Content reflows to one column with no horizontal page scrolling ([Monthly Comparison](acr-evidence/reflow-320-comparison.png)). Two areas scroll sideways inside their own box:<br>• the Monthly Comparison **data table** (5 columns, 760 px wide), which WCAG 1.4.10 exempts because a data table needs two dimensions;<br>• the **filter buttons** on Transactions (All accounts, Category, Date), which sit in one row that scrolls sideways ([screenshot](acr-evidence/reflow-320-transactions.png)). This one isn't exempt.<br>**Fixed (E13):** the filter buttons now wrap onto more lines, and long account names wrap inside their button. At 320 px nothing on Transactions scrolls sideways ([screenshot](acr-evidence/fixed-reflow-320-transactions.png)). |
 
 Text can be enlarged with **View → Zoom In** (Ctrl + = / Ctrl + −). There is no in-app text-size setting.
 
@@ -125,6 +134,11 @@ A style sheet applying the WCAG 1.4.12 spacing was added to the page:
 
 [Screenshot](acr-evidence/text-spacing-home.png).
 
+**Fixed (E13):**
+- Sidebar items, the top bar, the search box and key hints now have a minimum height instead of a fixed one.
+- Sidebar labels wrap instead of being cut short.
+- With the same spacing applied, items grow, and the sidebar scrolls to show the rest. No visible item overlaps another ([screenshot](acr-evidence/fixed-text-spacing-home.png)).
+
 ## E7. Windows High Contrast (forced colours)
 
 Windows High Contrast was emulated with the forced-colours media feature.
@@ -135,6 +149,11 @@ Windows High Contrast was emulated with the forced-colours media feature.
 - **One loss:** the filled "pill" that marks the current page in the sidebar is removed by forced colours. Screen readers still get the current page (`aria-current="page"`), but sighted high-contrast users lose the visual cue.
 
 [Screenshot](acr-evidence/forced-colors-home.png). The app also has its own **High contrast** setting (Settings → Display).
+
+**Fixed (E13):**
+- Under forced colours, the current page in the sidebar is now filled with the system **Highlight** colour, with its text in **HighlightText**.
+- The chosen tab and the chosen radio option or chip get the same treatment, since forced colours had removed their fills too.
+- Measured with the emulation: the current item's background is the system Highlight colour (rgb 26, 235, 255) where other items have none ([screenshot](acr-evidence/fixed-forced-colors-home.png), [Monthly Comparison](acr-evidence/fixed-forced-colors-comparison.png)).
 
 ## E8. Names, roles and states (accessibility tree)
 
@@ -157,6 +176,16 @@ The DOM accessibility semantics were checked for each kind of control. Chromium 
 **Issue found:**
 - **Data tables (Transactions, Spending categories, Monthly Comparison and others) are lists of row buttons, not grid or table structures.** Column headers are therefore not associated with cells. On most tables the row reads clearly on its own ("Nov 10 Uber Transportation Plaid Checking Posted −$5.40"). On Monthly Comparison the numbers lose their meaning without the column names ("Food & drink $516 $16 −$500 Down −96.8%").
 
+**Fixed (E13):** every data table is now an ARIA table, made of these parts:
+- a `table` named after its section ("Transactions", "Category breakdown", "Spending by category", and so on);
+- a header row of `columnheader`s;
+- rows of one `rowheader` followed by `cell`s.
+
+So a screen reader announces each value with its column name, and its table-navigation commands work. Details:
+- **Rows that open:** the row's button sits inside its row header, so every child of a row is a cell. The button is named with the column names, for example "Nov 10, Merchant: Uber, Category: Transportation, …, Amount: −$5.40".
+- **Section titles:** titles above tables ("Category breakdown", "Recent transactions", "Recurring & subscriptions", each bill group) were plain text and are now headings.
+- **Checked in the running app:** every visible table has headers and contains only cells in its rows (E13). The `a11yDom` tests also check this structure.
+
 **Not done:** this evaluation did **not** include testing with a screen reader (NVDA, JAWS or Narrator). Conformance remarks that depend on screen-reader output rest on the accessibility tree and axe results, not on listening sessions.
 
 ## E9. Input purpose and authentication
@@ -168,6 +197,8 @@ The DOM accessibility semantics were checked for each kind of control. Chromium 
 | Sign in | Username (`username`), Password (`current-password`) | none |
 | Create account | Name (`name`), Username (`username`), Password (`new-password`) | Confirm password (should be `new-password`) |
 | Profile | none | Name (`name`) and Username (`username`) |
+
+**Fixed (E13):** Profile → Name is now `name` and Username `username`. Create account → Confirm password is now `new-password`. Forgot password → Username is now `username`, and both new-password fields are `new-password`. Read back from the running app: no personal-data field is missing a value.
 
 **Authentication:**
 - Password fields accept pasted text and password-manager autofill, and have "Show password".
@@ -185,23 +216,68 @@ Pace exports statements and the Monthly Comparison report as **CSV** and **PDF**
 
 Code: `src/services/statementEncoders.ts` (HTML) and `desktop/main.js` (`printToPDF`).
 
+**Fixed (E13):**
+- **Tagged PDFs:** `printToPDF` now passes `generateTaggedPDF: true` (and `generateDocumentOutline: true`).
+- **Source HTML:** both the statement and the Monthly Comparison report now have `lang="en"`, `scope="col"` column headers and `scope="row"` row headers, and the statement table has a caption.
+- **Verified:** a PDF printed by Electron 45 the same way was inspected. It contains a structure tree (`/StructTreeRoot`, `/MarkInfo << /Marked true >>`), the document language `/Lang (en)` and `H1`, `Table` and `TH` structure elements.
+- **Not done:** full PDF/UA validation (for example with PAC) was not run.
+
 ## E11. Timing, motion and flashing
 
 - **Timing:**
   - Status notices disappear after **4 seconds** (`SHOW_MS` in `src/state/NoticeContext.tsx`). They're announced politely to screen readers, but sighted users can't pause or extend them.
   - There are no session timeouts. Signing back in is never forced.
+  - **Fixed (E13):** status notices now behave as follows:
+    - they stay for **10 seconds**;
+    - the time doesn't run while the mouse is over a notice or focus is on its button;
+    - each has a **Close message** button, with a light focus ring (11.7:1 against the dark bar);
+    - **Settings → Keep messages on screen** turns the time limit off, so notices stay until closed (WCAG 2.2.1 "Turn off").
 - **Motion and flashing:**
   - Nothing flashes, and nothing scrolls or updates on its own for more than 5 seconds.
   - Page transitions are off on desktop. Dialogs fade in, but nothing moves across the screen.
 
 ## E12. Automated test suites
 
-The project's own tests cover the behaviours above: 289 tests in 19 suites, all passing. Coverage is about 88% of statements, 78% of branches, 86% of functions and 91% of lines. The accessibility-specific suites are:
-- `a11yDom-test.tsx`: names, roles, headings, progress bars, dialogs and table structure.
+The project's own tests cover the behaviours above: 453 tests in 22 suites, all passing (289 in 19 suites before the remediation, 297 in 20 after it). Coverage is 89.4% of statements, 80.0% of branches, 87.3% of functions and 92.0% of lines. The [test coverage report](test-coverage-report.md) has the details. The accessibility-specific suites are:
+- `a11yContrast-test.ts` (115 tests): the WCAG contrast ratio of every text / background pair, plus borders, switch tracks, chart lines and the focus ring, in all four palettes. It found the Colour-blind orange at 4.45:1 on its badge; that colour is now `#A64200` (5.00:1).
+- `a11yWidgets-test.tsx` (41 tests) covers:
+  - chart text alternatives, and patterns as well as colour;
+  - bar state (`aria-pressed`), with axis labels hidden;
+  - switches and radio groups by keyboard;
+  - every Settings switch named by its label;
+  - Notifications actions not nested in the card button;
+  - focus after keyboard navigation (Ctrl+K, Ctrl+number, Alt+←).
+
+  It found the nested buttons and the bar-chart state; both are fixed.
+- `a11yDom-test.tsx`: names, roles, headings, progress bars, dialogs and table structure (table, column headers, row headers, cells).
+- `notice-test.tsx`: status notices: read out politely, closed with their button, the time paused while focused, kept until closed with the setting on.
+- `keyboard-test.ts`: includes `?` turned off by the Single-key shortcuts setting.
+- `bankFeatures-test.ts`, `comparison-test.ts`: the exported HTML has `lang="en"` and `scope` on its column and row headers.
 - `keyboardDom-test.tsx`: keys, focus handling, the focus ring and shortcuts.
 - `desktopDatePicker-test.tsx`: the date field by keyboard.
 - `journeyController-test.tsx`: Back and Forward on the signed-out pages.
 - `asyncData-test.tsx`: focus kept while a page reloads.
+
+## E13. Re-test after remediation
+
+Every issue from E1–E11 was fixed, and the desktop app was rebuilt and re-tested with the same scratch data and tools.
+
+| Check | Result |
+| --- | --- |
+| axe-core A/AA + best practice, all 10 main pages | **0 violations** on every page |
+| Full keyboard-only regression (the checklist's scripted run, rebuilt app) | **282 of 282 checks pass**: no traps, every stop has a visible focus indicator and is on screen and not covered, and every shortcut works |
+| Tables: Transactions, Spending, Bills (both groups), Accounts, Monthly Comparison | Each is a named `table` with `columnheader`s; each row holds only `rowheader` / `cell` children. Row buttons are named with column names. A click at the centre of any cell reaches the row's button, and a real mouse click on a cell opens the transaction ([screenshot](acr-evidence/fixed-comparison-table.png)) |
+| Exported PDF (printed by Electron 45 as the app does) | `/StructTreeRoot`, `/Marked true`, `/Lang (en)`, `H1`, `Table`, `TH` present |
+| Text spacing (WCAG 1.4.12 style sheet), Home | No visible sidebar item overlaps another; items grow and the sidebar scrolls ([screenshot](acr-evidence/fixed-text-spacing-home.png)) |
+| Forced colours (emulated), Home and Monthly Comparison | Current page filled with the system Highlight colour (rgb 26, 235, 255); others unfilled ([Home](acr-evidence/fixed-forced-colors-home.png), [Monthly Comparison](acr-evidence/fixed-forced-colors-comparison.png)) |
+| 320 CSS px (400% zoom), Transactions | Nothing scrolls sideways. Tab reaches the wrapped **Date** filter, which scrolls into view and isn't covered ([screenshot](acr-evidence/fixed-reflow-320-transactions.png)) |
+| Narrow-layout switches | Off track `#8C8A84` (rgb 140, 138, 132), 3.31:1 against the page |
+| Autocomplete (read from the app) | Sign in, Create account, Profile: every personal-data field has a value (`name`, `username`, `current-password`, `new-password`) |
+| Notices | A notice shows a **Close message** button. It's gone after 10 s by default, and still there after 15 s with **Keep messages on screen** on. Enter on Close removes it, and focus returns to the page. The Close button's focus ring is light lime, 11.7:1 against the bar ([screenshot](acr-evidence/fixed-notice-close.png)) |
+| Single-key shortcuts | Off: `?` does nothing, and Ctrl+/ still opens the list. On: `?` opens the list, and Esc closes it. The setting is saved per user |
+| Automated tests | 297 of 297 passed at the re-test. After the added accessibility suites: 453 of 453 pass (E12) |
+
+The scratch user's settings were put back to their defaults after testing.
 
 ## Not evaluated
 

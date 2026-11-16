@@ -3,7 +3,7 @@ import type { BudgetCategoryController } from '../../../controllers/budgetCatego
 import type { BudgetsController } from '../../../controllers/budgetsController';
 import { type BudgetCategory, BUDGET_STATUS_LABEL, type BudgetStatus, progress, remaining } from '../../../models/budget';
 import { useDisplay } from '../../../state/PreferencesContext';
-import { AsyncView, ProgressBar, StatusMark, Tap } from '../../../ui/components';
+import { AsyncView, Heading, ProgressBar, StatusMark, Tap } from '../../../ui/components';
 import { Badge, Col, DButton, DesktopPage, DTable, DText, Panel, Row } from '../../../ui/desktop';
 import { Fmt } from '../../../ui/format';
 import { Icon } from '../../../ui/icons';
@@ -70,7 +70,7 @@ export function BudgetsDesktop({ controller }: { controller: BudgetsController }
                         </Panel>
                       </Col>
                       <Col flex={2}>
-                        <Text style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>Categories</Text>
+                        <Heading style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>Categories</Heading>
                         {o.categories.length === 0 ? (
                           <Panel>
                             <Text style={[DText.body, { color: c.muted }]}>No budgets yet. Add one to set a monthly limit for a spending category; it applies to every month.</Text>
@@ -179,8 +179,8 @@ export function BudgetCategoryDesktop({ controller }: { controller: BudgetCatego
           </Row>
           {data.recent.length > 0 && (
             <View style={{ gap: 12 }}>
-              <Text style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>Recent transactions</Text>
-              <DTable
+              <Heading style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>Recent transactions</Heading>
+              <DTable label="Recent transactions"
                 columns={[{ label: 'Merchant', flex: 2 }, { label: 'Date' }, { label: 'Category' }, { label: 'Amount', align: 'right' }]}
                 rows={data.recent.map((t) => ({
                   key: t.id,

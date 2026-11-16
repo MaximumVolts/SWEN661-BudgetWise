@@ -31,8 +31,9 @@ describe('SQLite storage (the real schema)', () => {
     const ada = await new SqliteUserAccountRepository(database).create({ username: 'ada', passwordHash: 'h' });
     const prefs = new SqlitePreferencesRepository(database);
     expect(await prefs.load(ada.id)).toEqual(DEFAULT_PREFERENCES);
-    await prefs.save(ada.id, { ...DEFAULT_PREFERENCES, highContrast: true, billReminder: Reminder.off });
-    expect(await prefs.load(ada.id)).toEqual({ ...DEFAULT_PREFERENCES, highContrast: true, billReminder: Reminder.off });
+    const mine = { ...DEFAULT_PREFERENCES, highContrast: true, billReminder: Reminder.off, keepNotices: true, singleKeyShortcuts: false };
+    await prefs.save(ada.id, mine);
+    expect(await prefs.load(ada.id)).toEqual(mine);
   });
 
   test("report choices are kept per user and per report, and saving again replaces them", async () => {

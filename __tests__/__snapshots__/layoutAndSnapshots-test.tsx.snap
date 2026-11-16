@@ -2169,6 +2169,109 @@ exports[`Snapshots settings screen 1`] = `
                             value={true}
                           />
                         </View>
+                        <View
+                          style={
+                            {
+                              "backgroundColor": "#D3D1C9",
+                              "height": 1,
+                              "marginLeft": 0,
+                            }
+                          }
+                        />
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "flexDirection": "row",
+                              "minHeight": 60,
+                              "paddingHorizontal": 14,
+                              "paddingVertical": 12,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              {
+                                "alignItems": "center",
+                                "backgroundColor": "#EBEAE4",
+                                "borderRadius": 8,
+                                "height": 38,
+                                "justifyContent": "center",
+                                "width": 38,
+                              }
+                            }
+                          >
+                            <Text
+                              accessibilityElementsHidden={true}
+                              allowFontScaling={false}
+                              importantForAccessibility="no-hide-descendants"
+                              selectable={false}
+                              style={
+                                [
+                                  {
+                                    "color": "#1A1A1A",
+                                    "fontSize": 18.24,
+                                  },
+                                  undefined,
+                                  {
+                                    "fontFamily": "material",
+                                    "fontStyle": "normal",
+                                    "fontWeight": "normal",
+                                  },
+                                  {},
+                                ]
+                              }
+                            >
+                              
+                            </Text>
+                          </View>
+                          <View
+                            style={
+                              {
+                                "flex": 1,
+                                "marginLeft": 14,
+                              }
+                            }
+                          >
+                            <Text
+                              style={
+                                {
+                                  "color": "#1A1A1A",
+                                  "fontSize": 16,
+                                  "fontWeight": "400",
+                                }
+                              }
+                            >
+                              Keep messages on screen
+                            </Text>
+                            <Text
+                              style={
+                                {
+                                  "color": "#5B5A55",
+                                  "fontSize": 12,
+                                }
+                              }
+                            >
+                              Messages at the top stay until you close them
+                            </Text>
+                          </View>
+                          <RCTSwitch
+                            accessibilityLabel="Keep messages on screen"
+                            accessibilityRole="switch"
+                            onChange={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
+                            onTintColor="#1A1A1A"
+                            style={
+                              {
+                                "alignSelf": "flex-start",
+                              }
+                            }
+                            thumbTintColor="#FFFFFF"
+                            tintColor="#8C8A84"
+                            value={false}
+                          />
+                        </View>
                       </View>
                     </View>
                     <View>
@@ -3411,6 +3514,7 @@ exports[`Snapshots shared components 1`] = `
           >
             <View
               accessibilityLabel="Aug: $1,200.00"
+              accessibilityRole="image"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -3466,6 +3570,7 @@ exports[`Snapshots shared components 1`] = `
             </View>
             <View
               accessibilityLabel="Sep: $950.00"
+              accessibilityRole="image"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -3521,6 +3626,7 @@ exports[`Snapshots shared components 1`] = `
             </View>
             <View
               accessibilityLabel="Oct: $400.00"
+              accessibilityRole="image"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -3576,6 +3682,7 @@ exports[`Snapshots shared components 1`] = `
             </View>
           </View>
           <View
+            aria-hidden={true}
             importantForAccessibility="no-hide-descendants"
             style={
               {

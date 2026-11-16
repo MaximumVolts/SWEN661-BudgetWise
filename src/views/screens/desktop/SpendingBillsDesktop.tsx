@@ -4,7 +4,7 @@ import type { SpendingController } from '../../../controllers/spendingController
 import type { BillsUpcomingData, RecurringData } from '../../../models/bill';
 import { useDisplay } from '../../../state/PreferencesContext';
 import { BarChart } from '../../../ui/charts';
-import { AsyncView, Tap } from '../../../ui/components';
+import { AsyncView, Heading, Tap } from '../../../ui/components';
 import { ChipGroup, Col, DButton, DesktopPage, DTable, DText, InfoRow, Panel, Row, Stat } from '../../../ui/desktop';
 import { Fmt } from '../../../ui/format';
 import { Icon, iconFor } from '../../../ui/icons';
@@ -29,13 +29,14 @@ export function SpendingDesktop({ controller }: { controller: SpendingController
               <BarChart bars={data.bars} highlighted={highlighted} onBarPress={setHighlighted} />
             </Panel>
             <View style={{ gap: 12 }}>
-              <Text style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>Category breakdown</Text>
-              <DTable
+              <Heading style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>Category breakdown</Heading>
+              <DTable label="Category breakdown"
                 columns={[{ label: 'Category', flex: 1.6 }, { label: data.periodTitle }, { label: 'Change vs. period before' }]}
                 empty="No spending in this period."
                 rows={data.categories.map((cat) => ({
                   key: cat.id,
                   onPress: () => openCategory(cat.id),
+                  cellText: [cat.name],
                   cells: [
                     <View key="n" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                       <Icon name={iconFor(cat.iconKey)} size={20} color={c.ink} />
@@ -80,12 +81,13 @@ function Upcoming({ data, controller }: { data: BillsUpcomingData; controller: B
         )}
         {data.sections.map((s) => (
           <View key={s.title} style={{ gap: 12 }}>
-            <Text style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>{s.title}</Text>
-            <DTable
+            <Heading style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>{s.title}</Heading>
+            <DTable label={s.title}
               columns={[{ label: 'Bill', flex: 1.4 }, { label: 'Due date' }, { label: 'Payment' }, { label: 'Amount', align: 'right' }]}
               rows={s.items.map((b) => ({
                 key: b.id,
                 onPress: () => controller.openBill(b.id),
+                cellText: [undefined, undefined, b.paymentLabel],
                 cells: [
                   b.title,
                   b.dueLabel ?? b.subtitle,
@@ -126,8 +128,8 @@ function Recurring({ data, controller }: { data: RecurringData; controller: Bill
         <Stat label="Yearly" value={Fmt.money(data.yearlyTotal)} />
       </Row>
       <View style={{ gap: 12 }}>
-        <Text style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>Recurring & subscriptions</Text>
-        <DTable
+        <Heading style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>Recurring & subscriptions</Heading>
+        <DTable label="Recurring & subscriptions"
           columns={[
             { label: 'Name', flex: 1.4 },
             { label: 'Amount' },

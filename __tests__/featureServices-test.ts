@@ -2,6 +2,7 @@ import { AppException } from '@/models/appException';
 import type { BillItem } from '@/models/bill';
 import { CHOOSABLE_FREQUENCIES, Frequency } from '@/models/recurring';
 import { DEFAULT_PREFERENCES, Reminder, type UserPreferences } from '@/models/userPreferences';
+import { NOTICE_SHOW_MS, noticeTimeout } from '@/services/settingsService';
 import { InMemoryDeviceNotifications } from '@/repositories/deviceNotifications';
 import { InMemoryGoalRepository } from '@/repositories/goalRepository';
 import { BillReminderService } from '@/services/billReminderService';
@@ -365,6 +366,17 @@ describe('without a linked bank', () => {
     await auth.signIn('ada', 'secret123');
     await new Promise((r) => setTimeout(r, 0));
     expect(announced.at(-1)).toEqual(mine); // remembered
+  });
+
+  test('settings: messages can be kept on screen, and single-key shortcuts turned off', async () => {
+    const { settings } = app.services;
+    expect(noticeTimeout(await settings.preferences())).toBe(NOTICE_SHOW_MS);
+    await settings.setKeepNotices(true);
+    await settings.setSingleKeyShortcuts(false);
+    const p = await settings.preferences();
+    expect(p).toMatchObject({ keepNotices: true, singleKeyShortcuts: false });
+    expect(noticeTimeout(p)).toBeUndefined();
+    expect(await settings.load()).toMatchObject({ keepNotices: true, singleKeyShortcuts: false });
   });
 
   test('settings: the bill reminder choice is kept', async () => {

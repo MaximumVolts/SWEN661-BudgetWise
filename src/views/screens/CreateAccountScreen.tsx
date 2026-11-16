@@ -37,7 +37,7 @@ export function CreateAccountScreen({ controller }: { controller: CreateAccountC
           error={e.password}
           helper="At least 8 characters, with a letter and a number"
         />
-        <Field label="Confirm password" value={form.confirmPassword} onChangeText={set('confirmPassword')} secure error={e.confirmPassword} />
+        <Field label="Confirm password" value={form.confirmPassword} onChangeText={set('confirmPassword')} secure autoComplete="new-password" error={e.confirmPassword} />
         <Gap h={10} />
         <Text style={{ fontSize: 18, fontWeight: '700', color: c.ink }}>Security question</Text>
         <Text style={[t.body, { marginTop: 4, marginBottom: 14 }]}>Used to reset your password if you forget it.</Text>

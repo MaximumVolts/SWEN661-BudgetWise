@@ -9,8 +9,8 @@
 | **Report Date** | 15 November 2026 |
 | **Product Description** | Pace is a personal budgeting app. It connects to bank accounts (Plaid sandbox), shows spending, budgets, bills and savings goals, and compares months. It also projects cash flow and exports statements as CSV or PDF. The desktop app is the Expo / React Native web build running in Electron. It is operated with mouse or keyboard and has its own keyboard shortcuts. |
 | **Contact Information** | Pace project team, SWEN 661 (GitHub: `g3arshift`; repository `SWEN661-BudgetWise`) |
-| **Notes** | **Scope:** the Windows desktop app only, signed in and signed out, including documents it exports. The iOS and Android builds from the same code base were **not** evaluated, and the macOS desktop build was not run.<br>**Screen readers:** no screen-reader listening tests (NVDA, JAWS, Narrator) were done. Where a remark depends on what assistive technology announces, it rests on the accessibility tree and automated checks (see Evaluation Methods).<br>**Evidence:** sections E1–E12 of the [Accessibility test evidence](accessibility-test-evidence.md) document are cited throughout. |
-| **Evaluation Methods Used** | 1. **Automated testing:** axe-core 4.14.0 (WCAG 2.0/2.1/2.2 A, AA and AAA rules plus best practices) on every view, and the axe DevTools extension 4.140.0 inside the app (E1).<br>2. **Keyboard-only testing:** a scripted run on 41 views with no mouse use. It covered 775 focus stops, every shortcut, and the main tasks: 284 checks, all passing ([checklist](keyboard-testing-checklist.md), E2).<br>3. **Focus appearance and contrast:** measured from the design tokens, with screenshots (E3, E4).<br>4. **Zoom, reflow, text spacing and Windows High Contrast:** emulated at 200% and 400% zoom, with WCAG 1.4.12 spacing and forced colours (E5–E7).<br>5. **Accessibility tree:** names, roles, states and relationships inspected (E8).<br>6. **Code review:** input purpose, timing, exported documents (E9–E11).<br>7. **Automated unit tests:** 289 tests, including accessibility-specific DOM tests (E12).<br>Testing was done on Windows 11 Pro. |
+| **Notes** | **Scope:** the Windows desktop app only, signed in and signed out, including documents it exports. The iOS and Android builds from the same code base were **not** evaluated, and the macOS desktop build was not run.<br>**Screen readers:** no screen-reader listening tests (NVDA, JAWS, Narrator) were done. Where a remark depends on what assistive technology announces, it rests on the accessibility tree and automated checks (see Evaluation Methods).<br>**Evidence:** sections E1–E13 of the [Accessibility test evidence](accessibility-test-evidence.md) document are cited throughout. |
+| **Evaluation Methods Used** | 1. **Automated testing:** axe-core 4.14.0 (WCAG 2.0/2.1/2.2 A, AA and AAA rules plus best practices) on every view, and the axe DevTools extension 4.140.0 inside the app (E1).<br>2. **Keyboard-only testing:** a scripted run on 41 views with no mouse use. It covered 775 focus stops, every shortcut, and the main tasks: 284 checks, all passing ([checklist](keyboard-testing-checklist.md), E2).<br>3. **Focus appearance and contrast:** measured from the design tokens, with screenshots (E3, E4).<br>4. **Zoom, reflow, text spacing and Windows High Contrast:** emulated at 200% and 400% zoom, with WCAG 1.4.12 spacing and forced colours (E5–E7).<br>5. **Accessibility tree:** names, roles, states and relationships inspected (E8).<br>6. **Code review:** input purpose, timing, exported documents (E9–E11).<br>7. **Automated unit tests:** 453 tests, including 156 accessibility-specific tests: WCAG contrast ratios for every palette, and DOM tests of names, roles, states, keyboard operation and focus (E12, [coverage report](test-coverage-report.md)).<br>8. **Remediation and re-test:** every issue the first evaluation found was fixed, then re-tested in the running app, with axe and the keyboard run repeated (E13).<br>Testing was done on Windows 11 Pro. |
 
 ## Applicable Standards/Guidelines
 
@@ -64,15 +64,15 @@ The terms used in the Conformance Level information are defined as follows:
 | [1.2.1 Audio-only and Video-only (Prerecorded)](https://www.w3.org/TR/WCAG22/#audio-only-and-video-only-prerecorded) (Level A) | Not Applicable | There is no audio or video content. |
 | [1.2.2 Captions (Prerecorded)](https://www.w3.org/TR/WCAG22/#captions-prerecorded) (Level A) | Not Applicable | There is no audio or video content. |
 | [1.2.3 Audio Description or Media Alternative (Prerecorded)](https://www.w3.org/TR/WCAG22/#audio-description-or-media-alternative-prerecorded) (Level A) | Not Applicable | There is no video content. |
-| [1.3.1 Info and Relationships](https://www.w3.org/TR/WCAG22/#info-and-relationships) (Level A) | **Software:** Partially Supports<br>**Electronic Docs:** Does Not Support | **Software (what works):**<br>• Landmarks (banner, three named navigation regions, main, complementary).<br>• Page titles are `h1`, with `h2`/`h3` below.<br>• Lists, labelled form fields and radio / tab groups.<br>• Required and invalid fields are exposed programmatically.<br>**Software (exception):** data tables (Transactions, Spending categories, Monthly Comparison and others) are built as lists of row buttons, not as table or grid structures. Column headers are therefore not associated with cells. Most rows read clearly on their own. On **Monthly Comparison**, though, the values are read without their column names ("Food & drink $516 $16 −$500 Down −96.8%"), so the relationship between each value and its period is lost (E8).<br>**Electronic Docs:** exported PDFs are **untagged**: their heading and table structure isn't available to assistive technology. CSV files keep their structure through a header row (E10). |
-| [1.3.2 Meaningful Sequence](https://www.w3.org/TR/WCAG22/#meaningful-sequence) (Level A) | **Software:** Supports<br>**Electronic Docs:** Partially Supports | **Software:** the reading order matches the visual order: sidebar, then top bar, then page, left to right and top to bottom. Tab order follows the same sequence (E2).<br>**Electronic Docs:** untagged PDFs have no defined reading order. Their text runs in a simple top-to-bottom order (header, totals, table), but this isn't guaranteed to assistive technology (E10). |
+| [1.3.1 Info and Relationships](https://www.w3.org/TR/WCAG22/#info-and-relationships) (Level A) | **Software:** Supports<br>**Electronic Docs:** Supports | **Software:**<br>• Landmarks (banner, three named navigation regions, main, complementary).<br>• Page titles are `h1`, with `h2`/`h3` below. Section titles above tables are headings.<br>• Lists, labelled form fields and radio / tab groups.<br>• Required and invalid fields are exposed programmatically.<br>• **Data tables** (Transactions, Spending categories, Bills, Accounts, Monthly Comparison and others) are named ARIA tables. Each has a row of column headers, then rows made of a row header and cells, so each value is announced with its column name. A row that opens is a button inside its row header, named with the column names ("Food & drink, collapsed. October 2026 $516, November 2026 $16, …") (E8, E13).<br>**Electronic Docs:**<br>• Exported PDFs are **tagged**: heading, table (with caption), column and row headers.<br>• CSV files keep their structure through a header row (E10, E13). |
+| [1.3.2 Meaningful Sequence](https://www.w3.org/TR/WCAG22/#meaningful-sequence) (Level A) | **Software:** Supports<br>**Electronic Docs:** Supports | **Software:** the reading order matches the visual order: sidebar, then top bar, then page, left to right and top to bottom. Tab order follows the same sequence (E2).<br>**Electronic Docs:** the tagged PDF's structure tree gives the reading order: header, totals, then the table (E10, E13). |
 | [1.3.3 Sensory Characteristics](https://www.w3.org/TR/WCAG22/#sensory-characteristics) (Level A) | Supports | Instructions don't rely on shape, colour, size, position or sound. Arrows in legends come with text ("↑ Up = spent more"). |
 | [1.4.1 Use of Color](https://www.w3.org/TR/WCAG22/#use-of-color) (Level A) | Supports | • **Budget status and changes:** shown in words as well as colour ("On track", "Over budget", "Down −96.8%"), with arrows and signs on amounts.<br>• **Chart lines:** the current and previous periods differ strongly in lightness, are named in a text legend, and are covered by the chart's text alternative.<br>• **Colour-blind mode:** adds shapes and patterns and switches to a colour-blind-safe palette (E4). |
 | [1.4.2 Audio Control](https://www.w3.org/TR/WCAG22/#audio-control) (Level A) | Not Applicable | The app plays no audio. |
 | [2.1.1 Keyboard](https://www.w3.org/TR/WCAG22/#keyboard) (Level A) | Supports | Every function works from the keyboard. This includes:<br>• navigation, search, filters, pickers and dialogs;<br>• forms and dates;<br>• sign-in, account creation and onboarding.<br>The keyboard test found 284 of 284 checks passing on 41 views (E2). The browser's calendar pop-up opens only on click; from the keyboard, dates are typed, with ↑ ↓ on each part. |
 | [2.1.2 No Keyboard Trap](https://www.w3.org/TR/WCAG22/#no-keyboard-trap) (Level A) | Supports | • Tab and Shift+Tab cycle fully round every view.<br>• Dialogs, pickers and panels keep focus inside while open (modal) and close with Esc, returning focus to the control that opened them.<br>• A trap found in the period picker during testing has been fixed (E2). |
-| [2.1.4 Character Key Shortcuts](https://www.w3.org/TR/WCAG22/#character-key-shortcuts) (Level A) | Partially Supports | • **The exception:** **`?`** (Shift+/) opens the keyboard-shortcuts list. It is a single-character shortcut that can't be turned off or remapped. It doesn't fire while a text field has focus, and it only opens a dialog that Esc closes.<br>• All other shortcuts use Ctrl, Alt or F1.<br>• The same list also opens with Ctrl+/ or F1. |
-| [2.2.1 Timing Adjustable](https://www.w3.org/TR/WCAG22/#timing-adjustable) (Level A) | Partially Supports | • **The exception:** status notices (for example "Nothing to save here", sync results) disappear after 4 seconds and can't be paused or extended. They are announced to screen readers through `role="status"` (E11).<br>• There are no session timeouts or other time limits. |
+| [2.1.4 Character Key Shortcuts](https://www.w3.org/TR/WCAG22/#character-key-shortcuts) (Level A) | Supports | • **The one single-character shortcut:** **`?`** (Shift+/) opens the keyboard-shortcuts list.<br>• **Turning it off:** **Settings → Accessibility & display → Single-key shortcuts**. When it is off, `?` does nothing, and the list still opens with Ctrl+/ or F1 (E13).<br>• **Never while typing:** it doesn't fire while a text field has focus.<br>• **All other shortcuts** use Ctrl, Alt or F1. |
+| [2.2.1 Timing Adjustable](https://www.w3.org/TR/WCAG22/#timing-adjustable) (Level A) | Supports | • **Status notices:** for example "Nothing to save here" and sync results.<br>&nbsp;&nbsp;– They stay for 10 seconds, and the time doesn't run while the mouse or focus is on them.<br>&nbsp;&nbsp;– Each has a **Close message** button.<br>&nbsp;&nbsp;– **Settings → Keep messages on screen** turns the time limit off, so notices stay until closed.<br>&nbsp;&nbsp;– They are announced to screen readers through `role="status"` (E11, E13).<br>• There are no session timeouts or other time limits. |
 | [2.2.2 Pause, Stop, Hide](https://www.w3.org/TR/WCAG22/#pause-stop-hide) (Level A) | Supports | Nothing moves, blinks or scrolls automatically for more than 5 seconds. Data updated in the background replaces content in place without animation (E11). |
 | [2.3.1 Three Flashes or Below Threshold](https://www.w3.org/TR/WCAG22/#three-flashes-or-below-threshold) (Level A) | Supports | Nothing flashes. |
 | [2.4.1 Bypass Blocks](https://www.w3.org/TR/WCAG22/#bypass-blocks) (Level A) | Supports | • The first Tab stop is a **Skip to main content** link.<br>• Landmarks and headings mark each region.<br>• Ctrl+1…9 and Ctrl+K jump directly to pages and search (E2). |
@@ -83,7 +83,7 @@ The terms used in the Conformance Level information are defined as follows:
 | [2.5.2 Pointer Cancellation](https://www.w3.org/TR/WCAG22/#pointer-cancellation) (Level A) | Supports | Controls act on release (the up-event). Moving off a control before releasing cancels the action. |
 | [2.5.3 Label in Name](https://www.w3.org/TR/WCAG22/#label-in-name) (Level A) | Supports | Controls whose visible text names them are named by that text, in the same order. Composed labels that broke this were removed during the axe remediation (E1). |
 | [2.5.4 Motion Actuation](https://www.w3.org/TR/WCAG22/#motion-actuation) (Level A) | Not Applicable | No function uses device or user motion. |
-| [3.1.1 Language of Page](https://www.w3.org/TR/WCAG22/#language-of-page) (Level A) | **Software:** Supports<br>**Electronic Docs:** Does Not Support | **Software:** the language is set to English (`lang="en"`).<br>**Electronic Docs:** exported PDFs don't declare a document language (E10). |
+| [3.1.1 Language of Page](https://www.w3.org/TR/WCAG22/#language-of-page) (Level A) | **Software:** Supports<br>**Electronic Docs:** Supports | **Software:** the language is set to English (`lang="en"`).<br>**Electronic Docs:** exported PDFs declare their language (`/Lang (en)`) (E10, E13). |
 | [3.2.1 On Focus](https://www.w3.org/TR/WCAG22/#on-focus) (Level A) | Supports | Focusing a control never changes context. Focusing the search box only shows its list of suggestions. |
 | [3.2.2 On Input](https://www.w3.org/TR/WCAG22/#on-input) (Level A) | Supports | Choosing an option (period, view, filter) updates the content on the same page and doesn't move focus. Forms are submitted only by their button or Ctrl+S. |
 | [3.2.6 Consistent Help](https://www.w3.org/TR/WCAG22/#consistent-help) (Level A 2.2 only) | Supports | The help mechanism (the keyboard-shortcuts list) is always in the same place: the top bar's keyboard button and Help → Keyboard Shortcuts. |
@@ -100,13 +100,13 @@ The terms used in the Conformance Level information are defined as follows:
 | [1.2.4 Captions (Live)](https://www.w3.org/TR/WCAG22/#captions-live) (Level AA) | Not Applicable | There is no live media. |
 | [1.2.5 Audio Description (Prerecorded)](https://www.w3.org/TR/WCAG22/#audio-description-prerecorded) (Level AA) | Not Applicable | There is no video. |
 | [1.3.4 Orientation](https://www.w3.org/TR/WCAG22/#orientation) (Level AA 2.1 and 2.2) | Supports | The orientation isn't locked. The layout adapts to any window shape. |
-| [1.3.5 Identify Input Purpose](https://www.w3.org/TR/WCAG22/#identify-input-purpose) (Level AA 2.1 and 2.2) | Partially Supports | • **Correct:** Sign in and Create account use `name`, `username`, `current-password` and `new-password`.<br>• **Exceptions:** **Profile** → Name and Username have no `autocomplete` value, and **Create account** → "Confirm password" lacks `new-password` (E9). |
-| [1.4.3 Contrast (Minimum)](https://www.w3.org/TR/WCAG22/#contrast-minimum) (Level AA) | **Software:** Supports<br>**Electronic Docs:** Supports | **Software:**<br>• All text meets 4.5:1. The lowest ratios are secondary text on a chip (5.73:1) and red text on a red tint (4.57:1).<br>• axe finds no contrast violations (E1, E4).<br>**Electronic Docs:** PDF text is 6.91:1 or more. |
+| [1.3.5 Identify Input Purpose](https://www.w3.org/TR/WCAG22/#identify-input-purpose) (Level AA 2.1 and 2.2) | Supports | Fields that collect information about the user have the matching `autocomplete` value:<br>• **Sign in:** `username` and `current-password`.<br>• **Create account:** `name`, `username`, and `new-password` for Password and Confirm password.<br>• **Forgot password:** `username`, and `new-password` for both new-password fields.<br>• **Profile:** `name` and `username` (E9, E13). |
+| [1.4.3 Contrast (Minimum)](https://www.w3.org/TR/WCAG22/#contrast-minimum) (Level AA) | **Software:** Supports<br>**Electronic Docs:** Supports | **Software:**<br>• All text meets 4.5:1. The lowest ratios are secondary text on a chip (5.73:1) and red text on a red tint (4.57:1).<br>• This holds in all four palettes (standard, High contrast, and each with Colour-blind mode); an automated test checks every text / background pair.<br>• axe finds no contrast violations (E1, E4).<br>**Electronic Docs:** PDF text is 6.91:1 or more. |
 | [1.4.4 Resize Text](https://www.w3.org/TR/WCAG22/#resize-text) (Level AA) | Supports | View → Zoom In (Ctrl + =) enlarges everything. At 200% the app switches to its single-column layout with nothing lost, and keyboard and axe checks pass at that size (E5). |
 | [1.4.5 Images of Text](https://www.w3.org/TR/WCAG22/#images-of-text) (Level AA) | Supports | No images of text are used. The logo mark is an icon beside the text "Pace". |
-| [1.4.10 Reflow](https://www.w3.org/TR/WCAG22/#reflow) (Level AA 2.1 and 2.2) | Partially Supports | • **What works:** at 320 CSS px (400% zoom) content reflows to one column without horizontal page scrolling. The Monthly Comparison data table scrolls sideways inside its own area, which is exempt as a two-dimensional table.<br>• **Exception:** on Transactions, the filter buttons (All accounts, Category, Date) sit in one row that scrolls sideways (E5). |
-| [1.4.11 Non-text Contrast](https://www.w3.org/TR/WCAG22/#non-text-contrast) (Level AA 2.1 and 2.2) | Partially Supports | • **What works:**<br>&nbsp;&nbsp;– field and picker borders are 3.45:1;<br>&nbsp;&nbsp;– focus rings are 16.7:1;<br>&nbsp;&nbsp;– the desktop switches are 3.08:1 or more (grey track when off, ink when on);<br>&nbsp;&nbsp;– progress-bar fills are 14.4:1 against their track.<br>• **Exceptions:**<br>&nbsp;&nbsp;– In the standard theme the "previous period" line in spending charts is 1.69:1 against the chart background. The chart's text alternative and legend give the same information, and the **High contrast** setting raises the line to 5.49:1.<br>&nbsp;&nbsp;– In the narrow layout used at 200% zoom or more, the Settings switches show their **off** state as a light track (1.15:1) with a white thumb (1.21:1). In the High contrast theme the track is 1.32:1 (E4). |
-| [1.4.12 Text Spacing](https://www.w3.org/TR/WCAG22/#text-spacing) (Level AA 2.1 and 2.2) | Partially Supports | • **What works:** with the WCAG spacing applied, page content reflows without loss.<br>• **Exception:** the sidebar's fixed-height items overlap. "Trends" is covered by the item below it and "Monthly Comparison" is truncated. The Ctrl K key hints in the search box overflow their boxes (E6). |
+| [1.4.10 Reflow](https://www.w3.org/TR/WCAG22/#reflow) (Level AA 2.1 and 2.2) | Supports | • At 320 CSS px (400% zoom), content reflows to one column without horizontal page scrolling.<br>• The Transactions filter buttons wrap onto more lines, and the search, filters and list scroll together.<br>• Only the Monthly Comparison data table scrolls sideways, inside its own area. That is exempt, as a two-dimensional table (E5, E13). |
+| [1.4.11 Non-text Contrast](https://www.w3.org/TR/WCAG22/#non-text-contrast) (Level AA 2.1 and 2.2) | Supports | • Field and picker borders are 3.45:1.<br>• Focus rings are 16.7:1. The notice's Close button has a light ring, 11.7:1 against the dark bar.<br>• Switches show their off state with a grey track of 3.08:1 or more (3.31:1 in the narrow layout), and their on state in ink.<br>• Progress-bar fills are 14.4:1 against their track.<br>• The "previous period" chart line is 3.31:1 against the page and 3.45:1 against white, and 5.49:1 in the High contrast theme (E4, E13). |
+| [1.4.12 Text Spacing](https://www.w3.org/TR/WCAG22/#text-spacing) (Level AA 2.1 and 2.2) | Supports | With the WCAG spacing applied (line height 1.5, letter spacing 0.12 em, word spacing 0.16 em, paragraph spacing 2 em):<br>• page content reflows without loss;<br>• sidebar items, the search box and key hints grow to fit their text. Labels wrap rather than being cut short, and the sidebar scrolls. No visible item overlaps another (E6, E13). |
 | [1.4.13 Content on Hover or Focus](https://www.w3.org/TR/WCAG22/#content-on-hover-or-focus) (Level AA 2.1 and 2.2) | Supports | The search suggestions shown on focus stay while you hover or focus them, and Esc dismisses them. The tooltips on sidebar items are the browser's own (`title`), which are exempt. |
 | [2.4.5 Multiple Ways](https://www.w3.org/TR/WCAG22/#multiple-ways) (Level AA) | Supports | You can reach any view in more than one way:<br>• the sidebar;<br>• search (Ctrl+K), which also finds pages;<br>• numbered shortcuts;<br>• links from Home cards;<br>• the breadcrumb. |
 | [2.4.6 Headings and Labels](https://www.w3.org/TR/WCAG22/#headings-and-labels) (Level AA) | Supports | Headings name each page and section. Labels describe each field's purpose. |
@@ -130,13 +130,13 @@ The terms used in the Conformance Level information are defined as follows:
 | [1.2.7 Extended Audio Description (Prerecorded)](https://www.w3.org/TR/WCAG22/#extended-audio-description-prerecorded) (Level AAA) | Not Applicable | There is no media. |
 | [1.2.8 Media Alternative (Prerecorded)](https://www.w3.org/TR/WCAG22/#media-alternative-prerecorded) (Level AAA) | Not Applicable | There is no media. |
 | [1.2.9 Audio-only (Live)](https://www.w3.org/TR/WCAG22/#audio-only-live) (Level AAA) | Not Applicable | There is no media. |
-| [1.3.6 Identify Purpose](https://www.w3.org/TR/WCAG22/#identify-purpose) (Level AAA 2.1 and 2.2) | Partially Supports | Regions are identified with landmarks, and most personal-data fields have `autocomplete` values. Profile fields lack them (see 1.3.5). Icons don't carry machine-readable purpose metadata. |
+| [1.3.6 Identify Purpose](https://www.w3.org/TR/WCAG22/#identify-purpose) (Level AAA 2.1 and 2.2) | Partially Supports | • **Met:** regions are identified with landmarks, and every personal-data field has an `autocomplete` value (see 1.3.5).<br>• **Not met:** icons don't carry machine-readable purpose metadata. |
 | [1.4.6 Contrast (Enhanced)](https://www.w3.org/TR/WCAG22/#contrast-enhanced) (Level AAA) | Partially Supports | • **High contrast setting:** all text meets 7:1.<br>• **Standard theme:** secondary text is 5.73–6.62:1 and red text on the red tint is 4.57:1. axe flagged 4–18 elements per page (E1, E4). |
 | [1.4.7 Low or No Background Audio](https://www.w3.org/TR/WCAG22/#low-or-no-background-audio) (Level AAA) | Not Applicable | There is no audio. |
 | [1.4.8 Visual Presentation](https://www.w3.org/TR/WCAG22/#visual-presentation) (Level AAA) | Partially Supports | • **Met:**<br>&nbsp;&nbsp;– text isn't justified;<br>&nbsp;&nbsp;– blocks of text are short;<br>&nbsp;&nbsp;– text resizes to 200% without horizontal scrolling;<br>&nbsp;&nbsp;– users can switch to the High contrast theme or Windows High Contrast colours.<br>• **Not met:** users can't choose their own colours or line spacing within the app, and line spacing isn't 1.5 by default. |
 | [1.4.9 Images of Text (No Exception)](https://www.w3.org/TR/WCAG22/#images-of-text-no-exception) (Level AAA) | Supports | There are no images of text. |
 | [2.1.3 Keyboard (No Exception)](https://www.w3.org/TR/WCAG22/#keyboard-no-exception) (Level AAA) | Supports | Every function works by keyboard without exception (E2). |
-| [2.2.3 No Timing](https://www.w3.org/TR/WCAG22/#no-timing) (Level AAA) | Partially Supports | Status notices disappear after 4 seconds (see 2.2.1). Nothing else is timed. |
+| [2.2.3 No Timing](https://www.w3.org/TR/WCAG22/#no-timing) (Level AAA) | Supports | Nothing in Pace is timed. The time that status notices stay on screen can be turned off (**Keep messages on screen**, see 2.2.1). |
 | [2.2.4 Interruptions](https://www.w3.org/TR/WCAG22/#interruptions) (Level AAA) | Supports | Bill reminders, the only interruption, can be set to Off or delayed in Settings. In-app notices don't take focus. |
 | [2.2.5 Re-authenticating](https://www.w3.org/TR/WCAG22/#re-authenticating) (Level AAA) | Supports | Sessions don't expire while the app is open. Data entered is saved to the local database. |
 | [2.2.6 Timeouts](https://www.w3.org/TR/WCAG22/#timeouts) (Level AAA 2.1 and 2.2) | Supports | No data is lost through inactivity. |
@@ -164,15 +164,15 @@ The terms used in the Conformance Level information are defined as follows:
 
 | Criteria | Conformance Level | Remarks and Explanations |
 | --- | --- | --- |
-| 302.1 Without Vision | Partially Supports | • **What works:** the app exposes names, roles, states and landmarks through the platform accessibility API (via Chromium), and everything is keyboard operable.<br>• **Gaps:** table cells aren't associated with their column headers (1.3.1), and exported PDFs are untagged.<br>• **Not done:** no screen-reader listening tests. |
-| 302.2 With Limited Vision | Partially Supports | • **What works:**<br>&nbsp;&nbsp;– zoom to 200% and beyond, with reflow;<br>&nbsp;&nbsp;– a High contrast theme;<br>&nbsp;&nbsp;– Windows High Contrast is honoured;<br>&nbsp;&nbsp;– a strong focus ring.<br>• **Gaps:**<br>&nbsp;&nbsp;– the sidebar overlaps with increased text spacing (1.4.12);<br>&nbsp;&nbsp;– the current-page highlight is lost in Windows High Contrast (E7);<br>&nbsp;&nbsp;– the filter row on Transactions scrolls sideways at 400% zoom (1.4.10). |
+| 302.1 Without Vision | Supports | • **What works:**<br>&nbsp;&nbsp;– names, roles, states, landmarks and table structure are exposed through the platform accessibility API (via Chromium);<br>&nbsp;&nbsp;– everything is keyboard operable;<br>&nbsp;&nbsp;– exported PDFs are tagged.<br>• **Not done:** no screen-reader listening tests (see Notes). |
+| 302.2 With Limited Vision | Supports | • Zoom to 200% and beyond, with reflow, including at 320 CSS px (1.4.10).<br>• Text spacing can be increased without loss (1.4.12).<br>• A High contrast theme.<br>• Windows High Contrast is honoured, with the current page and chosen options in the system highlight colour (E7, E13).<br>• A strong focus ring. |
 | 302.3 Without Perception of Color | Supports | Status and changes are given in words and symbols as well as colour. Colour-blind mode adds patterns and shapes. |
 | 302.4 Without Hearing | Supports | The app uses no audio. Reminders are visual system notifications. |
 | 302.5 With Limited Hearing | Supports | The app uses no audio. |
 | 302.6 Without Speech | Supports | No function needs speech. |
 | 302.7 With Limited Manipulation | Supports | • Everything can be done by keyboard, and no key chords are required: every shortcut has a sidebar or menu equivalent.<br>• There are no fine gestures, drags or timed actions.<br>• Targets are at least 24 px. |
 | 302.8 With Limited Reach and Strength | Supports | The app runs on the user's own computer with any input device. No physical reach or strength is needed. |
-| 302.9 With Limited Language, Cognitive, and Learning Abilities | Partially Supports | • **What works:**<br>&nbsp;&nbsp;– plain language and consistent layout;<br>&nbsp;&nbsp;– errors that say how to fix them;<br>&nbsp;&nbsp;– confirmations before deleting;<br>&nbsp;&nbsp;– no timed tasks.<br>• **Gaps:** notices disappear after 4 seconds, and some financial terms aren't explained (3.1.3). |
+| 302.9 With Limited Language, Cognitive, and Learning Abilities | Partially Supports | • **What works:**<br>&nbsp;&nbsp;– plain language and consistent layout;<br>&nbsp;&nbsp;– errors that say how to fix them;<br>&nbsp;&nbsp;– confirmations before deleting;<br>&nbsp;&nbsp;– no timed tasks, and notices can be kept on screen until closed.<br>• **Gap:** some financial terms aren't explained (3.1.3). |
 
 ### Chapter 4: [Hardware](https://www.access-board.gov/ict/#chapter-4-hardware)
 
@@ -189,7 +189,7 @@ The terms used in the Conformance Level information are defined as follows:
 | **502.3 Accessibility Services** | Heading cell – no response required | Heading cell – no response required |
 | 502.3.1 Object Information | Supports | Role, name and state of every control are exposed through UI Automation / MSAA by Chromium from the page's semantics (E8). |
 | 502.3.2 Modification of Object Information | Supports | States set by the user (checked, selected, expanded) are exposed and updated when the user changes them. |
-| 502.3.3 Row, Column, and Headers | Partially Supports | Data tables are lists of rows without programmatic column headers (see 1.3.1). Customize panel options and lists expose list relationships. |
+| 502.3.3 Row, Column, and Headers | Supports | Data tables expose table, row, column-header, row-header and cell roles, so cells are associated with their headers (see 1.3.1). Customize panel options and lists expose list relationships. |
 | 502.3.4 Values | Supports | Text fields, progress bars (`aria-valuenow` / `aria-valuetext`), switches and pickers expose their current values. |
 | 502.3.5 Modification of Values | Supports | Values can be changed through standard controls exposed to assistive technology. |
 | 502.3.6 Label Relationships | Supports | Fields are labelled, and error and helper text is associated as the field's description. |
@@ -203,13 +203,13 @@ The terms used in the Conformance Level information are defined as follows:
 | 502.3.14 Event Notification | Supports | Focus, state, value and live-region changes are reported through the platform API. Notices use a polite live region. |
 | 502.4 Platform Accessibility Features | Supports | The app works with Windows accessibility features (for example Sticky Keys, Filter Keys and High Contrast) because it doesn't intercept or block them. |
 | **503 Applications** | Heading cell – no response required | Heading cell – no response required |
-| 503.2 User Preferences | Partially Supports | • **What works:** the app honours Windows High Contrast (forced colours), system text scaling and zoom.<br>• **Gap:** the current-page highlight in the sidebar is removed under forced colours (E7). |
+| 503.2 User Preferences | Supports | • The app honours Windows High Contrast (forced colours), system text scaling and zoom.<br>• Under forced colours, the current page and chosen options use the system Highlight colours (E7, E13). |
 | 503.3 Alternative User Interfaces | Not Applicable | Pace doesn't provide an alternative user interface that works as assistive technology. |
 | 503.4 User Controls for Captions and Audio Description | Not Applicable | There is no media. |
 | **504 Authoring Tools** | Heading cell – no response required | Heading cell – no response required |
 | 504.2 Content Creation or Editing | Not Applicable | Pace isn't an authoring tool. Users don't create content for others. The statements and reports it generates are covered under Electronic Docs in the WCAG section and EN 301 549 Clause 10. |
 | 504.2.1 Preservation of Information Provided for Accessibility in Format Conversion | Not Applicable | Not an authoring tool. See EN 301 549 5.4 for the PDF export. |
-| 504.2.2 PDF Export | Not Applicable | Not an authoring tool. Exported PDFs aren't PDF/UA conformant (untagged), as reported in EN 301 549 Clause 10. |
+| 504.2.2 PDF Export | Not Applicable | Not an authoring tool. Exported PDFs are tagged and declare their language (EN 301 549 Clause 10). Full PDF/UA validation was not run. |
 | 504.3 Prompts | Not Applicable | Not an authoring tool. |
 | 504.4 Templates | Not Applicable | Not an authoring tool. |
 
@@ -232,8 +232,8 @@ The terms used in the Conformance Level information are defined as follows:
 
 | Criteria | Conformance Level | Remarks and Explanations |
 | --- | --- | --- |
-| 4.2.1 Usage without vision | Partially Supports | See Section 508 302.1. |
-| 4.2.2 Usage with limited vision | Partially Supports | See Section 508 302.2. |
+| 4.2.1 Usage without vision | Supports | See Section 508 302.1. |
+| 4.2.2 Usage with limited vision | Supports | See Section 508 302.2. |
 | 4.2.3 Usage without perception of colour | Supports | See Section 508 302.3. |
 | 4.2.4 Usage without hearing | Supports | The app uses no audio. |
 | 4.2.5 Usage with limited hearing | Supports | The app uses no audio. |
@@ -251,7 +251,7 @@ The terms used in the Conformance Level information are defined as follows:
 | 5.1 Closed functionality (5.1.1 – 5.1.6.2) | Not Applicable | Pace isn't closed. It works with the user's own assistive technology. |
 | 5.2 Activation of accessibility features | Supports | The High contrast, Colour-blind and chart-value settings are in Settings and can be reached by keyboard. Zoom is in the View menu. |
 | 5.3 Biometrics | Not Applicable | Pace doesn't use biometrics. |
-| 5.4 Preservation of accessibility information during conversion | Partially Supports | • **CSV:** column headers are preserved.<br>• **PDF:** made from structured HTML (heading, table with headers, title), but this structure is lost: the PDF is generated untagged and without a document language (E10). |
+| 5.4 Preservation of accessibility information during conversion | Supports | • **CSV:** column headers are preserved.<br>• **PDF:** the structure of the source HTML is kept in a tagged PDF (heading, table, column and row headers, title, language) (E10, E13). |
 | 5.5 Operable parts (5.5.1 – 5.5.2) | Not Applicable | There are no physical operable parts. |
 | 5.6 Locking or toggle controls (5.6.1 – 5.6.2) | Supports | The software toggles (switches) show their state visually and to assistive technology (`aria-checked`). There are no hardware locking keys. |
 | 5.7 Key repeat | Supports | Pace doesn't change the system's key-repeat settings. Shortcuts act once per press and ignore auto-repeat. |
@@ -282,8 +282,8 @@ These clauses apply to the statements and Monthly Comparison reports that Pace e
 | --- | --- | --- |
 | 10.1.1.1 Non-text content | Supports | The documents contain no images. |
 | 10.1.2.1 – 10.1.2.5 Time-based media | Not Applicable | There is no media. |
-| 10.1.3.1 Info and relationships | Does Not Support | The PDF is untagged, so its heading and table structure is lost. CSV supports this through its header row. |
-| 10.1.3.2 Meaningful sequence | Partially Supports | The untagged PDF has no defined reading order. Its content order is simple (header, totals, table). |
+| 10.1.3.1 Info and relationships | Supports | The tagged PDF keeps its heading and table structure, with column and row headers. CSV keeps it through its header row. |
+| 10.1.3.2 Meaningful sequence | Supports | The tagged PDF's structure tree gives the reading order: header, totals, then the table. |
 | 10.1.3.3 Sensory characteristics | Supports | No instructions depend on sensory characteristics. |
 | 10.1.3.4 Orientation | Supports | The orientation isn't locked. |
 | 10.1.3.5 Identify input purpose | Not Applicable | The documents have no form fields. |
@@ -298,7 +298,7 @@ These clauses apply to the statements and Monthly Comparison reports that Pace e
 | 10.1.4.13 Content on hover or focus | Not Applicable | The documents have no interactive content. |
 | 10.2.1.1 – 10.2.5.4 Operable (keyboard, timing, seizures, navigation) | Not Applicable | The documents are static, with no links or controls. Keyboard navigation is provided by the viewer. |
 | 10.2.4.2 Document titled | Supports | The PDF has a title, "Pace statement · account · month". |
-| 10.3.1.1 Language of document | Does Not Support | The PDF doesn't declare a document language. |
+| 10.3.1.1 Language of document | Supports | The PDF declares its language (`/Lang (en)`). |
 | 10.3.1.2 Language of parts | Not Applicable | Everything is in one language. |
 | 10.3.2.x / 10.3.3.x Predictable, input assistance | Not Applicable | The documents have no interaction or input. |
 | 10.4.1.2 Name, role, value | Not Applicable | The documents have no user interface components. |
@@ -317,7 +317,7 @@ These clauses apply to the statements and Monthly Comparison reports that Pace e
 | 11.5.2.3 Use of accessibility services | Supports | Standard roles and states are used (Section 508 502.3.1). |
 | 11.5.2.4 Assistive technology | Not Applicable | Pace isn't assistive technology. |
 | 11.5.2.5 Object information | Supports | See Section 508 502.3.1. |
-| 11.5.2.6 Row, column, and headers | Partially Supports | See Section 508 502.3.3. |
+| 11.5.2.6 Row, column, and headers | Supports | See Section 508 502.3.3. |
 | 11.5.2.7 Values | Supports | See Section 508 502.3.4. |
 | 11.5.2.8 Label relationships | Supports | See Section 508 502.3.6. |
 | 11.5.2.9 Parent-child relationships | Supports | See Section 508 502.3.7. |
@@ -332,7 +332,7 @@ These clauses apply to the statements and Monthly Comparison reports that Pace e
 | **11.6 Documented accessibility usage** | Heading cell – no response required | Heading cell – no response required |
 | 11.6.1 User control of accessibility features | Not Applicable | Pace isn't platform software. |
 | 11.6.2 No disruption of accessibility features | Supports | See Section 508 502.2.2. |
-| 11.7 User preferences | Partially Supports | See Section 508 503.2. |
+| 11.7 User preferences | Supports | See Section 508 503.2. |
 | **11.8 Authoring tools** | Heading cell – no response required | Heading cell – no response required |
 | 11.8.1 Content technology | Not Applicable | Pace isn't an authoring tool. |
 | 11.8.2 Accessible content creation | Not Applicable | Pace isn't an authoring tool. |
@@ -356,34 +356,50 @@ These clauses apply to the statements and Monthly Comparison reports that Pace e
 
 **Notes:** Not Applicable. Pace provides no relay or emergency services.
 
-## Known Issues and Planned Remediation
+## Remediation
 
-Each issue that stops a criterion from being fully supported, in priority order:
+### Fixed and re-tested
 
-| # | Issue | Criteria affected | Planned fix |
-| --- | --- | --- | --- |
-| 1 | Data tables aren't tables to assistive technology; Monthly Comparison values are read without their column names | 1.3.1, 508 502.3.3, EN 11.5.2.6 | Give each row's name its column headers ("Food & drink: October $516, November $16, change −$500, down 96.8%"), or render tables with `role="table"` / `row` / `cell` / `columnheader`. |
-| 2 | Exported PDFs are untagged and have no language | 1.3.1, 1.3.2, 3.1.1 (Electronic Docs), EN 5.4, 10.1.3.1, 10.3.1.1 | Pass `generateTaggedPDF: true` to `printToPDF` in `desktop/main.js`, and add `lang="en"` to the statement HTML in `statementEncoders.ts`. |
-| 3 | Sidebar items overlap when text spacing is increased | 1.4.12, 508 302.2 | Replace the fixed item height with a minimum height. Let labels wrap rather than truncate. |
-| 4 | Status notices disappear after 4 seconds | 2.2.1, 2.2.3, 508 302.9 | Keep a notice while it has mouse hover or keyboard focus, add a Dismiss button, and lengthen the time to about 20 seconds per WCAG guidance. Or keep a notification history. |
-| 5 | The `?` shortcut can't be turned off | 2.1.4 | Add a setting to turn off single-key shortcuts. Ctrl+/ and F1 remain. |
-| 6 | Profile Name and Username fields, and Create account → Confirm password, have no `autocomplete` value | 1.3.5, 1.3.6 | Add `name`, `username` and `new-password`. |
-| 7 | "Previous period" chart line is 1.69:1 in the standard theme. In the narrow (zoomed) layout, a switch's off state is 1.15:1 | 1.4.11 | Darken the chart token to at least #8C8A84 (3.3:1). Give the narrow layout's switch track `c.outline` when off, as the desktop switch does. |
-| 8 | Current-page highlight is lost under Windows High Contrast | 503.2, EN 11.7, 302.2 | Add a forced-colours border or underline (`@media (forced-colors: active)`) to the current sidebar item. |
-| 9 | Transactions filter row scrolls sideways at 320 px | 1.4.10 | Let the filter buttons wrap onto more lines at narrow widths. |
-| 10 | AAA items: secondary text below 7:1 in the standard theme, targets smaller than 44 px, terms without a glossary | 1.4.6, 2.5.5, 3.1.3, 3.1.4 | These are optional (AAA). The High contrast theme already meets 1.4.6. |
+The first evaluation found the issues below. Each has been fixed in this version and re-tested in the running app (E13).
+
+| # | Issue found | Criteria | Fix | Re-test result |
+| --- | --- | --- | --- | --- |
+| 1 | Data tables weren't tables to assistive technology; Monthly Comparison values were read without their column names | 1.3.1, 508 502.3.3, EN 11.5.2.6 | Tables are ARIA tables: named `table`, `columnheader`s, and rows of a `rowheader` and `cell`s. Row buttons sit in the row header and are named with column names. Section titles above tables became headings. | Every table on every page has headers and contains only cells in its rows |
+| 2 | Exported PDFs were untagged and had no language | 1.3.1, 1.3.2, 3.1.1 (Electronic Docs), EN 5.4, 10.1.3.1, 10.1.3.2, 10.3.1.1 | `generateTaggedPDF` in `printToPDF`; `lang="en"`, `scope` on headers and a caption in the source HTML | PDF has `/StructTreeRoot`, `/Marked true`, `/Lang (en)`, `H1`, `Table`, `TH` |
+| 3 | Sidebar items overlapped when text spacing was increased; key hints overflowed | 1.4.12, 508 302.2 | Minimum heights instead of fixed ones; labels wrap; the sidebar scrolls | No visible overlap with WCAG text spacing applied |
+| 4 | Status notices disappeared after 4 seconds | 2.2.1, 2.2.3, 508 302.9 | 10 seconds, paused while hovered or focused; a **Close message** button; **Settings → Keep messages on screen** turns the limit off | Notice gone after 10 s by default; still there after 15 s with the setting on; Enter on Close removes it and focus returns to the page |
+| 5 | The `?` shortcut couldn't be turned off | 2.1.4 | **Settings → Single-key shortcuts** | Off: `?` does nothing, Ctrl+/ and F1 still work. On: `?` opens the list |
+| 6 | Profile Name and Username, and Create account → Confirm password, had no `autocomplete` value | 1.3.5, 1.3.6 | `name`, `username`, `new-password` (also on Forgot password) | No personal-data field without a value |
+| 7 | "Previous period" chart line was 1.69:1; the narrow layout's switch off state was 1.15:1 | 1.4.11 | Chart token `#8C8A84`; narrow switch off track uses the outline colour | 3.31:1 and 3.31:1 against the page |
+| 8 | Current-page highlight was lost under Windows High Contrast | 503.2, EN 11.7, 302.2 | Forced-colours rule: current page, chosen tab and chosen option use `Highlight` / `HighlightText` | Current item filled with the system highlight colour |
+| 9 | Transactions filter row scrolled sideways at 320 px | 1.4.10 | Filters wrap; search, filters and list scroll together | Nothing scrolls sideways at 320 px |
+| 10 | In Colour-blind mode, orange danger text on its badge was 4.45:1 (found by the contrast tests) | 1.4.3 | Orange darkened from `#B34700` to `#A64200` | 5.00:1 on the badge, 5.91:1 on the page; `a11yContrast-test.ts` passes for all four palettes |
+| 11 | A notification's action buttons ("Mark paid", "View bill") were inside the card's own button (found by the DOM tests) | 4.1.2 | The card's button holds only the message; the actions sit beside it | No button inside another on the Notifications page (`a11yWidgets-test.tsx`) |
+| 12 | Bar chart on desktop: the chosen bar's state wasn't exposed, and axis labels were read twice (found by the DOM tests) | 1.3.1, 4.1.2 | Chosen bar is `aria-pressed`; axis row is `aria-hidden`; non-pressable bars are named images | Bars report pressed / not pressed; axis labels hidden from assistive technology |
+
+### Remaining
+
+| Issue | Criteria | Notes |
+| --- | --- | --- |
+| Secondary text below 7:1 in the standard theme | 1.4.6 (AAA) | All text meets the AA minimum of 4.5:1. The High contrast setting meets 7:1. |
+| Targets smaller than 44 × 44 px | 2.5.5 (AAA) | All targets meet the AA minimum of 24 × 24 px (2.5.8). |
+| No glossary for some financial terms; abbreviations in bank data not expanded | 3.1.3, 3.1.4 (AAA), 508 302.9, EN 4.2.10 | |
+| No in-app choice of colours or line spacing | 1.4.8 (AAA) | Users can switch to High contrast or Windows High Contrast. |
+| Icons carry no machine-readable purpose | 1.3.6 (AAA) | |
+| Screen-reader listening tests (NVDA, JAWS, Narrator) not yet done | — | Recommended next step. Results here rest on the accessibility tree and automated checks. |
 
 ## Supporting Documentation
 
 | Document | Contents |
 | --- | --- |
-| [Accessibility test evidence](accessibility-test-evidence.md) | Methods and results for each evaluation (E1–E12): axe results per page, contrast tables, zoom and reflow, text spacing, forced colours, accessibility tree, input purpose, exported documents, timing |
+| [Accessibility test evidence](accessibility-test-evidence.md) | Methods and results for each evaluation (E1–E13): axe results per page, contrast tables, zoom and reflow, text spacing, forced colours, accessibility tree, input purpose, exported documents, timing, and the re-test after remediation |
 | [Keyboard testing checklist](keyboard-testing-checklist.md) | Keyboard-only test of 41 views and 775 focus stops, with every shortcut: 284 checks, the 10 problems found and fixed, and focus screenshots |
 | [axe DevTools result](axe-devtools-0-issues.png) | Screenshot of the axe DevTools extension inside the Pace window: 0 issues |
-| [Evidence screenshots](acr-evidence/) | 200% zoom, 320 px reflow, text spacing, Windows High Contrast |
+| [Evidence screenshots](acr-evidence/) | 200% zoom, 320 px reflow, text spacing, Windows High Contrast, before and after the fixes (`fixed-*.png`) |
 | [Keyboard screenshots](keyboard-testing/) | Skip link, focus rings (button, link, field), picker arrow keys, search |
 | [README: Keyboard](../README.md) | The user documentation of keyboard use and shortcuts |
-| `__tests__/a11yDom-test.tsx`, `keyboardDom-test.tsx`, `desktopDatePicker-test.tsx`, `journeyController-test.tsx`, `asyncData-test.tsx` | Automated tests that guard the accessibility behaviour (289 tests in total, all passing) |
+| [Test coverage report](test-coverage-report.md) | Coverage per layer, the accessibility test suites mapped to WCAG criteria, and the defects they found |
+| `__tests__/a11yContrast-test.ts`, `a11yWidgets-test.tsx`, `a11yDom-test.tsx`, `keyboardDom-test.tsx`, `notice-test.tsx`, `desktopDatePicker-test.tsx`, `journeyController-test.tsx`, `asyncData-test.tsx` | Automated tests that guard the accessibility behaviour (453 tests in total, all passing) |
 
 ## Legal Disclaimer (Pace project team)
 

@@ -192,13 +192,14 @@ function NavItem({
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={({ hovered }: { hovered?: boolean }) => [
-        { flexDirection: 'row', alignItems: 'center', gap: 18, height: 52, paddingHorizontal: 20, borderRadius: 26 },
+        // A minimum (not fixed) height, and labels that wrap: with larger text spacing items grow instead of overlapping.
+        { flexDirection: 'row', alignItems: 'center', gap: 18, minHeight: 52, paddingVertical: 6, paddingHorizontal: 20, borderRadius: 26 },
         active ? { backgroundColor: c.navPill } : hovered && { backgroundColor: c.chip },
         focused && focusRing(c.ink),
       ]}
     >
       <Icon name={icon} color={active ? c.lime : c.ink} />
-      <Text numberOfLines={1} style={{ flex: 1, fontSize: 16, fontWeight: '500', color: active ? '#FFFFFF' : c.ink }}>
+      <Text style={{ flex: 1, fontSize: 16, fontWeight: '500', color: active ? '#FFFFFF' : c.ink }}>
         {label}
       </Text>
       {badge}
@@ -209,7 +210,7 @@ function NavItem({
 function TopBar({ controller: ctl }: { controller: ShellController }) {
   const { colors: c } = useDisplay();
   return (
-    <View role="banner" style={{ flexDirection: 'row', alignItems: 'center', gap: 16, height: 80, paddingHorizontal: 36, borderBottomWidth: 1, borderBottomColor: c.line, backgroundColor: c.bg }}>
+    <View role="banner" style={{ flexDirection: 'row', alignItems: 'center', gap: 16, minHeight: 80, paddingHorizontal: 36, borderBottomWidth: 1, borderBottomColor: c.line, backgroundColor: c.bg }}>
       <View accessibilityRole="header" accessibilityLabel={`${ctl.crumbs.group}, ${ctl.crumbs.title}`} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, minWidth: 0 }}>
         {ctl.crumbs.group === 'Overview' && ctl.section !== 'home' ? (
           <Tap onPress={ctl.openHome} role="link" style={{ minHeight: 40 }}>
@@ -298,7 +299,7 @@ function SearchBox({ controller: ctl }: { controller: ShellController }) {
     <View style={{ width: 380 }}>
       <View
         style={[
-          { flexDirection: 'row', alignItems: 'center', gap: 8, height: 48, borderRadius: 24, backgroundColor: c.chip, paddingLeft: 16, paddingRight: 8 },
+          { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 48, borderRadius: 24, backgroundColor: c.chip, paddingLeft: 16, paddingRight: 8 },
           open && focusRing(c.ink),
           open && { borderRadius: 24 },
         ]}

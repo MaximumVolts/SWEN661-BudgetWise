@@ -30,12 +30,12 @@ function ProfileForm({ data, banks, controller }: { data: ProfileData; banks: Ba
         <Text style={{ color: c.lime, fontSize: 32, fontWeight: '700' }}>{data.initials}</Text>
       </View>
       <Gap h={28} />
-      <Field label="Name" value={name} onChangeText={setName} autoCapitalize="words" error={e.name} onSubmitEditing={save} />
+      <Field label="Name" value={name} onChangeText={setName} autoCapitalize="words" autoComplete="name" error={e.name} onSubmitEditing={save} />
       {/* Read-only: the username is the account's sign-in and can't be changed here. */}
       <View style={{ marginBottom: 18 }}>
         <Text style={[t.sub, { marginBottom: 6, color: c.ink, fontWeight: '600' }]}>Username</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: c.line, borderRadius: 6, paddingHorizontal: 14 }}>
-          <TextInput accessibilityLabel="Username" value={data.username} editable={false} style={{ flex: 1, fontSize: 18, color: c.muted, paddingVertical: 14 }} />
+          <TextInput accessibilityLabel="Username" autoComplete="username" value={data.username} editable={false} style={{ flex: 1, fontSize: 18, color: c.muted, paddingVertical: 14 }} />
           <Icon name="lock-outline" size={20} color={c.muted} />
         </View>
         <Text style={[t.sub, { marginTop: 4 }]}>Your username is how you sign in, so it can’t be changed.</Text>

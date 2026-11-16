@@ -1,5 +1,5 @@
 import { Children, Fragment, type ReactNode, useState } from 'react';
-import { Modal, Pressable, ScrollView, type StyleProp, StyleSheet, Text, type TextStyle, View, type ViewStyle } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, type StyleProp, StyleSheet, Text, type TextStyle, View, type ViewStyle } from 'react-native';
 import { useDisplay } from '../state/PreferencesContext';
 import { focusRing, Heading, Tap } from './components';
 import { Icon, type IconName } from './icons';
@@ -278,78 +278,169 @@ export interface TableRow {
    */
   actions?: ReactNode;
   onPress?: () => void;
-  /** What a screen reader says for the whole row (defaults to the text cells joined). */
+  /** What a screen reader says for the whole row (defaults to the cells with their column names). */
   label?: string;
+  /** What cells that are elements, not text, say (by column), for the row's default [label]. */
+  cellText?: (string | undefined)[];
   tone?: 'normal' | 'sub' | 'total';
   /** For rows that open and close (their details below them): whether open. */
   expanded?: boolean;
 }
 
-/** A table with a shaded header row, inside a rounded border. Rows with [onPress] open on click / Enter. */
-export function DTable({ columns, rows, compact, empty, bare }: { columns: TableColumn[]; rows: TableRow[]; compact?: boolean; empty?: string; /** No border of its own (inside a panel). */ bare?: boolean }) {
+/**
+ * A table with a shaded header row, inside a rounded border. Rows with [onPress] open on click / Enter.
+ *
+ * On desktop it is a table to screen readers (table, row, column header, row header and cell roles), so
+ * each value is read with its column's name and table navigation works. A row that opens is a button
+ * laid under the row's cells, inside its row header, so the table keeps only rows and cells. Phones
+ * have no table role: each row there is one item read as "first cell, column: value, …".
+ */
+export function DTable({
+  columns,
+  rows,
+  compact,
+  empty,
+  bare,
+  label,
+}: {
+  columns: TableColumn[];
+  rows: TableRow[];
+  compact?: boolean;
+  empty?: string;
+  /** No border of its own (inside a panel). */
+  bare?: boolean;
+  /** The table's name for screen readers. */
+  label?: string;
+}) {
   const { colors: c } = useDisplay();
-  const align = (col: TableColumn): TextStyle => ({ textAlign: col.align === 'right' ? 'right' : 'left' });
-  const cell = (content: ReactNode, col: TableColumn, row: TableRow, i: number, hidden?: boolean) => (
+  const align = (col: TableColumn | undefined): TextStyle => ({ textAlign: col?.align === 'right' ? 'right' : 'left' });
+  const box = (col: TableColumn | undefined): ViewStyle => ({ flex: col?.flex ?? 1, minWidth: 0, alignItems: col?.align === 'right' ? 'flex-end' : 'flex-start' });
+  const content = (value: ReactNode, col: TableColumn | undefined, row: TableRow, i: number) =>
+    typeof value === 'string' || typeof value === 'number' ? (
+      <Text
+        numberOfLines={2}
+        style={[
+          { fontSize: row.tone === 'total' ? 18 : i === 0 && row.tone !== 'sub' ? 14 : 16, color: row.tone === 'sub' && i === 0 ? c.muted : c.ink },
+          i === 0 && row.tone !== 'sub' && { fontWeight: '500' },
+          row.tone === 'total' && { fontWeight: '500' },
+          row.tone === 'sub' && i === 0 && { paddingLeft: 56 },
+          align(col),
+        ]}
+      >
+        {value}
+      </Text>
+    ) : (
+      value
+    );
+  const lineStyle = (row: TableRow): ViewStyle => ({
+    flexDirection: 'row',
+    gap: 16,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    minHeight: compact ? 44 : row.tone === 'total' ? 56 : 62,
+    paddingVertical: compact ? 6 : 10,
+    borderTopWidth: row.tone === 'total' ? 2 : 1,
+    borderTopColor: row.tone === 'total' ? c.outline : c.line,
+    backgroundColor: row.tone === 'total' ? c.chip : row.tone === 'sub' ? c.panel : 'transparent',
+  });
+  /** "Coffee Bean, Date: Oct 3, Amount: $4.50": each text cell after the first with its column's name. */
+  const spokenRow = (row: TableRow) =>
+    row.label ??
+    row.cells
+      .map((x, i) => (typeof x === 'string' || typeof x === 'number' ? String(x) : row.cellText?.[i]))
+      .map((x, i) => (!x ? null : i === 0 || !columns[i]?.label ? x : `${columns[i].label}: ${x}`))
+      .filter((x): x is string => !!x)
+      .join(', ');
+  const frame: ViewStyle = bare ? { backgroundColor: c.surface } : { borderWidth: 1, borderColor: c.line, borderRadius: 12, overflow: 'hidden', backgroundColor: c.surface };
+  const headerStyle: ViewStyle = { flexDirection: 'row', gap: 16, backgroundColor: c.chip, paddingHorizontal: 20, height: 46, alignItems: 'center' };
+  const headerText = (col: TableColumn): TextStyle[] => [{ flex: col.flex ?? 1, fontSize: 14, fontWeight: '500', color: c.ink }, align(col)];
+  const emptyText = rows.length === 0 && empty ? <Text style={[DText.body, { color: c.muted, padding: 20 }]}>{empty}</Text> : null;
+
+  if (Platform.OS === 'web') {
+    return (
+      <View style={frame}>
+        <View role="table" aria-label={label}>
+          <View role="rowgroup">
+            <View role="row" style={headerStyle}>
+              {columns.map((col, i) => (
+                <Text key={i} role="columnheader" style={headerText(col)}>
+                  {col.label}
+                </Text>
+              ))}
+            </View>
+          </View>
+          <View role="rowgroup">
+            {rows.map((row) => {
+              // The row's button covers the whole row, under its cells (which let clicks through to it);
+              // only the actions, on top, take clicks of their own.
+              const button = row.onPress ? (
+                <HoverRow onPress={row.onPress} label={spokenRow(row)} expanded={row.expanded} style={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 }} />
+              ) : null;
+              return (
+                <View key={row.key} role="row" style={lineStyle(row)}>
+                  {row.cells.map((value, i) => (
+                    // The row header holds the button; 'static' lets the button size itself to the whole row.
+                    // Cells let clicks through to the button under them (the row header passes them on to it).
+                    <View
+                      key={i}
+                      role={i === 0 ? 'rowheader' : 'cell'}
+                      pointerEvents={button ? (i === 0 ? 'box-none' : 'none') : 'auto'}
+                      style={[box(columns[i]), i === 0 && button ? { position: 'static' } : null]}
+                    >
+                      {i === 0 && button}
+                      <View pointerEvents={button ? 'none' : 'auto'} style={{ maxWidth: '100%' }}>
+                        {content(value, columns[i], row, i)}
+                      </View>
+                    </View>
+                  ))}
+                  {row.actions !== undefined && (
+                    <View role="cell" style={box(columns[row.cells.length])}>
+                      {row.actions}
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+          </View>
+        </View>
+        {emptyText}
+      </View>
+    );
+  }
+
+  const cell = (value: ReactNode, col: TableColumn | undefined, row: TableRow, i: number, hidden?: boolean) => (
     <View
       key={i}
-      // Under a layered row: not read (the row's button says it all) and clicks go through to the button.
+      // Under a layered row: not read (the row's button says it all) and touches go through to the button.
       {...(hidden && { 'aria-hidden': true, importantForAccessibility: 'no-hide-descendants' as const, pointerEvents: 'none' as const })}
-      style={{ flex: col.flex ?? 1, minWidth: 0, alignItems: col.align === 'right' ? 'flex-end' : 'flex-start' }}
+      style={box(col)}
     >
-      {typeof content === 'string' || typeof content === 'number' ? (
-        <Text
-          numberOfLines={2}
-          style={[
-            { fontSize: row.tone === 'total' ? 18 : i === 0 && row.tone !== 'sub' ? 14 : 16, color: row.tone === 'sub' && i === 0 ? c.muted : c.ink },
-            i === 0 && row.tone !== 'sub' && { fontWeight: '500' },
-            row.tone === 'total' && { fontWeight: '500' },
-            row.tone === 'sub' && i === 0 && { paddingLeft: 56 },
-            align(col),
-          ]}
-        >
-          {content}
-        </Text>
-      ) : (
-        content
-      )}
+      {content(value, col, row, i)}
     </View>
   );
   return (
-    <View style={bare ? { backgroundColor: c.surface } : { borderWidth: 1, borderColor: c.line, borderRadius: 12, overflow: 'hidden', backgroundColor: c.surface }}>
-      {/* Column titles: a visual guide (each row reads out its own cells). Outside the list, which holds only rows. */}
-      <View style={{ flexDirection: 'row', gap: 16, backgroundColor: c.chip, paddingHorizontal: 20, height: 46, alignItems: 'center' }}>
+    <View style={frame}>
+      {/* Column titles: a visual guide (each row reads out its cells with their column names). */}
+      <View style={headerStyle}>
         {columns.map((col, i) => (
-          <Text key={i} style={[{ flex: col.flex ?? 1, fontSize: 14, fontWeight: '500', color: c.ink }, align(col)]}>
+          <Text key={i} style={headerText(col)}>
             {col.label}
           </Text>
         ))}
       </View>
-      {rows.length === 0 && empty && <Text style={[DText.body, { color: c.muted, padding: 20 }]}>{empty}</Text>}
+      {emptyText}
       <View role="list">
         {rows.map((row) => {
           // With actions, the row's button lies under its cells (spoken by the button's label, so not
-          // read twice) and only the actions, on top, take clicks of their own.
+          // read twice) and only the actions, on top, take touches of their own.
           const layered = !!row.onPress && row.actions !== undefined;
           const line = (
-            <View
-              pointerEvents={layered ? 'box-none' : undefined}
-              style={{
-                flexDirection: 'row',
-                gap: 16,
-                alignItems: 'center',
-                paddingHorizontal: 20,
-                minHeight: compact ? 44 : row.tone === 'total' ? 56 : 62,
-                paddingVertical: compact ? 6 : 10,
-                borderTopWidth: row.tone === 'total' ? 2 : 1,
-                borderTopColor: row.tone === 'total' ? c.outline : c.line,
-                backgroundColor: row.tone === 'total' ? c.chip : row.tone === 'sub' ? c.panel : 'transparent',
-              }}
-            >
-              {row.cells.map((content, i) => cell(content, columns[i], row, i, layered))}
+            <View pointerEvents={layered ? 'box-none' : undefined} style={lineStyle(row)}>
+              {row.cells.map((value, i) => cell(value, columns[i], row, i, layered))}
               {row.actions !== undefined && cell(row.actions, columns[row.cells.length], row, row.cells.length)}
             </View>
           );
-          const spoken = row.label ?? row.cells.filter((x) => typeof x === 'string').join(', ');
+          const spoken = spokenRow(row);
           if (layered) {
             return (
               <View key={row.key} role="listitem">
@@ -613,7 +704,7 @@ export function SubHeading({ title, action, onAction }: { title: string; action?
 export function Kbd({ label }: { label: string }) {
   const { colors: c } = useDisplay();
   return (
-    <View style={{ borderWidth: 1, borderColor: c.outline, borderBottomWidth: 2, borderRadius: 6, paddingHorizontal: 6, minWidth: 24, height: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: c.surface }}>
+    <View style={{ borderWidth: 1, borderColor: c.outline, borderBottomWidth: 2, borderRadius: 6, paddingHorizontal: 6, minWidth: 24, minHeight: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: c.surface }}>
       <Text style={{ fontSize: 12, fontWeight: '600', color: c.ink }}>{label}</Text>
     </View>
   );

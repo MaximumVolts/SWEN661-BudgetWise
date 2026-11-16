@@ -169,11 +169,14 @@ function typingIn(el: Element | null): boolean {
  * Calls [onCommand] for the app's keyboard shortcuts, the mouse's Back / Forward buttons and the
  * Electron menu's commands. While a dialog is open only the dialog gets keys (Ctrl/⌘ + S and P
  * are still kept from the browser, which would otherwise offer to save or print the page).
+ * [singleKey]: whether single-key shortcuts (?) work (default true).
  */
-export function useShortcutListener(onCommand: (command: ShortcutCommand) => void) {
+export function useShortcutListener(onCommand: (command: ShortcutCommand) => void, { singleKey = true }: { singleKey?: boolean } = {}) {
   const latest = useRef(onCommand);
+  const singleKeyOn = useRef(singleKey);
   useEffect(() => {
     latest.current = onCommand;
+    singleKeyOn.current = singleKey;
   });
   useEffect(() => {
     if (!web || typeof window === 'undefined') return undefined;
@@ -181,7 +184,7 @@ export function useShortcutListener(onCommand: (command: ShortcutCommand) => voi
     const seen = new WeakSet<Event>();
     const onKey = (e: KeyboardEvent) => {
       if (e.defaultPrevented || seen.has(e)) return;
-      const command = matchShortcut(e, { mac, typing: typingIn(document.activeElement) });
+      const command = matchShortcut(e, { mac, typing: typingIn(document.activeElement), singleKey: singleKeyOn.current });
       if (!command) return;
       seen.add(e);
       if (modalOpen()) {
@@ -269,12 +272,27 @@ export const bareInput: object = web ? { outlineStyle: 'none' } : {};
 export const focusRingRule = (color: string) =>
   `:focus-visible:not(input):not(textarea):not(select):not([tabindex="-1"]) { outline: 3px solid ${color}; outline-offset: 2px; }`;
 
-/** Desktop: adds focusRingRule in [color] to the page (and keeps it in step with the theme). */
+/**
+ * Windows High Contrast (forced colours) removes background fills, and with them the filled pill
+ * that marks the current page in the sidebar and the fill of a chosen chip or tab. Those get the
+ * system's selection colours instead, so what is current or chosen still shows.
+ */
+export const FORCED_COLORS_RULE = `@media (forced-colors: active) {
+  [aria-current="page"], [role="tab"][aria-selected="true"], [role="radio"][aria-checked="true"] {
+    forced-color-adjust: none; background-color: Highlight !important; border-color: Highlight !important;
+  }
+  [aria-current="page"], [aria-current="page"] *, [role="tab"][aria-selected="true"], [role="tab"][aria-selected="true"] *,
+  [role="radio"][aria-checked="true"], [role="radio"][aria-checked="true"] * {
+    color: HighlightText !important; border-color: HighlightText;
+  }
+}`;
+
+/** Desktop: adds focusRingRule in [color] and FORCED_COLORS_RULE to the page (and keeps them in step with the theme). */
 export function FocusRingStyle({ color }: { color: string }) {
   useEffect(() => {
     if (!web || typeof document === 'undefined') return undefined;
     const style = document.createElement('style');
-    style.textContent = focusRingRule(color);
+    style.textContent = `${focusRingRule(color)}\n${FORCED_COLORS_RULE}`;
     document.head.appendChild(style);
     return () => style.remove();
   }, [color]);

@@ -9,6 +9,7 @@ import type { ShortcutCommand } from '@/models/shortcuts';
 import {
   FocusPressable,
   FocusRingStyle,
+  FORCED_COLORS_RULE,
   focusRingRule,
   focusById,
   focusPageSoon,
@@ -191,13 +192,22 @@ describe('the focus ring everywhere', () => {
     expect(rule).toContain(':not([tabindex="-1"])');
     render(<FocusRingStyle color="#123456" />);
     const styles = () => [...document.head.querySelectorAll('style')].map((s) => s.textContent).filter((t) => t?.includes(':focus-visible'));
-    expect(styles()).toEqual([rule]);
+    expect(styles()).toEqual([`${rule}
+${FORCED_COLORS_RULE}`]);
     // A new theme colour replaces the rule; leaving takes it away.
     act(() => root!.render(<FocusRingStyle color="#000000" />));
-    expect(styles()).toEqual([focusRingRule('#000000')]);
+    expect(styles()).toEqual([`${focusRingRule('#000000')}
+${FORCED_COLORS_RULE}`]);
     act(() => root!.unmount());
     root = undefined;
     expect(styles()).toEqual([]);
+  });
+
+  test('Windows High Contrast: the current page and chosen tab or option get the system selection colours', () => {
+    expect(FORCED_COLORS_RULE).toContain('@media (forced-colors: active)');
+    for (const selector of ['[aria-current="page"]', '[role="tab"][aria-selected="true"]', '[role="radio"][aria-checked="true"]']) expect(FORCED_COLORS_RULE).toContain(selector);
+    expect(FORCED_COLORS_RULE).toContain('background-color: Highlight');
+    expect(FORCED_COLORS_RULE).toContain('color: HighlightText');
   });
 });
 
