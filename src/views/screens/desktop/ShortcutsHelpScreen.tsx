@@ -1,23 +1,24 @@
 import { Fragment } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Platform, ScrollView, Text, View } from 'react-native';
 import type { KeyboardController } from '../../../controllers/keyboardController';
 import { keyLabels, keysFor, SHORTCUT_GROUPS } from '../../../models/shortcuts';
 import { useDisplay } from '../../../state/PreferencesContext';
 import { Heading, Tap } from '../../../ui/components';
 import { DButton, DText, Kbd } from '../../../ui/desktop';
 import { Icon } from '../../../ui/icons';
-import { isMac } from '../../../ui/keyboard';
+import { Backdrop, dialogName, isMac, tabCycleProps } from '../../../ui/keyboard';
 
 /** The keyboard shortcuts list (?, Ctrl/⌘ + /, or the top bar's keyboard button). Esc closes it. */
 export function ShortcutsHelpScreen({ controller: ctl }: { controller: KeyboardController }) {
   const { colors: c } = useDisplay();
   const mac = isMac();
   return (
-    <Modal visible={ctl.helpOpen} transparent animationType="fade" onRequestClose={ctl.closeHelp}>
+    <Modal visible={ctl.helpOpen} transparent animationType="fade" onRequestClose={ctl.closeHelp} {...dialogName('Keyboard shortcuts')}>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <View
           accessibilityViewIsModal
           aria-label="Keyboard shortcuts"
+          {...tabCycleProps}
           style={{ width: 860, maxWidth: '100%', maxHeight: '90%', zIndex: 1, backgroundColor: c.bg, borderRadius: 24, borderWidth: 1, borderColor: c.line }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 32, paddingRight: 16, paddingTop: 20, paddingBottom: 8 }}>
@@ -26,7 +27,11 @@ export function ShortcutsHelpScreen({ controller: ctl }: { controller: KeyboardC
               <Icon name="close" color={c.ink} />
             </Tap>
           </View>
-          <ScrollView contentContainerStyle={{ paddingHorizontal: 32, paddingBottom: 8 }}>
+          {/* Scrolls in a short window: a Tab stop, so the arrow keys can scroll it too. */}
+          <ScrollView
+            {...(Platform.OS === 'web' && { tabIndex: 0 as const, role: 'region' as const, 'aria-label': 'Shortcut list' })}
+            contentContainerStyle={{ paddingHorizontal: 32, paddingBottom: 8 }}
+          >
             <Text style={[DText.small, { color: c.muted, marginBottom: 8 }]}>
               {mac ? '⌘ shortcuts also work with Ctrl.' : 'Ctrl shortcuts work even while you are typing in a field.'} Tab moves through everything else.
             </Text>
@@ -72,7 +77,7 @@ export function ShortcutsHelpScreen({ controller: ctl }: { controller: KeyboardC
           </View>
         </View>
         {/* After the dialog, so focus starts inside it; a click outside closes, Esc does from the keyboard. */}
-        <Pressable accessibilityLabel="Close" focusable={false} onPress={ctl.closeHelp} style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(26,26,26,0.32)' }]} />
+        <Backdrop onPress={ctl.closeHelp} style={{ backgroundColor: 'rgba(26,26,26,0.32)' }} />
       </View>
     </Modal>
   );

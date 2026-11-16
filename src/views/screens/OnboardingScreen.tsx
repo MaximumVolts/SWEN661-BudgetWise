@@ -4,7 +4,7 @@ import { useDisplay } from '../../state/PreferencesContext';
 import { AsyncView, Card, Chip, Gap, PillButton, Screen, Scroll, TopBar } from '../../ui/components';
 import { useDesktop } from '../../ui/responsive';
 import { OnboardingDesktop } from './desktop/JourneyPages';
-import { FocusPressable, KeyGroup } from '../../ui/keyboard';
+import { FocusPressable, KeyGroup, phoneLabel } from '../../ui/keyboard';
 
 /** 02 - Onboarding priorities: what the user wants help with, and how they're paid. */
 function OnboardingPhone({ controller }: { controller: OnboardingController }) {
@@ -41,7 +41,7 @@ function OnboardingPhone({ controller }: { controller: OnboardingController }) {
                           ringColor={c.ink}
                           key={o.id}
                           accessibilityRole="radio"
-                          accessibilityLabel={`${o.title}. ${o.subtitle}`}
+                          accessibilityLabel={phoneLabel(`${o.title}. ${o.subtitle}`)}
                           accessibilityState={{ checked: on }}
                           onPress={() => setIncome(o.id)}
                           style={{ flexDirection: 'row', alignItems: 'center', gap: 16, paddingHorizontal: 8, paddingVertical: 12 }}

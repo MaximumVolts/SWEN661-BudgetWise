@@ -5,6 +5,7 @@ import { useDisplay } from '../../state/PreferencesContext';
 import { appServices } from '../../state/ServicesContext';
 import { useSession } from '../../state/SessionContext';
 import { Platform } from 'react-native';
+import { FocusRingStyle } from '../../ui/keyboard';
 import { useDesktop } from '../../ui/responsive';
 import { AppFrameView, type FrameMode } from '../AppFrameView';
 import { KeyboardShortcutsView } from '../KeyboardShortcutsView';
@@ -58,6 +59,8 @@ function RootStack() {
   return (
     <>
       <StatusBar style="dark" />
+      {/* Desktop: the app's focus ring (in the theme's ink) on everything, not the browser's thin one. */}
+      {Platform.OS === 'web' && <FocusRingStyle color={colors.ink} />}
       {Platform.OS === 'web' ? <AppFrameView mode={mode}>{stack}</AppFrameView> : stack}
       {/* Desktop keyboard shortcuts, once signed in (any window width). */}
       {Platform.OS === 'web' && stage === 'app' && <KeyboardShortcutsView />}

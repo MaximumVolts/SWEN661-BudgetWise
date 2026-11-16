@@ -1,6 +1,7 @@
 import { type ReactNode, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Platform,
   type GestureResponderEvent,
   Pressable,
   ScrollView,
@@ -23,7 +24,7 @@ import { useDisplay } from '../state/PreferencesContext';
 import { DateLabels } from '../utils/dateLabels';
 import { DatePicker } from './DatePicker';
 import { Icon, type IconName } from './icons';
-import { bareInput, FocusPressable, focusRing, KeyGroup, spaceKeyProps, useRevealFirstError } from './keyboard';
+import { bareInput, FocusPressable, focusRing, KeyGroup, pressKeyProps, rememberFocus, usingKeyboard, useRevealFirstError } from './keyboard';
 import { useResponsive } from './responsive';
 
 // ── Layout ────────────────────────────────────────────────────────────────────
@@ -82,19 +83,32 @@ export function TopBar({ title, onBack, trailing }: { title: string; onBack?: ()
           <Icon name="arrow-back" size={48} color={c.ink} />
         </Tap>
       )}
-      <Heading style={[t.appBar, { fontSize: onBack ? 20 : 24, flex: 1 }]}>{title}</Heading>
+      <Heading level={1} style={[t.appBar, { fontSize: onBack ? 20 : 24, flex: 1 }]}>{title}</Heading>
       {trailing}
     </View>
   );
 }
 
-/** Text marked as a heading for screen readers. */
-export function Heading({ children, style }: { children: ReactNode; style?: StyleProp<TextStyle> }) {
+/**
+ * Text marked as a heading for screen readers. [level] 1 is the page's title (one per page, an
+ * <h1> on desktop); sections inside it are level 2 (the default), and so on.
+ */
+export function Heading({ children, style, level = 2 }: { children: ReactNode; style?: StyleProp<TextStyle>; level?: 1 | 2 | 3 }) {
   return (
-    <Text accessibilityRole="header" style={style}>
+    // React Native has no heading levels; react-native-web renders aria-level as <h1>, <h2>…
+    <Text accessibilityRole="header" {...({ 'aria-level': level } as object)} style={style}>
       {children}
     </Text>
   );
+}
+
+/** Read by screen readers, not shown: takes no room and nothing is drawn. */
+export const visuallyHidden: TextStyle = { position: 'absolute', width: 1, height: 1, overflow: 'hidden', opacity: 0 };
+
+/** Words only screen readers hear, on desktop (phones read the control's own label instead; see phoneLabel). */
+export function ScreenReaderText({ children }: { children: string }) {
+  if (Platform.OS !== 'web') return null;
+  return <Text style={visuallyHidden}>{children}</Text>;
 }
 
 /** Uppercase small section header, optional olive action on the right. */
@@ -163,6 +177,11 @@ export function Tap({
   const { colors: c } = useDisplay();
   const enabled = !!onPress && !disabled;
   const [focused, setFocused] = useState(false);
+  // A radio or checkbox is checked, not "selected" (aria-checked is required for those roles).
+  if ((role === 'radio' || role === 'checkbox') && checked === undefined) {
+    checked = !!selected;
+    selected = undefined;
+  }
   return (
     <Pressable
       // Handlers may await dialogs; the press itself never waits for them.
@@ -173,7 +192,7 @@ export function Tap({
       accessibilityHint={hint}
       accessibilityState={checked === undefined ? { disabled: !enabled, selected } : { disabled: !enabled, selected, checked }}
       {...(checked !== undefined && { 'aria-checked': checked })}
-      {...spaceKeyProps(role, enabled ? onPress : undefined)}
+      {...pressKeyProps(role, enabled ? onPress : undefined)}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={({ pressed }) => [
@@ -385,8 +404,13 @@ export function ProgressBar({
     <View
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
       accessible={!!label}
+      accessibilityRole={label ? 'progressbar' : undefined}
       accessibilityLabel={label}
-      accessibilityValue={label ? { text: `${Math.round(v * 100)} percent` } : undefined}
+      // As aria-value* (react-native-web drops accessibilityValue; React Native reads both).
+      aria-valuemin={label ? 0 : undefined}
+      aria-valuemax={label ? 100 : undefined}
+      aria-valuenow={label ? Math.round(v * 100) : undefined}
+      aria-valuetext={label ? `${Math.round(v * 100)} percent` : undefined}
       importantForAccessibility={label ? 'yes' : 'no-hide-descendants'}
       style={{ height, borderRadius: height / 2, overflow: 'hidden', backgroundColor: track ?? c.chip }}
     >
@@ -605,11 +629,13 @@ export function SelectField({
   return (
     <View style={{ marginBottom: 18 }}>
       <Text style={[t.sub, { marginBottom: 6, color: error ? c.red : c.ink, fontWeight: '600' }]}>{label}</Text>
-      <Pressable
+      <FocusPressable
         ref={ref}
+        ringColor={c.ink}
         {...invalidProps(error)}
         accessibilityRole="button"
-        accessibilityLabel={`${label}: ${current?.label ?? 'not chosen'}`}
+        // Ends with what the box shows, so the visible text is part of the name (WCAG 2.5.3).
+        accessibilityLabel={`${label}: ${current?.label ?? placeholder}`}
         accessibilityHint={error}
         onPress={() =>
           void choose({ title: label, options, selectedId: value }).then((id) => id !== undefined && onChange(id))
@@ -620,7 +646,7 @@ export function SelectField({
           {current?.label ?? placeholder}
         </Text>
         <Icon name="expand-more" color={c.ink} />
-      </Pressable>
+      </FocusPressable>
       {error && <Text style={{ color: c.red, fontSize: 13, marginTop: 4 }}>{error}</Text>}
     </View>
   );
@@ -645,34 +671,50 @@ export function DateField({
   placeholder?: string;
 }) {
   const { colors: c, type: t } = useDisplay();
-  const [picking, setPicking] = useState(false);
+  // Open, and whether with the calendar pop-up (not when opened from the keyboard).
+  const [picking, setPicking] = useState<false | { calendar: boolean }>(false);
+  // Desktop: back to this field when the picker closes from the keyboard (Enter, Esc), not when
+  // Tab has already moved focus on.
+  const restoreFocus = useRef<() => void>(undefined);
   return (
     <View style={{ marginBottom: 18 }}>
       <Text style={[t.sub, { marginBottom: 6, color: error ? c.red : c.ink, fontWeight: '600' }]}>{label}</Text>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={`${label}: ${value ? DateLabels.long(value) : 'not chosen'}`}
-        accessibilityHint={error ?? helper}
-        onPress={() => setPicking(true)}
-        style={[styles.field, { ...boxBorder(error ? c.red : c.outline, !!error), backgroundColor: c.surface, minHeight: 56 }]}
-      >
-        <Icon name="event" color={c.ink} />
-        <Text style={{ flex: 1, fontSize: 18, marginLeft: 10, color: value ? c.ink : c.muted }}>
-          {value ? DateLabels.long(value) : placeholder}
-        </Text>
+      <View>
+        <FocusPressable
+          ringColor={c.ink}
+          accessibilityRole="button"
+          accessibilityLabel={`${label}: ${value ? DateLabels.long(value) : placeholder}`}
+          accessibilityHint={error ?? helper}
+          onPress={() => {
+            restoreFocus.current = rememberFocus();
+            setPicking({ calendar: !usingKeyboard() });
+          }}
+          style={[styles.field, { ...boxBorder(error ? c.red : c.outline, !!error), backgroundColor: c.surface, minHeight: 56 }, value && { paddingRight: 56 }]}
+        >
+          <Icon name="event" color={c.ink} />
+          <Text style={{ flex: 1, fontSize: 18, marginLeft: 10, color: value ? c.ink : c.muted }}>
+            {value ? DateLabels.long(value) : placeholder}
+          </Text>
+        </FocusPressable>
+        {/* Beside the field's button, drawn over its right end: a button can't hold another. */}
         {value && (
-          <Tap onPress={() => onChange(undefined)} label={`Clear ${label.toLowerCase()}`}>
-            <Icon name="close" color={c.muted} />
-          </Tap>
+          <View style={{ position: 'absolute', right: 8, top: 0, bottom: 0, justifyContent: 'center' }}>
+            <Tap onPress={() => onChange(undefined)} label={`Clear ${label.toLowerCase()}`}>
+              <Icon name="close" color={c.muted} />
+            </Tap>
+          </View>
         )}
-      </Pressable>
+      </View>
       {picking && (
         <DatePicker
           value={value ?? minimumDate ?? new Date()}
           minimumDate={minimumDate}
+          showCalendar={picking.calendar}
           onDone={(date) => {
             setPicking(false);
             if (date) onChange(date);
+            restoreFocus.current?.();
+            restoreFocus.current = undefined;
           }}
         />
       )}

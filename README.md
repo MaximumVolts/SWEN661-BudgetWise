@@ -158,6 +158,9 @@ The renderer is sandboxed, with no Node access, context isolation and a strict c
 | ← → ↑ ↓ | Move between tabs, options and choices in a picker (one Tab stop per group) |
 | Space | Tick checkboxes and switches |
 | Esc | Close a dialog, the Customize panel or search; focus goes back where it was |
+| Date fields: Enter, then type or ↑ ↓ | Edit the date (Enter sets it, Esc cancels). Clicked open, the calendar pop-up opens instead |
+
+The Ctrl shortcuts also work while typing in a field (Ctrl + S saves the form you're typing in). Back and Forward also work on the sign-in and sign-up pages. The keyboard-only test results are in [docs/keyboard-testing-checklist.md](docs/keyboard-testing-checklist.md). The full accessibility conformance report (VPAT® 2.5 INT: WCAG 2.2 A–AAA, Section 508, EN 301 549) is [docs/accessibility-conformance-report.md](docs/accessibility-conformance-report.md).
 
 Dialogs and panels keep focus inside while open, and shortcuts don't reach the page behind them. After a shortcut opens a page, focus moves to that page. The sidebar has three labelled navigation landmarks (Primary, Tools, Account), next to the top bar (banner) and the page (main). The shortcuts are defined in `src/models/shortcuts.ts`, the key handling is in `src/ui/keyboard.tsx`, and pages offer their Save / New / Print actions with `usePageShortcut` (`src/state/ShortcutsContext.tsx`). The menu bar lists the same shortcuts.
 
@@ -182,7 +185,11 @@ npm run test:coverage    # plus coverage: text summary, and HTML in coverage/lco
 | `settingsAndTools-test.tsx` | RNTL + navigation | settings toggles and reminders, profile, accounts, notifications, goals, cash flow, spending, statements |
 | `layoutAndSnapshots-test.tsx` | unit + RNTL + snapshot | phone/tablet layouts, snapshots of shared components and screens |
 | `keyboard-test.ts` | unit | keyboard shortcuts (keys per platform, menu commands, the shortcuts list), search destinations, page Save / New / Print actions |
-| `keyboardDom-test.tsx` | DOM (jsdom + react-native-web) | desktop keyboard support in a real DOM: arrow keys in tab lists / radio groups / list boxes, Space, focus helpers, the shortcut listener, mouse Back / Forward, Electron menu commands |
+| `keyboardDom-test.tsx` | DOM (jsdom + react-native-web) | desktop keyboard support in a real DOM: arrow keys in tab lists / radio groups / list boxes, Space, Enter on links, Tab going round a dialog, focus returning after a dialog, the focus ring, the shortcut listener (also while typing in a field), mouse Back / Forward, Electron menu commands |
+| `desktopDatePicker-test.tsx` | DOM (jsdom) | the desktop date field by keyboard: typing or ↑ ↓ edits, Enter sets, Esc cancels, no calendar pop-up when opened from the keyboard |
+| `journeyController-test.tsx` | DOM (jsdom) | Back and Forward on the sign-in and sign-up pages |
+| `asyncData-test.tsx` | DOM (jsdom) | a page keeps its content (and the focused control) while its own controls load other data |
+| `a11yDom-test.tsx` | DOM (jsdom + react-native-web) | the desktop accessibility fixes from an axe scan: controls named by their visible text, page titles as `<h1>`, progress bars, radios' checked state, dialog backdrops, tables as lists with row actions beside (not inside) the row's button |
 | `comparison-test.ts` | unit | Monthly Comparison: months, totals, CSV / PDF export following the Customize choices, saved choices per user, category rules |
 | `desktop-test.ts` | unit | the Electron desktop repositories and bridge |
 | `desktopScreens-test.tsx` | RNTL + navigation | every page in the desktop layout; transactions, budgets, bills, notifications; Monthly Comparison rows, periods, downloads and the Customize panel |

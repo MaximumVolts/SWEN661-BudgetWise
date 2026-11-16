@@ -16,7 +16,7 @@ import {
   visibleRows,
 } from '../../models/comparison';
 import { useDisplay } from '../../state/PreferencesContext';
-import { AsyncView, Heading, Screen, Tap, TopBar } from '../../ui/components';
+import { AsyncView, Heading, Screen, Tap, TopBar, visuallyHidden } from '../../ui/components';
 import {
   Checkbox,
   DButton,
@@ -33,7 +33,7 @@ import {
   Tabs,
 } from '../../ui/desktop';
 import { Icon, iconFor } from '../../ui/icons';
-import { KeyGroup } from '../../ui/keyboard';
+import { KeyGroup, phoneLabel } from '../../ui/keyboard';
 import { useDesktop } from '../../ui/responsive';
 
 /**
@@ -50,7 +50,10 @@ export function ComparisonScreen({ controller: ctl }: { controller: ComparisonCo
       {desktop && (
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 16 }}>
           <View style={{ flex: 1 }}>
-            {o.showTitle && <Heading style={{ fontSize: 32, lineHeight: 40, fontWeight: '600', color: c.ink }}>Monthly Comparison</Heading>}
+            {/* The page's title; when hidden from the report it's still there for screen readers. */}
+            <Heading level={1} style={o.showTitle ? { fontSize: 32, lineHeight: 40, fontWeight: '600', color: c.ink } : visuallyHidden}>
+              Monthly Comparison
+            </Heading>
             <Text style={[DText.body, { color: c.muted }]}>Compare your spending across different months.</Text>
           </View>
           <DButton label="Customize" icon="tune" kind="primary" onPress={() => ctl.openCustomize('data')} />
@@ -81,7 +84,7 @@ export function ComparisonScreen({ controller: ctl }: { controller: ComparisonCo
 function PickerField({ label, value, icon, onPress, width }: { label: string; value: string; icon: 'event' | 'expand-more'; onPress: () => void; width?: number }) {
   const { colors: c } = useDisplay();
   return (
-    <Tap onPress={onPress} label={`${label}: ${value}`} style={{ alignItems: 'stretch', flexGrow: width ? 0 : 1, width }}>
+    <Tap onPress={onPress} label={phoneLabel(`${label}: ${value}`)} style={{ alignItems: 'stretch', flexGrow: width ? 0 : 1, width }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', height: 60, borderWidth: 1, borderColor: c.outline, borderRadius: 6, paddingHorizontal: 16, backgroundColor: c.surface }}>
         <View style={{ flex: 1 }}>
           <Text style={[DText.small, { color: c.muted }]}>{label}</Text>
@@ -385,7 +388,7 @@ function CustomizeDrawer({ controller: ctl }: { controller: ComparisonController
 function SelectField({ label, value, onPress }: { label: string; value: string; onPress: () => void }) {
   const { colors: c } = useDisplay();
   return (
-    <Tap onPress={onPress} label={`${label}: ${value}`} style={{ alignItems: 'stretch' }}>
+    <Tap onPress={onPress} label={phoneLabel(`${label}: ${value}`)} style={{ alignItems: 'stretch' }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', height: 48, borderWidth: 1, borderColor: c.outline, borderRadius: 6, paddingHorizontal: 14, backgroundColor: c.surface }}>
         <Text style={{ flex: 1, fontSize: 16, color: c.ink }}>{value}</Text>
         <Icon name="expand-more" color={c.ink} />

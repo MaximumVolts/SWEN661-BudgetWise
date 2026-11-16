@@ -24,7 +24,7 @@ export function CreateAccountScreen({ controller }: { controller: CreateAccountC
           onChangeText={set('username')}
           autoCapitalize="none"
           autoCorrect={false}
-          autoComplete="username-new"
+          autoComplete="username"
           error={e.username}
           helper="3–30 letters, numbers, dots, dashes or underscores"
         />
@@ -33,7 +33,7 @@ export function CreateAccountScreen({ controller }: { controller: CreateAccountC
           value={form.password}
           onChangeText={set('password')}
           secure
-          autoComplete="password-new"
+          autoComplete="new-password"
           error={e.password}
           helper="At least 8 characters, with a letter and a number"
         />

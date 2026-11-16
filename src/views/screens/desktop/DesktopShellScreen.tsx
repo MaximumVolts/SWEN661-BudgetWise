@@ -3,10 +3,10 @@ import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import type { ShellController } from '../../../controllers/shellController';
 import type { AppSection } from '../../../models/navigation';
 import { useDisplay } from '../../../state/PreferencesContext';
-import { focusRing, Tap } from '../../../ui/components';
+import { focusRing, ScreenReaderText, Tap } from '../../../ui/components';
 import { Kbd } from '../../../ui/desktop';
 import { Icon, type IconName } from '../../../ui/icons';
-import { focusById, focusPageSoon, isMac, MAIN_CONTENT_ID, SEARCH_INPUT_ID } from '../../../ui/keyboard';
+import { focusById, focusPageSoon, isMac, MAIN_CONTENT_ID, phoneLabel, pressKeyProps, SEARCH_INPUT_ID } from '../../../ui/keyboard';
 
 const MAIN: [AppSection, string, IconName][] = [
   ['home', 'Home', 'home'],
@@ -39,7 +39,6 @@ export const SHELL_INSET = { left: 320, top: 80 };
 export function DesktopShellScreen({ controller: ctl }: { controller: ShellController }) {
   return (
     <>
-      <SkipLink />
       <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: SHELL_INSET.left, zIndex: 1 }}>
         <Sidebar controller={ctl} />
       </View>
@@ -60,6 +59,7 @@ function SkipLink() {
       role="link"
       accessibilityLabel="Skip to main content"
       onPress={() => focusById(MAIN_CONTENT_ID)}
+      {...pressKeyProps('link', () => focusById(MAIN_CONTENT_ID))}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={[
@@ -84,6 +84,8 @@ function Sidebar({ controller: ctl }: { controller: ShellController }) {
       accessibilityLabel="Sidebar"
       style={{ flex: 1, backgroundColor: c.panel, borderRightWidth: 1, borderRightColor: c.line, paddingTop: 24, paddingHorizontal: 14, paddingBottom: 14 }}
     >
+      {/* First in the page, so the first Tab stop; inside a landmark like everything else. */}
+      <SkipLink />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 13, marginBottom: 26 }}>
         <View style={{ width: 44, height: 44, borderRadius: 13, backgroundColor: c.lime, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="speed" color="#1A1A1A" />
@@ -120,6 +122,7 @@ function Sidebar({ controller: ctl }: { controller: ShellController }) {
               unread > 0 ? (
                 <View style={{ minWidth: 24, height: 24, borderRadius: 12, backgroundColor: c.red, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 }}>
                   <Text style={{ fontSize: 13, fontWeight: '600', color: '#FFFFFF' }}>{unread > 99 ? '99+' : unread}</Text>
+                  <ScreenReaderText> new</ScreenReaderText>
                 </View>
               ) : undefined
             }
@@ -128,7 +131,7 @@ function Sidebar({ controller: ctl }: { controller: ShellController }) {
         </View>
         <View style={{ height: 1, backgroundColor: c.line, marginVertical: 14 }} />
         {ctl.profile && (
-          <Tap onPress={ctl.openProfile} label={`Profile: ${ctl.profile.name}, ${ctl.profile.username}`} style={{ alignItems: 'stretch' }}>
+          <Tap onPress={ctl.openProfile} label={phoneLabel(`Profile: ${ctl.profile.name}, ${ctl.profile.username}`)} style={{ alignItems: 'stretch' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 12 }}>
               <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: c.navPill, alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ fontSize: 14, fontWeight: '600', color: c.lime }}>{ctl.profile.initials}</Text>
@@ -180,11 +183,12 @@ function NavItem({
   return (
     <Pressable
       accessibilityRole="link"
-      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityLabel={phoneLabel(accessibilityLabel ?? label)}
       accessibilityState={{ selected: active }}
       aria-current={active ? 'page' : undefined}
       {...(shortcut && { 'aria-keyshortcuts': shortcut.replace('⌘', 'Meta'), title: `${label} (${shortcut})` })}
       onPress={onPress}
+      {...pressKeyProps('link', onPress)}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={({ hovered }: { hovered?: boolean }) => [
@@ -261,7 +265,9 @@ function SearchBox({ controller: ctl }: { controller: ShellController }) {
     setActive(0);
     setOpen(false);
     input.current?.blur();
-    if (result) focusPageSoon();
+    // To the page, whether a result was opened or search was left with Esc: never to nowhere
+    // (the body), where the next Tab would start over from the top of the window.
+    focusPageSoon();
   };
 
   const onKey = (e: { nativeEvent: { key: string }; preventDefault(): void }) => {
@@ -369,8 +375,10 @@ function SearchBox({ controller: ctl }: { controller: ShellController }) {
               nativeID={optionId(i)}
               role="option"
               aria-selected={i === current}
-              // Results are reached with ↑ ↓ from the box, not Tab.
+              // Results are reached with ↑ ↓ from the box, not Tab. react-native-web ignores
+              // focusable={false} on a Pressable (it still gets tabIndex 0), so say so explicitly.
               focusable={false}
+              {...({ tabIndex: -1 } as object)}
               onPress={() => finish(r)}
               onHoverIn={() => setActive(i)}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, minHeight: 44, backgroundColor: i === current ? c.chip : 'transparent' }}

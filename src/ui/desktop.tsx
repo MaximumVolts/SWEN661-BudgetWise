@@ -3,7 +3,7 @@ import { Modal, Pressable, ScrollView, type StyleProp, StyleSheet, Text, type Te
 import { useDisplay } from '../state/PreferencesContext';
 import { focusRing, Heading, Tap } from './components';
 import { Icon, type IconName } from './icons';
-import { FocusPressable, KeyGroup, spaceKeyProps } from './keyboard';
+import { Backdrop, dialogName, FocusPressable, KeyGroup, phoneLabel, pressKeyProps, tabCycleProps } from './keyboard';
 
 /**
  * Building blocks for the desktop layout (the design's sidebar app): a page with a title row,
@@ -48,7 +48,7 @@ export function DesktopPage({
           </View>
         )}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 }}>
-          <Heading style={[DText.title, { flex: 1, color: c.ink }]}>{title}</Heading>
+          <Heading level={1} style={[DText.title, { flex: 1, color: c.ink }]}>{title}</Heading>
           {actions}
         </View>
         {trail && <Text style={[DText.small, { color: c.muted }]}>{trail}</Text>}
@@ -270,8 +270,13 @@ export interface TableColumn {
 
 export interface TableRow {
   key: string;
-  /** One per column: text, or any element. */
+  /** One per column: text, or any element (but no buttons: those go in [actions]). */
   cells: ReactNode[];
+  /**
+   * Buttons for the last column (a ⋮ menu). A row that opens on click is itself a button, and
+   * one control can't hold another, so these sit beside the row's button rather than inside it.
+   */
+  actions?: ReactNode;
   onPress?: () => void;
   /** What a screen reader says for the whole row (defaults to the text cells joined). */
   label?: string;
@@ -284,8 +289,13 @@ export interface TableRow {
 export function DTable({ columns, rows, compact, empty, bare }: { columns: TableColumn[]; rows: TableRow[]; compact?: boolean; empty?: string; /** No border of its own (inside a panel). */ bare?: boolean }) {
   const { colors: c } = useDisplay();
   const align = (col: TableColumn): TextStyle => ({ textAlign: col.align === 'right' ? 'right' : 'left' });
-  const cell = (content: ReactNode, col: TableColumn, row: TableRow, i: number) => (
-    <View key={i} style={{ flex: col.flex ?? 1, minWidth: 0, alignItems: col.align === 'right' ? 'flex-end' : 'flex-start' }}>
+  const cell = (content: ReactNode, col: TableColumn, row: TableRow, i: number, hidden?: boolean) => (
+    <View
+      key={i}
+      // Under a layered row: not read (the row's button says it all) and clicks go through to the button.
+      {...(hidden && { 'aria-hidden': true, importantForAccessibility: 'no-hide-descendants' as const, pointerEvents: 'none' as const })}
+      style={{ flex: col.flex ?? 1, minWidth: 0, alignItems: col.align === 'right' ? 'flex-end' : 'flex-start' }}
+    >
       {typeof content === 'string' || typeof content === 'number' ? (
         <Text
           numberOfLines={2}
@@ -305,8 +315,9 @@ export function DTable({ columns, rows, compact, empty, bare }: { columns: Table
     </View>
   );
   return (
-    <View accessibilityRole="list" style={bare ? { backgroundColor: c.surface } : { borderWidth: 1, borderColor: c.line, borderRadius: 12, overflow: 'hidden', backgroundColor: c.surface }}>
-      <View accessibilityRole="header" style={{ flexDirection: 'row', gap: 16, backgroundColor: c.chip, paddingHorizontal: 20, height: 46, alignItems: 'center' }}>
+    <View style={bare ? { backgroundColor: c.surface } : { borderWidth: 1, borderColor: c.line, borderRadius: 12, overflow: 'hidden', backgroundColor: c.surface }}>
+      {/* Column titles: a visual guide (each row reads out its own cells). Outside the list, which holds only rows. */}
+      <View style={{ flexDirection: 'row', gap: 16, backgroundColor: c.chip, paddingHorizontal: 20, height: 46, alignItems: 'center' }}>
         {columns.map((col, i) => (
           <Text key={i} style={[{ flex: col.flex ?? 1, fontSize: 14, fontWeight: '500', color: c.ink }, align(col)]}>
             {col.label}
@@ -314,52 +325,73 @@ export function DTable({ columns, rows, compact, empty, bare }: { columns: Table
         ))}
       </View>
       {rows.length === 0 && empty && <Text style={[DText.body, { color: c.muted, padding: 20 }]}>{empty}</Text>}
-      {rows.map((row) => {
-        const line = (
-          <View
-            style={{
-              flexDirection: 'row',
-              gap: 16,
-              alignItems: 'center',
-              paddingHorizontal: 20,
-              minHeight: compact ? 44 : row.tone === 'total' ? 56 : 62,
-              paddingVertical: compact ? 6 : 10,
-              borderTopWidth: row.tone === 'total' ? 2 : 1,
-              borderTopColor: row.tone === 'total' ? c.outline : c.line,
-              backgroundColor: row.tone === 'total' ? c.chip : row.tone === 'sub' ? c.panel : 'transparent',
-            }}
-          >
-            {row.cells.map((content, i) => cell(content, columns[i], row, i))}
-          </View>
-        );
-        const spoken = row.label ?? row.cells.filter((x) => typeof x === 'string').join(', ');
-        return row.onPress ? (
-          <HoverRow key={row.key} onPress={row.onPress} label={spoken} expanded={row.expanded}>
-            {line}
-          </HoverRow>
-        ) : (
-          <View key={row.key} accessible accessibilityLabel={spoken}>
-            {line}
-          </View>
-        );
-      })}
+      <View role="list">
+        {rows.map((row) => {
+          // With actions, the row's button lies under its cells (spoken by the button's label, so not
+          // read twice) and only the actions, on top, take clicks of their own.
+          const layered = !!row.onPress && row.actions !== undefined;
+          const line = (
+            <View
+              pointerEvents={layered ? 'box-none' : undefined}
+              style={{
+                flexDirection: 'row',
+                gap: 16,
+                alignItems: 'center',
+                paddingHorizontal: 20,
+                minHeight: compact ? 44 : row.tone === 'total' ? 56 : 62,
+                paddingVertical: compact ? 6 : 10,
+                borderTopWidth: row.tone === 'total' ? 2 : 1,
+                borderTopColor: row.tone === 'total' ? c.outline : c.line,
+                backgroundColor: row.tone === 'total' ? c.chip : row.tone === 'sub' ? c.panel : 'transparent',
+              }}
+            >
+              {row.cells.map((content, i) => cell(content, columns[i], row, i, layered))}
+              {row.actions !== undefined && cell(row.actions, columns[row.cells.length], row, row.cells.length)}
+            </View>
+          );
+          const spoken = row.label ?? row.cells.filter((x) => typeof x === 'string').join(', ');
+          if (layered) {
+            return (
+              <View key={row.key} role="listitem">
+                <HoverRow onPress={row.onPress!} label={spoken} expanded={row.expanded} style={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 }} />
+                {line}
+              </View>
+            );
+          }
+          return row.onPress ? (
+            <View key={row.key} role="listitem">
+              <HoverRow onPress={row.onPress} label={spoken} expanded={row.expanded}>
+                {line}
+              </HoverRow>
+            </View>
+          ) : (
+            <View key={row.key} role="listitem" accessible accessibilityLabel={phoneLabel(spoken)}>
+              {line}
+            </View>
+          );
+        })}
+      </View>
     </View>
   );
 }
 
-function HoverRow({ onPress, label, expanded, children }: { onPress: () => void; label: string; expanded?: boolean; children: ReactNode }) {
+/**
+ * A table row's button. With [children] (its cells) it is named by them on desktop; without (it
+ * lies under them) it is named by [label].
+ */
+function HoverRow({ onPress, label, expanded, children, style }: { onPress: () => void; label: string; expanded?: boolean; children?: ReactNode; style?: ViewStyle }) {
   const { colors: c } = useDisplay();
   const [focused, setFocused] = useState(false);
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={label}
+      accessibilityLabel={children ? phoneLabel(label) : label}
       accessibilityState={expanded === undefined ? undefined : { expanded }}
       aria-expanded={expanded}
       onPress={onPress}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
-      style={({ hovered }: { hovered?: boolean }) => [hovered && { backgroundColor: c.panel }, focused && focusRing(c.ink)]}
+      style={({ hovered }: { hovered?: boolean }) => [style, hovered && { backgroundColor: c.panel }, focused && focusRing(c.ink)]}
     >
       {children}
     </Pressable>
@@ -412,7 +444,7 @@ export function Checkbox({ label, checked, onChange }: { label: string; checked:
 export function Radio({ label, caption, selected, onPress }: { label: string; caption?: string; selected: boolean; onPress: () => void }) {
   const { colors: c } = useDisplay();
   return (
-    <Tap onPress={onPress} role="radio" checked={selected} label={caption ? `${label}. ${caption}` : label} style={{ minHeight: 40, alignItems: 'flex-start' }}>
+    <Tap onPress={onPress} role="radio" checked={selected} label={caption ? phoneLabel(`${label}. ${caption}`) : label} style={{ minHeight: 40, alignItems: 'flex-start' }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
         <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: c.ink, alignItems: 'center', justifyContent: 'center' }}>
           {selected && <View style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: c.ink }} />}
@@ -451,7 +483,7 @@ export function DSwitch({ label, value, onChange }: { label: string; value: bool
       accessibilityLabel={label}
       accessibilityState={{ checked: value }}
       onPress={() => onChange(!value)}
-      {...spaceKeyProps('switch', () => onChange(!value))}
+      {...pressKeyProps('switch', () => onChange(!value))}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={[
@@ -534,9 +566,9 @@ export function Tabs({ tabs, selected, onChange }: { tabs: { label: string; icon
 export function Drawer({ visible, title, onClose, children, footer }: { visible: boolean; title: string; onClose: () => void; children: ReactNode; footer?: ReactNode }) {
   const { colors: c } = useDisplay();
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} {...dialogName(title)}>
       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
-        <View accessibilityViewIsModal aria-label={title} style={{ width: 400, zIndex: 1, backgroundColor: c.bg, borderLeftWidth: 1, borderLeftColor: c.line }}>
+        <View accessibilityViewIsModal aria-label={title} {...tabCycleProps} style={{ width: 400, zIndex: 1, backgroundColor: c.bg, borderLeftWidth: 1, borderLeftColor: c.line }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 28, paddingRight: 12, paddingTop: 20, paddingBottom: 8 }}>
             <Heading style={[DText.title, { flex: 1, fontSize: 24, color: c.ink }]}>{title}</Heading>
             <Tap onPress={onClose} label="Close">
@@ -556,7 +588,7 @@ export function Drawer({ visible, title, onClose, children, footer }: { visible:
           Clicking outside closes; from the keyboard it's Esc or the Close button. The backdrop comes
           after the panel so the dialog's focus starts inside the panel, and it is never a Tab stop.
         */}
-        <Pressable accessibilityLabel="Close panel" focusable={false} onPress={onClose} style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(26,26,26,0.32)' }]} />
+        <Backdrop onPress={onClose} style={{ backgroundColor: 'rgba(26,26,26,0.32)' }} />
       </View>
     </Modal>
   );

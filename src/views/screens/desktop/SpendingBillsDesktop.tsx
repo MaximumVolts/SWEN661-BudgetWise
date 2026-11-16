@@ -150,10 +150,12 @@ function Recurring({ data, controller }: { data: RecurringData; controller: Bill
               item.nextLabel ?? '',
               item.yearlyLine,
               item.status === 'active' ? 'Active' : 'Paused',
-              <Tap key="m" onPress={() => controller.openMenu(item)} label={`Options for ${item.name}`}>
-                <Icon name="more-vert" color={c.ink} />
-              </Tap>,
             ],
+            actions: (
+              <Tap onPress={() => controller.openMenu(item)} label={`Options for ${item.name}`}>
+                <Icon name="more-vert" color={c.ink} />
+              </Tap>
+            ),
           }))}
         />
       </View>

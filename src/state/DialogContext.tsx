@@ -1,7 +1,7 @@
 import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Icon, type IconName } from '../ui/icons';
-import { bareInput, FocusPressable, KeyGroup } from '../ui/keyboard';
+import { Backdrop, bareInput, dialogName, FocusPressable, KeyGroup, rememberFocus, tabCycleProps } from '../ui/keyboard';
 import { useDesktop } from '../ui/responsive';
 import { useDisplay } from './PreferencesContext';
 
@@ -21,10 +21,18 @@ interface Dialogs {
   promptText(opts: { title: string; label: string; initial?: string; action: string }): Promise<string | undefined>;
 }
 
-type Open =
+type Open = (
   | { kind: 'confirm'; title: string; message: string; action: string; done: (v: boolean) => void }
   | { kind: 'choose'; title: string; subtitle?: string; options: ChoiceOption[]; selectedId?: string; done: (v?: string) => void }
-  | { kind: 'prompt'; title: string; label: string; initial?: string; action: string; done: (v?: string) => void };
+  | { kind: 'prompt'; title: string; label: string; initial?: string; action: string; done: (v?: string) => void }
+) & {
+  /**
+   * Desktop: puts focus back where it was when the dialog opened. (The Modal's own focus return
+   * misses when a text field focuses itself as the dialog opens: it returns focus to that field,
+   * which is gone.)
+   */
+  restoreFocus?: () => void;
+};
 
 const DialogContext = createContext<Dialogs | null>(null);
 
@@ -37,18 +45,17 @@ export function DialogProvider({ children }: { children: ReactNode }) {
   // Desktop: pickers are a centred dialog instead of a bottom sheet.
   const desktop = useDesktop();
 
-  const confirm = useCallback<Dialogs['confirm']>(
-    (o) => new Promise((resolve) => setOpen({ kind: 'confirm', ...o, done: resolve })),
-    [],
-  );
-  const choose = useCallback<Dialogs['choose']>((o) => new Promise((resolve) => setOpen({ kind: 'choose', ...o, done: resolve })), []);
+  const show = useCallback((next: Open) => setOpen({ ...next, restoreFocus: rememberFocus() }), []);
+
+  const confirm = useCallback<Dialogs['confirm']>((o) => new Promise((resolve) => show({ kind: 'confirm', ...o, done: resolve })), [show]);
+  const choose = useCallback<Dialogs['choose']>((o) => new Promise((resolve) => show({ kind: 'choose', ...o, done: resolve })), [show]);
   const promptText = useCallback<Dialogs['promptText']>(
     (o) =>
       new Promise((resolve) => {
         setText(o.initial ?? '');
-        setOpen({ kind: 'prompt', ...o, done: resolve });
+        show({ kind: 'prompt', ...o, done: resolve });
       }),
-    [],
+    [show],
   );
   const value = useMemo(() => ({ confirm, choose, promptText }), [confirm, choose, promptText]);
 
@@ -56,6 +63,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
     const current = open;
     setOpen(undefined);
     if (!current) return;
+    current.restoreFocus?.();
     if (current.kind === 'confirm') current.done(result === true);
     else current.done(result as string | undefined);
   };
@@ -75,10 +83,10 @@ export function DialogProvider({ children }: { children: ReactNode }) {
         the Customize panel).
       */}
       {open !== undefined && (
-        <Modal visible transparent animationType="fade" onRequestClose={() => close()}>
+        <Modal visible transparent animationType="fade" onRequestClose={() => close()} {...dialogName(open.title)}>
           {open.kind === 'choose' ? (
             <View style={desktop ? [styles.sheetBackdrop, styles.centred] : styles.sheetBackdrop}>
-              <View style={[styles.sheet, { backgroundColor: c.bg, zIndex: 1 }, ...(desktop ? [styles.desktopSheet] : [])]} accessibilityViewIsModal>
+              <View style={[styles.sheet, { backgroundColor: c.bg, zIndex: 1 }, ...(desktop ? [styles.desktopSheet] : [])]} accessibilityViewIsModal {...tabCycleProps}>
                 {desktop ? <View style={{ height: 20 }} /> : <View style={[styles.handle, { backgroundColor: c.line }]} />}
                 <Text accessibilityRole="header" style={[t.title, styles.sheetTitle]}>
                   {open.title}
@@ -114,11 +122,11 @@ export function DialogProvider({ children }: { children: ReactNode }) {
                 Tapping outside closes; from the keyboard it's Esc. The backdrop comes after the sheet so
                 the dialog's focus starts inside the sheet, and it is never a Tab stop.
               */}
-              <Pressable style={StyleSheet.absoluteFill} onPress={() => close()} accessibilityLabel="Close" focusable={false} />
+              <Backdrop onPress={() => close()} />
             </View>
           ) : (
             <View style={styles.dialogBackdrop}>
-              <View style={[styles.dialog, { backgroundColor: c.bg }, ...(desktop ? [styles.desktopDialog] : [])]} accessibilityViewIsModal>
+              <View style={[styles.dialog, { backgroundColor: c.bg }, ...(desktop ? [styles.desktopDialog] : [])]} accessibilityViewIsModal {...tabCycleProps}>
                 <Text accessibilityRole="header" style={t.title}>
                   {open.title}
                 </Text>

@@ -8,6 +8,7 @@ import { useDisplay } from '../../../state/PreferencesContext';
 import { AsyncView, Tap } from '../../../ui/components';
 import { ChipGroup, Col, DButton, DesktopPage, DText, Panel, Row, SwitchLine } from '../../../ui/desktop';
 import { Icon, type IconName } from '../../../ui/icons';
+import { phoneLabel } from '../../../ui/keyboard';
 
 /** 14 - Notifications on desktop: the alerts with their actions, and a way to tune them. */
 export function NotificationsDesktop({ controller }: { controller: NotificationsController }) {
@@ -55,7 +56,7 @@ function NotificationCard({ n, onOpen, onPrimary }: { n: NotificationItem; onOpe
   };
   const [icon, tint] = looks[n.kind];
   return (
-    <Tap onPress={onOpen} style={{ alignItems: 'stretch' }} label={`${n.isNew ? 'New. ' : ''}${n.metaLabel}. ${n.title}. ${n.body}`}>
+    <Tap onPress={onOpen} style={{ alignItems: 'stretch' }} label={phoneLabel(`${n.isNew ? 'New. ' : ''}${n.metaLabel}. ${n.title}. ${n.body}`)}>
       <Panel>
         <View style={{ flexDirection: 'row', gap: 16 }}>
           <Icon name={icon} color={tint} />
