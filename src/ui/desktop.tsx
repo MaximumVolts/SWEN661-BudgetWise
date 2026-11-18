@@ -655,9 +655,9 @@ export function Tabs({ tabs, selected, onChange, label }: { tabs: { label: strin
 
 /** A panel that slides over the right of the window (Customize), with a footer for its buttons. */
 export function Drawer({ visible, title, onClose, children, footer }: { visible: boolean; title: string; onClose: () => void; children: ReactNode; footer?: ReactNode }) {
-  const { colors: c } = useDisplay();
+  const { colors: c, motion } = useDisplay();
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} {...dialogName(title)}>
+    <Modal visible={visible} transparent animationType={motion.modal} onRequestClose={onClose} {...dialogName(title)}>
       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
         <View accessibilityViewIsModal aria-label={title} {...tabCycleProps} style={{ width: 400, zIndex: 1, backgroundColor: c.bg, borderLeftWidth: 1, borderLeftColor: c.line }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 28, paddingRight: 12, paddingTop: 20, paddingBottom: 8 }}>

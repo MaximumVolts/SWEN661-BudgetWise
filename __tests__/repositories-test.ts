@@ -31,7 +31,7 @@ describe('SQLite storage (the real schema)', () => {
     const ada = await new SqliteUserAccountRepository(database).create({ username: 'ada', passwordHash: 'h' });
     const prefs = new SqlitePreferencesRepository(database);
     expect(await prefs.load(ada.id)).toEqual(DEFAULT_PREFERENCES);
-    const mine = { ...DEFAULT_PREFERENCES, highContrast: true, billReminder: Reminder.off, keepNotices: true, singleKeyShortcuts: false };
+    const mine = { ...DEFAULT_PREFERENCES, highContrast: true, billReminder: Reminder.off, keepNotices: true, singleKeyShortcuts: false, reduceMotion: true };
     await prefs.save(ada.id, mine);
     expect(await prefs.load(ada.id)).toEqual(mine);
   });

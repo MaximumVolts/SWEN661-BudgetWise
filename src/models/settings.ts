@@ -13,5 +13,7 @@ export interface SettingsData {
   budgetAlerts: boolean;
   keepNotices: boolean;
   singleKeyShortcuts: boolean;
+  /** Animations off (Settings: "Turn off animations"). */
+  reduceMotion: boolean;
   footerLabel: string;
 }

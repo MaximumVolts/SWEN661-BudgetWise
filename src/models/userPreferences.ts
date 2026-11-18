@@ -34,6 +34,8 @@ export interface UserPreferences {
   keepNotices: boolean;
   /** Shortcuts that are a single key (? for the shortcuts list); off, only Ctrl/⌘ shortcuts work (WCAG 2.1.4). */
   singleKeyShortcuts: boolean;
+  /** No animations: dialogs and screens appear and go without fading or sliding (WCAG 2.3.3). */
+  reduceMotion: boolean;
 }
 
 /** What applies when nobody is signed in. */
@@ -45,6 +47,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   billReminder: Reminder.threeDays,
   keepNotices: false,
   singleKeyShortcuts: true,
+  reduceMotion: false,
 };
 
 export const samePreferences = (a: UserPreferences, b: UserPreferences) =>
@@ -54,4 +57,5 @@ export const samePreferences = (a: UserPreferences, b: UserPreferences) =>
   a.budgetAlerts === b.budgetAlerts &&
   a.billReminder.id === b.billReminder.id &&
   a.keepNotices === b.keepNotices &&
-  a.singleKeyShortcuts === b.singleKeyShortcuts;
+  a.singleKeyShortcuts === b.singleKeyShortcuts &&
+  a.reduceMotion === b.reduceMotion;

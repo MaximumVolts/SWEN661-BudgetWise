@@ -73,6 +73,13 @@ function SettingsBody({ data, controller: ctl }: { data: SettingsData; controlle
           toggle={data.keepNotices}
           onToggle={(v) => toggle('keepNotices', v)}
         />
+        <Row
+          icon="motion-photos-off"
+          title="Turn off animations"
+          sub="Screens and dialogs appear without sliding or fading. Also off when your system asks for reduced motion"
+          toggle={data.reduceMotion}
+          onToggle={(v) => toggle('reduceMotion', v)}
+        />
         {/* Keyboard shortcuts exist only on desktop (this layout is also the desktop app's, zoomed in). */}
         {Platform.OS === 'web' && (
           <Row

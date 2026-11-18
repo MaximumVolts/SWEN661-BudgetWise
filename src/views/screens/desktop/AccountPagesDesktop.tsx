@@ -143,6 +143,12 @@ function SettingsBody({ data, controller: ctl }: { data: SettingsData; controlle
                 onChange={(v) => ctl.toggle('keepNotices', v)}
               />
               <SwitchLine
+                title="Turn off animations"
+                caption="Dialogs and pages appear without fading or sliding. Also off when your system asks for reduced motion"
+                value={data.reduceMotion}
+                onChange={(v) => ctl.toggle('reduceMotion', v)}
+              />
+              <SwitchLine
                 title="Single-key shortcuts"
                 caption="Press ? for the list of shortcuts. Ctrl+/ and F1 always work"
                 value={data.singleKeyShortcuts}

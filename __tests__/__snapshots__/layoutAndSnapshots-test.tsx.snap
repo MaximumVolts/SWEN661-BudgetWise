@@ -2272,6 +2272,109 @@ exports[`Snapshots settings screen 1`] = `
                             value={false}
                           />
                         </View>
+                        <View
+                          style={
+                            {
+                              "backgroundColor": "#D3D1C9",
+                              "height": 1,
+                              "marginLeft": 0,
+                            }
+                          }
+                        />
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "flexDirection": "row",
+                              "minHeight": 60,
+                              "paddingHorizontal": 14,
+                              "paddingVertical": 12,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              {
+                                "alignItems": "center",
+                                "backgroundColor": "#EBEAE4",
+                                "borderRadius": 8,
+                                "height": 38,
+                                "justifyContent": "center",
+                                "width": 38,
+                              }
+                            }
+                          >
+                            <Text
+                              accessibilityElementsHidden={true}
+                              allowFontScaling={false}
+                              importantForAccessibility="no-hide-descendants"
+                              selectable={false}
+                              style={
+                                [
+                                  {
+                                    "color": "#1A1A1A",
+                                    "fontSize": 18.24,
+                                  },
+                                  undefined,
+                                  {
+                                    "fontFamily": "material",
+                                    "fontStyle": "normal",
+                                    "fontWeight": "normal",
+                                  },
+                                  {},
+                                ]
+                              }
+                            >
+                              
+                            </Text>
+                          </View>
+                          <View
+                            style={
+                              {
+                                "flex": 1,
+                                "marginLeft": 14,
+                              }
+                            }
+                          >
+                            <Text
+                              style={
+                                {
+                                  "color": "#1A1A1A",
+                                  "fontSize": 16,
+                                  "fontWeight": "400",
+                                }
+                              }
+                            >
+                              Turn off animations
+                            </Text>
+                            <Text
+                              style={
+                                {
+                                  "color": "#5B5A55",
+                                  "fontSize": 12,
+                                }
+                              }
+                            >
+                              Screens and dialogs appear without sliding or fading. Also off when your system asks for reduced motion
+                            </Text>
+                          </View>
+                          <RCTSwitch
+                            accessibilityLabel="Turn off animations"
+                            accessibilityRole="switch"
+                            onChange={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
+                            onTintColor="#1A1A1A"
+                            style={
+                              {
+                                "alignSelf": "flex-start",
+                              }
+                            }
+                            thumbTintColor="#FFFFFF"
+                            tintColor="#8C8A84"
+                            value={false}
+                          />
+                        </View>
                       </View>
                     </View>
                     <View>

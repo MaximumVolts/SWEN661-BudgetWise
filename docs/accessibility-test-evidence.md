@@ -238,7 +238,7 @@ Code: `src/services/statementEncoders.ts` (HTML) and `desktop/main.js` (`printTo
 
 ## E12. Automated test suites
 
-The project's own tests cover the behaviours above: 510 tests in 23 suites, all passing (289 in 19 suites before the remediation, 297 in 20 after it). Coverage is 89.5% of statements, 80.7% of branches, 87.7% of functions and 92.1% of lines. The [test coverage report](test-coverage-report.md) has the details. The accessibility-specific suites are:
+The project's own tests cover the behaviours above: 517 tests in 23 suites, all passing (289 in 19 suites before the remediation, 297 in 20 after it). Coverage is 89.6% of statements, 80.7% of branches, 87.7% of functions and 92.1% of lines. The [test coverage report](test-coverage-report.md) has the details. The accessibility-specific suites are:
 - `a11yContrast-test.ts` (115 tests): the WCAG contrast ratio of every text / background pair, plus borders, switch tracks, chart lines and the focus ring, in all four palettes. It found the Colour-blind orange at 4.45:1 on its badge; that colour is now `#A64200` (5.00:1).
 - `a11yNames-test.tsx` (53 tests): every screen, in the phone and the desktop layout. Each control, text field, image, group, table and region must have an accessible name (E14).
 - `a11yWidgets-test.tsx` (45 tests) covers:
@@ -276,7 +276,7 @@ Every issue from E1–E11 was fixed, and the desktop app was rebuilt and re-test
 | Autocomplete (read from the app) | Sign in, Create account, Profile: every personal-data field has a value (`name`, `username`, `current-password`, `new-password`) |
 | Notices | A notice shows a **Close message** button. It's gone after 10 s by default, and still there after 15 s with **Keep messages on screen** on. Enter on Close removes it, and focus returns to the page. The Close button's focus ring is light lime, 11.7:1 against the bar ([screenshot](acr-evidence/fixed-notice-close.png)) |
 | Single-key shortcuts | Off: `?` does nothing, and Ctrl+/ still opens the list. On: `?` opens the list, and Esc closes it. The setting is saved per user |
-| Automated tests | 297 of 297 passed at the re-test. After the added accessibility suites: 510 of 510 pass (E12) |
+| Automated tests | 297 of 297 passed at the re-test. After the added accessibility suites: 517 of 517 pass (E12) |
 
 The scratch user's settings were put back to their defaults after testing.
 
@@ -313,3 +313,20 @@ The scratch user's settings were put back to their defaults after testing.
 - **The macOS desktop build.** It runs the same code, and the unit tests cover the ⌘ key mapping.
 - **Screen-reader listening tests**, as noted in E8.
 - **Chromium's own date-picker pop-up.** It opens only on a mouse click; from the keyboard, dates are typed instead.
+
+## E15. Turning off animations
+
+**Setting:** **Settings → Accessibility & display → Turn off animations**, saved per user. The same switch is on the phone Settings screen. Animations are also off whenever the operating system asks for reduced motion (`prefers-reduced-motion` on the desktop), even with the switch off.
+
+**Method:** the rebuilt desktop app, on scratch data. The switch was used from the keyboard only (Tab, then Space). Animations were read with `document.getAnimations()` the moment the Monthly Comparison **Customize** panel opened, and the system setting was emulated over the DevTools protocol.
+
+| Check | Result |
+| --- | --- |
+| Default | Switch off; the Customize panel fades in (one 250 ms animation) |
+| Switch reached with Tab and turned on with Space | Pass ([screenshot](acr-evidence/motion-setting-on.png)) |
+| Switch on | The panel appears at once (no animations running); the page gets the rule that stops CSS transitions and animations |
+| After a reload and signing in again | Still on |
+| Switch off, system reduce-motion on | No fade; the rule is on the page |
+| System setting cleared | The fade is back |
+
+**Automated:** `motionFor` (the rule: off if the user *or* the system says so) in `featureServices-test.ts`, saving in `repositories-test.ts`, both settings screens and the dialogs' animation in `settingsAndTools-test.tsx` (including the system setting), and the page rule in `a11yWidgets-test.tsx`.

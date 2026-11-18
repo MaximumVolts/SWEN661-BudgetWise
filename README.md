@@ -35,14 +35,14 @@ npm run desktop        # build the web bundle and open Pace in Electron
 | React Navigation | Expo Router's `Stack` and `Tabs` are React Navigation navigators (`src/views/routes/_layout.tsx`, `(tabs)/_layout.tsx`). Sign-in guards use `Stack.Protected`. |
 | State management | React Context: `ServicesContext`, `SessionContext`, `PreferencesContext`, `NoticeContext`, `DialogContext` (`src/state/`) |
 | Phone and tablet layouts | `src/ui/responsive.ts` (`useResponsive`): from 768 dp wide, screens are centered at a readable width and the dashboard switches to two columns. The app rotates freely, and `ios.supportsTablet` is on. |
-| Accessibility | Every touch target has an `accessibilityRole` plus a label (its text or `accessibilityLabel`). Other props: `accessibilityState` (selected/checked/disabled), headings marked `header`, charts read out as text, decorative icons hidden, 48×48 minimum targets, high contrast and colorblind modes. |
+| Accessibility | Every touch target has an `accessibilityRole` plus a label (its text or `accessibilityLabel`). Other props: `accessibilityState` (selected/checked/disabled), headings marked `header`, charts read out as text, decorative icons hidden, 48×48 minimum targets, high contrast and colorblind modes, and **Settings → Turn off animations** (dialogs and screens appear without fading or sliding; also off whenever the system asks for reduced motion). |
 | Built with Expo | Expo SDK 57, EAS Build profiles in `eas.json` |
 | File structure | screens `src/views/screens`, components `src/ui`, hooks `src/controllers` (one `useXController` hook per screen) and `src/ui/responsive.ts`, utils `src/utils` |
 | ESLint, no errors | `npm run lint` (Expo config, MVCS import rules, `eslint-plugin-security`) |
 | Type checking | TypeScript strict, `npm run typecheck` |
 | Security analysis | `npm run security`, see [Security analysis](#security-analysis) and [SECURITY.md](SECURITY.md) |
 | Android / iOS builds | `npm run build:android` / `npm run build:ios` (EAS), or a local APK with `npm run build:android:local` |
-| Jest + RNTL tests, 60%+ coverage | 510 tests in `__tests__/`, at about 90% statement and 81% branch coverage (75% is enforced). `npm run test:coverage` writes the HTML report to `coverage/lcov-report/index.html`; the summary is in [docs/test-coverage-report.md](docs/test-coverage-report.md). |
+| Jest + RNTL tests, 60%+ coverage | 517 tests in `__tests__/`, at about 90% statement and 81% branch coverage (75% is enforced). `npm run test:coverage` writes the HTML report to `coverage/lcov-report/index.html`; the summary is in [docs/test-coverage-report.md](docs/test-coverage-report.md). |
 | Framework comparison | [`docs/framework-comparison.md`](docs/framework-comparison.md) (export it to PDF/Word to submit) |
 
 ## First-time setup
@@ -200,7 +200,7 @@ npm run test:coverage    # plus coverage: text summary, and HTML in coverage/lco
 | `desktopScreens-test.tsx` | RNTL + navigation | every page in the desktop layout; transactions, budgets, bills, notifications; Monthly Comparison rows, periods, downloads and the Customize panel |
 | `desktopShell-test.tsx` | RNTL + navigation | the desktop frame: sidebar, breadcrumb, top-bar search box, notifications, profile, the shortcuts list, and each keyboard command |
 
-Coverage at the time of writing: **89.5% statements, 80.7% branches, 87.7% functions, 92.1% lines** (510 tests in 23 suites; details in [docs/test-coverage-report.md](docs/test-coverage-report.md)). `npm run test:coverage` fails if any of the four drops below **75%** (`coverageThreshold` in `package.json`).
+Coverage at the time of writing: **89.6% statements, 80.7% branches, 87.7% functions, 92.1% lines** (517 tests in 23 suites; details in [docs/test-coverage-report.md](docs/test-coverage-report.md)). `npm run test:coverage` fails if any of the four drops below **75%** (`coverageThreshold` in `package.json`).
 
 Tests run the real services on an in-memory SQLite database (sql.js), with Plaid replayed from responses recorded from the sandbox (`__tests__/fixtures/plaid_sandbox`). "Today" is fixed to the recording date, 12 October 2026. Screen tests open the actual routes (`src/views/routes`) with Expo Router's `renderRouter`. Nothing in the tests calls Plaid.
 

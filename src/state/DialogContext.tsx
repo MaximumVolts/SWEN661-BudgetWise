@@ -41,7 +41,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState<Open>();
   const [text, setText] = useState('');
   const [typing, setTyping] = useState(false);
-  const { colors: c, type: t } = useDisplay();
+  const { colors: c, type: t, motion } = useDisplay();
   // Desktop: pickers are a centred dialog instead of a bottom sheet.
   const desktop = useDesktop();
 
@@ -83,7 +83,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
         the Customize panel).
       */}
       {open !== undefined && (
-        <Modal visible transparent animationType="fade" onRequestClose={() => close()} {...dialogName(open.title)}>
+        <Modal visible transparent animationType={motion.modal} onRequestClose={() => close()} {...dialogName(open.title)}>
           {open.kind === 'choose' ? (
             <View style={desktop ? [styles.sheetBackdrop, styles.centred] : styles.sheetBackdrop}>
               <View style={[styles.sheet, { backgroundColor: c.bg, zIndex: 1 }, ...(desktop ? [styles.desktopSheet] : [])]} accessibilityViewIsModal {...tabCycleProps}>

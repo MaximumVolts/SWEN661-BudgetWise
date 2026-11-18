@@ -13,6 +13,7 @@ import { BarChart, CashFlowChart, SpendAreaChart } from '@/ui/charts';
 import { ProgressBar, SegTabs } from '@/ui/components';
 import { ChipGroup, DSwitch, Tabs } from '@/ui/desktop';
 import { MAIN_CONTENT_ID, SEARCH_INPUT_ID } from '@/ui/keyboard';
+import { REDUCED_MOTION_RULE, ReducedMotionStyle } from '@/ui/motion';
 import { KeyboardShortcutsView } from '@/views/KeyboardShortcutsView';
 import { NotificationsDesktop, SettingsDesktop } from '@/views/screens/desktop/AccountPagesDesktop';
 
@@ -46,7 +47,7 @@ jest.mock('@/state/PreferencesContext', () => {
   return {
     useDisplay: () => {
       const colors = paletteFor({ ...DEFAULT_PREFERENCES, colorblindMode: display.colorblind });
-      return { preferences: DEFAULT_PREFERENCES, colors, type: typeScale(colors), colorblind: display.colorblind };
+      return { preferences: DEFAULT_PREFERENCES, colors, type: typeScale(colors), colorblind: display.colorblind, motion: { animate: true, modal: 'fade', screen: undefined } };
     },
   };
 });
@@ -500,6 +501,7 @@ const settingsData: SettingsData = {
   budgetAlerts: false,
   keepNotices: true,
   singleKeyShortcuts: false,
+  reduceMotion: true,
   footerLabel: 'VERSION 1.0',
 };
 
@@ -528,6 +530,7 @@ describe('Settings (desktop)', () => {
     ['Chart patterns and icons', 'colorblindMode'],
     ['Show values on charts', 'showChartValues'],
     ['Keep messages on screen', 'keepNotices'],
+    ['Turn off animations', 'reduceMotion'],
     ['Single-key shortcuts', 'singleKeyShortcuts'],
     ['Budget alerts', 'budgetAlerts'],
   ];
@@ -644,5 +647,26 @@ describe('Notifications (desktop)', () => {
     render(<NotificationsDesktop controller={notificationsController([])} />);
     expect(host.textContent).toContain("You're all caught up.");
     expect(all('[role="list"]')).toHaveLength(0);
+  });
+});
+
+// ── Animations off (2.3.3) ────────────────────────────────────────────────────
+
+describe('turning off animations on the desktop', () => {
+  const rules = () => [...document.head.querySelectorAll('style')].map((s) => s.textContent ?? '').filter((t) => t.includes('transition: none'));
+
+  test('with animations off, the page gets a rule stopping transitions, animations and smooth scrolling', () => {
+    render(<ReducedMotionStyle animate={false} />);
+    expect(rules()).toEqual([REDUCED_MOTION_RULE]);
+    expect(REDUCED_MOTION_RULE).toContain('animation: none !important');
+    expect(REDUCED_MOTION_RULE).toContain('scroll-behavior: auto !important');
+    // Loading spinners keep turning: they are the only sign that something is still happening.
+    expect(REDUCED_MOTION_RULE).toContain(':not([role="progressbar"])');
+  });
+
+  test('turned back on, the rule is removed; with animations on there is none', () => {
+    render(<ReducedMotionStyle animate={false} />);
+    render(<ReducedMotionStyle animate />);
+    expect(rules()).toEqual([]);
   });
 });

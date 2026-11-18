@@ -10,10 +10,10 @@ import { Backdrop, dialogName, isMac, tabCycleProps } from '../../../ui/keyboard
 
 /** The keyboard shortcuts list (?, Ctrl/⌘ + /, or the top bar's keyboard button). Esc closes it. */
 export function ShortcutsHelpScreen({ controller: ctl }: { controller: KeyboardController }) {
-  const { colors: c } = useDisplay();
+  const { colors: c, motion } = useDisplay();
   const mac = isMac();
   return (
-    <Modal visible={ctl.helpOpen} transparent animationType="fade" onRequestClose={ctl.closeHelp} {...dialogName('Keyboard shortcuts')}>
+    <Modal visible={ctl.helpOpen} transparent animationType={motion.modal} onRequestClose={ctl.closeHelp} {...dialogName('Keyboard shortcuts')}>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <View
           accessibilityViewIsModal

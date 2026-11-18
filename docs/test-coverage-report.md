@@ -3,17 +3,17 @@
 **App:** Pace (BudgetWise), Expo / React Native, desktop build in Electron
 **Date:** 17 November 2026
 **Command:** `npm run test:coverage` (Jest 29 with the `jest-expo` preset)
-**Result:** 23 suites, **510 tests, all passing**, 4 snapshots passing. `npx tsc --noEmit` and `npx expo lint` are clean.
+**Result:** 23 suites, **517 tests, all passing**, 4 snapshots passing. `npx tsc --noEmit` and `npx expo lint` are clean.
 
 ## Summary
 
 | Metric | Required | Enforced in CI (`coverageThreshold`) | Before this round | **Now** | Change |
 | --- | --- | --- | --- | --- | --- |
-| Statements | 60% | 75% | 88.09% (4195 / 4762) | **89.52%** (4263 / 4762) | +1.43 |
-| Branches | 60% | 75% | 78.22% (2961 / 3785) | **80.65%** (3056 / 3789) | +2.43 |
-| Functions | 60% | 75% | 85.66% (1530 / 1786) | **87.68%** (1566 / 1786) | +2.02 |
-| Lines | 60% | 75% | 90.79% (3611 / 3977) | **92.07%** (3662 / 3977) | +1.28 |
-| Tests | | | 297 in 20 suites | **510 in 23 suites** | +213 |
+| Statements | 60% | 75% | 88.09% (4195 / 4762) | **89.58%** (4292 / 4791) | +1.49 |
+| Branches | 60% | 75% | 78.22% (2961 / 3785) | **80.70%** (3075 / 3810) | +2.48 |
+| Functions | 60% | 75% | 85.66% (1530 / 1786) | **87.66%** (1578 / 1800) | +2.00 |
+| Lines | 60% | 75% | 90.79% (3611 / 3977) | **92.12%** (3687 / 4002) | +1.33 |
+| Tests | | | 297 in 20 suites | **517 in 23 suites** | +220 |
 
 All four metrics are well above the 60% minimum. `npm run test:coverage` fails if any of them drops below 75%.
 
