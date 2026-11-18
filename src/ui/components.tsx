@@ -289,10 +289,10 @@ export function Chip({
 }
 
 /** Two/three segment toggle (e.g. Upcoming | Recurring). */
-export function SegTabs({ labels, selected, onChange }: { labels: string[]; selected: number; onChange: (i: number) => void }) {
+export function SegTabs({ labels, selected, onChange, label }: { labels: string[]; selected: number; onChange: (i: number) => void; label: string }) {
   const { colors: c } = useDisplay();
   return (
-    <KeyGroup role="tablist" style={[styles.seg, { borderColor: c.outline, backgroundColor: c.surface }]}>
+    <KeyGroup role="tablist" label={label} style={[styles.seg, { borderColor: c.outline, backgroundColor: c.surface }]}>
       {labels.map((l, i) => (
         <FocusPressable
           key={l}
@@ -415,14 +415,14 @@ export function ProgressBar({
       style={{ height, borderRadius: height / 2, overflow: 'hidden', backgroundColor: track ?? c.chip }}
     >
       {width > 0 && (
-        <Svg width={width} height={height}>
+        <Svg width={width} height={height} aria-hidden>
           {!striped ? (
             <Rect x={0} y={0} width={w} height={height} fill={fill} />
           ) : (
             <>
               {stripes(width, `${fill}40`)}
               <Rect x={0} y={0} width={w} height={height} fill={fill} opacity={0.55} />
-              <Svg width={w} height={height}>
+              <Svg width={w} height={height} aria-hidden>
                 {stripes(w, fill)}
               </Svg>
             </>

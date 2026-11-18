@@ -174,7 +174,7 @@ The scripted run was repeated on the rebuilt app: **282 of 282 checks pass**, wi
 - [ ] → [x] A notice's **Close message** button is reachable with Tab and closes on Enter. Focus then returns to the page, and the button has a light 3 px focus ring on the dark bar.
 - [ ] → [x] At 400% zoom (320 CSS px), Tab reaches the wrapped **Date** filter on Transactions, which scrolls into view.
 
-Details are in the [test evidence](accessibility-test-evidence.md#e13-re-test-after-remediation) (E13). The automated suite was 297 tests in 20 suites at the re-run, and is now 453 tests in 22 suites with the added accessibility suites ([coverage report](test-coverage-report.md)).
+Details are in the [test evidence](accessibility-test-evidence.md#e13-re-test-after-remediation) (E13). The automated suite was 297 tests in 20 suites at the re-run, and is now 510 tests in 23 suites with the added accessibility suites ([coverage report](test-coverage-report.md)).
 
 ## Not covered by this test
 

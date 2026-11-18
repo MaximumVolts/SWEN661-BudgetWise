@@ -28,7 +28,7 @@ function CashFlowPhone({ controller }: { controller: CashFlowController }) {
               <Heading style={{ fontSize: 22, fontWeight: '500', color: c.ink, marginLeft: 4 }}>Cash Flow Projection</Heading>
             </View>
             <Gap h={16} />
-            <KeyGroup role="tablist" style={{ flexDirection: 'row', height: 40, borderRadius: 20, borderWidth: 1, borderColor: c.outline, overflow: 'hidden', backgroundColor: c.surface }}>
+            <KeyGroup role="tablist" label="Projection range" style={{ flexDirection: 'row', height: 40, borderRadius: 20, borderWidth: 1, borderColor: c.outline, overflow: 'hidden', backgroundColor: c.surface }}>
               {data.rangeLabels.map((l, i) => {
                 const on = i === data.selectedRange;
                 return (

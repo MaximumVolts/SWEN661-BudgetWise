@@ -42,7 +42,7 @@ npm run desktop        # build the web bundle and open Pace in Electron
 | Type checking | TypeScript strict, `npm run typecheck` |
 | Security analysis | `npm run security`, see [Security analysis](#security-analysis) and [SECURITY.md](SECURITY.md) |
 | Android / iOS builds | `npm run build:android` / `npm run build:ios` (EAS), or a local APK with `npm run build:android:local` |
-| Jest + RNTL tests, 60%+ coverage | 453 tests in `__tests__/`, at about 89% statement and 80% branch coverage (75% is enforced). `npm run test:coverage` writes the HTML report to `coverage/lcov-report/index.html`; the summary is in [docs/test-coverage-report.md](docs/test-coverage-report.md). |
+| Jest + RNTL tests, 60%+ coverage | 510 tests in `__tests__/`, at about 90% statement and 81% branch coverage (75% is enforced). `npm run test:coverage` writes the HTML report to `coverage/lcov-report/index.html`; the summary is in [docs/test-coverage-report.md](docs/test-coverage-report.md). |
 | Framework comparison | [`docs/framework-comparison.md`](docs/framework-comparison.md) (export it to PDF/Word to submit) |
 
 ## First-time setup
@@ -193,13 +193,14 @@ npm run test:coverage    # plus coverage: text summary, and HTML in coverage/lco
 | `notice-test.tsx` | DOM (jsdom + react-native-web) | messages at the top of the screen: read out politely, closed with their button, the time paused while focused, kept until closed with "Keep messages on screen" |
 | `a11yDom-test.tsx` | DOM (jsdom + react-native-web) | the desktop accessibility fixes from an axe scan: controls named by their visible text, page titles as `<h1>`, progress bars, radios' checked state, dialog backdrops, data tables as ARIA tables (column and row headers, cells, a row's button in its row header and its actions in a cell of their own) |
 | `a11yContrast-test.ts` | unit | WCAG contrast ratios for every text / background pair, borders, switch tracks, chart lines and the focus ring, in all four palettes (standard, high contrast, each in colorblind mode) |
+| `a11yNames-test.tsx` | RNTL + navigation | every screen (26 routes), in the phone and the desktop layout: each control, text field, image, group, table and region has an accessible name |
 | `a11yWidgets-test.tsx` | DOM (jsdom + react-native-web) | charts' text alternatives and patterns, bar state, switches and radio groups by keyboard, the Settings and Notifications pages' names, roles and states, and focus after keyboard shortcuts |
 | `comparison-test.ts` | unit | Monthly Comparison: months, totals, CSV / PDF export following the Customize choices, saved choices per user, category rules |
 | `desktop-test.ts` | unit | the Electron desktop repositories and bridge |
 | `desktopScreens-test.tsx` | RNTL + navigation | every page in the desktop layout; transactions, budgets, bills, notifications; Monthly Comparison rows, periods, downloads and the Customize panel |
 | `desktopShell-test.tsx` | RNTL + navigation | the desktop frame: sidebar, breadcrumb, top-bar search box, notifications, profile, the shortcuts list, and each keyboard command |
 
-Coverage at the time of writing: **89.4% statements, 80.0% branches, 87.3% functions, 92.0% lines** (453 tests in 22 suites; details in [docs/test-coverage-report.md](docs/test-coverage-report.md)). `npm run test:coverage` fails if any of the four drops below **75%** (`coverageThreshold` in `package.json`).
+Coverage at the time of writing: **89.5% statements, 80.7% branches, 87.7% functions, 92.1% lines** (510 tests in 23 suites; details in [docs/test-coverage-report.md](docs/test-coverage-report.md)). `npm run test:coverage` fails if any of the four drops below **75%** (`coverageThreshold` in `package.json`).
 
 Tests run the real services on an in-memory SQLite database (sql.js), with Plaid replayed from responses recorded from the sandbox (`__tests__/fixtures/plaid_sandbox`). "Today" is fixed to the recording date, 12 October 2026. Screen tests open the actual routes (`src/views/routes`) with Expo Router's `renderRouter`. Nothing in the tests calls Plaid.
 

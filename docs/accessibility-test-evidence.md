@@ -238,9 +238,10 @@ Code: `src/services/statementEncoders.ts` (HTML) and `desktop/main.js` (`printTo
 
 ## E12. Automated test suites
 
-The project's own tests cover the behaviours above: 453 tests in 22 suites, all passing (289 in 19 suites before the remediation, 297 in 20 after it). Coverage is 89.4% of statements, 80.0% of branches, 87.3% of functions and 92.0% of lines. The [test coverage report](test-coverage-report.md) has the details. The accessibility-specific suites are:
+The project's own tests cover the behaviours above: 510 tests in 23 suites, all passing (289 in 19 suites before the remediation, 297 in 20 after it). Coverage is 89.5% of statements, 80.7% of branches, 87.7% of functions and 92.1% of lines. The [test coverage report](test-coverage-report.md) has the details. The accessibility-specific suites are:
 - `a11yContrast-test.ts` (115 tests): the WCAG contrast ratio of every text / background pair, plus borders, switch tracks, chart lines and the focus ring, in all four palettes. It found the Colour-blind orange at 4.45:1 on its badge; that colour is now `#A64200` (5.00:1).
-- `a11yWidgets-test.tsx` (41 tests) covers:
+- `a11yNames-test.tsx` (53 tests): every screen, in the phone and the desktop layout. Each control, text field, image, group, table and region must have an accessible name (E14).
+- `a11yWidgets-test.tsx` (45 tests) covers:
   - chart text alternatives, and patterns as well as colour;
   - bar state (`aria-pressed`), with axis labels hidden;
   - switches and radio groups by keyboard;
@@ -275,9 +276,36 @@ Every issue from E1–E11 was fixed, and the desktop app was rebuilt and re-test
 | Autocomplete (read from the app) | Sign in, Create account, Profile: every personal-data field has a value (`name`, `username`, `current-password`, `new-password`) |
 | Notices | A notice shows a **Close message** button. It's gone after 10 s by default, and still there after 15 s with **Keep messages on screen** on. Enter on Close removes it, and focus returns to the page. The Close button's focus ring is light lime, 11.7:1 against the bar ([screenshot](acr-evidence/fixed-notice-close.png)) |
 | Single-key shortcuts | Off: `?` does nothing, and Ctrl+/ still opens the list. On: `?` opens the list, and Esc closes it. The setting is saved per user |
-| Automated tests | 297 of 297 passed at the re-test. After the added accessibility suites: 453 of 453 pass (E12) |
+| Automated tests | 297 of 297 passed at the re-test. After the added accessibility suites: 510 of 510 pass (E12) |
 
 The scratch user's settings were put back to their defaults after testing.
+
+## E14. Accessible-name audit
+
+**Method:** for every view and dialog, Chromium's computed accessibility tree (`Accessibility.getFullAXTree` over the DevTools protocol) was read from the rebuilt desktop app, on the scratch data. Every element was listed whose role needs a name (button, link, switch, radio, tab, text field, combo box, image, progress bar, tab list, radio group, list box, table, column / row header, heading, dialog, navigation, region, form) but whose computed name was empty. Icon-font glyphs were not counted as a name. Dialogs and pickers were opened and then closed with Esc; confirmations were never confirmed.
+
+**Views covered (46):**
+- **Signed-out pages:** Sign in, Create account, Forgot password.
+- **The 10 main pages.**
+- **Detail pages:** a transaction, a spending category, a budget category, a bill.
+- **Forms:** add budget, add bill, goal, expected income, profile.
+- **Account and statement pages:** Manage budgets, Connected accounts, add account, Budget categories, Statement export, Notifications.
+- **Dialogs, pickers and lists:**
+  - Transactions Date, Account and Category filters;
+  - the Monthly Comparison Customize panel and period picker;
+  - Bills Recurring tab and Manage recurring bill;
+  - the Theme and reminder pickers, and the Delete account confirmation;
+  - the top bar's notifications, search results and keyboard-shortcuts list.
+
+| Run | Result |
+| --- | --- |
+| First run | 25 unnamed elements on 5 views. 24 were SVG drawings, each exposed as an unnamed image inside an already-named progress bar or chart (Home 4, a transaction 1, Budgets 13, Savings goals 6). 1 was the Customize panel's tab list. |
+| After the fixes | **0 unnamed elements on all 46 views** |
+| axe-core A/AA on the 10 main pages, after the fixes | 0 violations |
+
+**Fixes:** every `<Svg>` is `aria-hidden` (`src/ui/components.tsx`, `src/ui/charts.tsx`). `Tabs` and `SegTabs` require a `label`, and every tab list now has one.
+
+**Automated guard:** `__tests__/a11yNames-test.tsx` repeats the check on all 26 screens in both the phone and the desktop layout (53 tests), so a control added later without a name fails the build.
 
 ## Not evaluated
 

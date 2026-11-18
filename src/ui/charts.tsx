@@ -59,7 +59,7 @@ export function SpendAreaChart({ data, height = 150 }: { data: SpendChartData; h
   return (
     <View onLayout={onLayout} accessible accessibilityRole="image" accessibilityLabel={parts.join(' ')} style={{ height }}>
       {width > 0 && (
-        <Svg width={width} height={height}>
+        <Svg width={width} height={height} aria-hidden>
           {content}
         </Svg>
       )}
@@ -114,7 +114,7 @@ export function BarChart({
               >
                 {/* Colorblind mode: the selected bar is hatched, not only a different color. */}
                 {selected && colorblind && (
-                  <Svg width="100%" height={h}>
+                  <Svg width="100%" height={h} aria-hidden>
                     {Array.from({ length: 30 }, (_, k) => -h + k * 6).map((x) => (
                       <Line key={x} x1={x} y1={h} x2={x + h} y2={0} stroke={c.olive} strokeWidth={1.5} />
                     ))}
@@ -192,7 +192,7 @@ export function CashFlowChart({ data, height = 170 }: { data: CashFlowChartData;
     <View accessible accessibilityRole="image" accessibilityLabel={summary}>
       <View onLayout={onLayout} style={{ height }}>
         {width > 0 && (
-          <Svg width={width} height={height}>
+          <Svg width={width} height={height} aria-hidden>
             {content}
           </Svg>
         )}

@@ -26,7 +26,7 @@ function BudgetsPhone({ controller }: { controller: BudgetsController }) {
         {(ps) => (
           <>
             <View style={{ paddingHorizontal: 20, paddingVertical: 12 }}>
-              <SegTabs labels={ps.map((p) => p.label)} selected={selected} onChange={selectPeriod} />
+              <SegTabs label="Budget period" labels={ps.map((p) => p.label)} selected={selected} onChange={selectPeriod} />
             </View>
             <AsyncView state={overview.state} onRetry={overview.reload}>
               {(o) =>

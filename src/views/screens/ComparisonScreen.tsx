@@ -317,6 +317,7 @@ function CustomizeDrawer({ controller: ctl }: { controller: ComparisonController
       {d && (
         <>
           <Tabs
+            label="Customize sections"
             tabs={[
               { label: 'Data', icon: 'table-chart' },
               { label: 'Visual', icon: 'palette' },

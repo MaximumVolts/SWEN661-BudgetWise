@@ -10,7 +10,8 @@ import type { SettingsController } from '@/controllers/settingsController';
 import type { NotificationItem } from '@/models/notification';
 import type { SettingsData } from '@/models/settings';
 import { BarChart, CashFlowChart, SpendAreaChart } from '@/ui/charts';
-import { ChipGroup, DSwitch } from '@/ui/desktop';
+import { ProgressBar, SegTabs } from '@/ui/components';
+import { ChipGroup, DSwitch, Tabs } from '@/ui/desktop';
 import { MAIN_CONTENT_ID, SEARCH_INPUT_ID } from '@/ui/keyboard';
 import { KeyboardShortcutsView } from '@/views/KeyboardShortcutsView';
 import { NotificationsDesktop, SettingsDesktop } from '@/views/screens/desktop/AccountPagesDesktop';
@@ -24,7 +25,11 @@ jest.mock('react-native-safe-area-context', () => {
 jest.mock('react-native-svg', () => {
   const { View } = jest.requireActual('react-native-web');
   const shape = (kind: string) => (p: { children?: unknown; strokeDasharray?: string }) => <View testID={`${kind}:${p.strokeDasharray ?? 'solid'}`}>{p.children}</View>;
-  const Svg = (p: { children?: unknown }) => <View testID="svg">{p.children}</View>;
+  const Svg = (p: { children?: unknown; 'aria-hidden'?: boolean }) => (
+    <View testID="svg" aria-hidden={p['aria-hidden']}>
+      {p.children}
+    </View>
+  );
   return { __esModule: true, default: Svg, Line: shape('line'), Rect: shape('rect'), Path: shape('path'), Circle: shape('circle'), Text: shape('text') };
 });
 jest.mock('@/ui/icons', () => ({ Icon: () => null, iconFor: () => 'circle' }));
@@ -263,6 +268,70 @@ describe('switches (4.1.2, 2.1.1)', () => {
     const ev = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true });
     act(() => void one('[role="switch"]').dispatchEvent(ev));
     expect(ev.defaultPrevented).toBe(true);
+  });
+});
+
+describe('every group and graphic is named or hidden', () => {
+  test('tab lists are named, so a screen reader says what the tabs choose', () => {
+    render(
+      <>
+        <Tabs label="Customize sections" tabs={[{ label: 'Data' }, { label: 'Visual' }]} selected={0} onChange={() => {}} />
+        <SegTabs label="Bills view" labels={['Upcoming', 'Recurring']} selected={1} onChange={() => {}} />
+      </>,
+    );
+    expect(all('[role="tablist"]').map((t) => t.getAttribute('aria-label'))).toEqual(['Customize sections', 'Bills view']);
+    expect(all('[role="tab"]').map((t) => t.getAttribute('aria-selected'))).toEqual(['true', 'false', 'false', 'true']);
+  });
+});
+
+describe('graphics drawn once laid out are hidden; their container carries the name', () => {
+  const realWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+  beforeAll(() => {
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', { configurable: true, get: () => 200 });
+    (window as unknown as { ResizeObserver: unknown }).ResizeObserver = class {
+      constructor(private cb: (entries: { target: Element }[]) => void) {}
+      observe(target: Element) {
+        this.cb([{ target }]);
+      }
+      unobserve() {}
+      disconnect() {}
+    };
+  });
+  afterAll(() => {
+    if (realWidth) Object.defineProperty(HTMLElement.prototype, 'offsetWidth', realWidth);
+    delete (window as unknown as { ResizeObserver?: unknown }).ResizeObserver;
+  });
+  const laidOut = () => act(async () => void (await new Promise((r) => setTimeout(r, 20))));
+
+  test('a progress bar: the bar is a named progressbar, its drawing is hidden', async () => {
+    render(<ProgressBar value={0.3} label="Food budget used" />);
+    await laidOut();
+    const bar = one('[role="progressbar"]');
+    expect(bar.getAttribute('aria-label')).toBe('Food budget used');
+    const svg = bar.querySelector('[data-testid="svg"]')!;
+    expect(svg.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  test('an unlabelled progress bar (decoration next to visible figures) is hidden entirely', async () => {
+    render(<ProgressBar value={0.5} striped />);
+    await laidOut();
+    expect(all('[data-testid="svg"]').every((s) => s.closest('[aria-hidden="true"]'))).toBe(true);
+  });
+
+  test("charts' drawings are hidden; the named image around them is what is read", async () => {
+    display.colorblind = true;
+    render(
+      <>
+        <SpendAreaChart data={{ actual: [1, 2], projected: [3], previous: [1, 2, 3] }} />
+        <CashFlowChart data={{ values: [1, 2], xLabels: [], gridValues: [] }} />
+        <BarChart bars={[{ label: 'A', value: 1 }]} highlighted={0} />
+      </>,
+    );
+    await laidOut();
+    const svgs = all('[data-testid="svg"]');
+    expect(svgs).toHaveLength(3);
+    for (const s of svgs) expect(s.getAttribute('aria-hidden')).toBe('true');
+    for (const img of all('[role="img"]')) expect(img.getAttribute('aria-label')).toBeTruthy();
   });
 });
 

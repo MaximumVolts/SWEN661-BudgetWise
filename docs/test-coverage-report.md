@@ -1,19 +1,19 @@
 # Test coverage report
 
 **App:** Pace (BudgetWise), Expo / React Native, desktop build in Electron
-**Date:** 16 November 2026
+**Date:** 17 November 2026
 **Command:** `npm run test:coverage` (Jest 29 with the `jest-expo` preset)
-**Result:** 22 suites, **453 tests, all passing**, 4 snapshots passing. `npx tsc --noEmit` and `npx expo lint` are clean.
+**Result:** 23 suites, **510 tests, all passing**, 4 snapshots passing. `npx tsc --noEmit` and `npx expo lint` are clean.
 
 ## Summary
 
 | Metric | Required | Enforced in CI (`coverageThreshold`) | Before this round | **Now** | Change |
 | --- | --- | --- | --- | --- | --- |
-| Statements | 60% | 75% | 88.09% (4195 / 4762) | **89.37%** (4256 / 4762) | +1.28 |
-| Branches | 60% | 75% | 78.22% (2961 / 3785) | **80.02%** (3032 / 3789) | +1.80 |
-| Functions | 60% | 75% | 85.66% (1530 / 1786) | **87.34%** (1560 / 1786) | +1.68 |
-| Lines | 60% | 75% | 90.79% (3611 / 3977) | **91.95%** (3657 / 3977) | +1.16 |
-| Tests | | | 297 in 20 suites | **453 in 22 suites** | +156 |
+| Statements | 60% | 75% | 88.09% (4195 / 4762) | **89.52%** (4263 / 4762) | +1.43 |
+| Branches | 60% | 75% | 78.22% (2961 / 3785) | **80.65%** (3056 / 3789) | +2.43 |
+| Functions | 60% | 75% | 85.66% (1530 / 1786) | **87.68%** (1566 / 1786) | +2.02 |
+| Lines | 60% | 75% | 90.79% (3611 / 3977) | **92.07%** (3662 / 3977) | +1.28 |
+| Tests | | | 297 in 20 suites | **510 in 23 suites** | +213 |
 
 All four metrics are well above the 60% minimum. `npm run test:coverage` fails if any of them drops below 75%.
 
@@ -51,12 +51,13 @@ Most of the gap in `repositories` is native-only code that Jest cannot run: `exp
 
 ## Accessibility tests
 
-This round added **two accessibility suites (156 tests)**, on top of the three that already existed.
+This round added **three accessibility suites (213 tests)**, on top of the three that already existed.
 
 | Suite | Tests | What it checks | WCAG 2.2 |
 | --- | --- | --- | --- |
 | `a11yContrast-test.ts` **(new)** | 115 | Works out the WCAG contrast ratio for every text / background pair in all four palettes (standard, high contrast, and each in colorblind mode). Covers: body, muted, link and danger text on every surface; danger badges; text on lime and on the dark nav; field borders, switch tracks, the chart's previous-period line and the focus ring at 3:1. Also checks that high contrast is never weaker than standard, reaches 7:1 for body text and shows dividers. Checks that colorblind mode uses blue / orange that also differ in lightness. | 1.4.1, 1.4.3, 1.4.6, 1.4.11 |
-| `a11yWidgets-test.tsx` **(new)** | 41 | In a real DOM (jsdom with react-native-web, as in the Electron app):<br>• Charts are named images that state their numbers. Bars are named with their values. The chosen bar is `aria-pressed`. Axis labels are hidden so they aren't read twice. Patterns or dashes are drawn, not only colour (colorblind hatching, dashed projection, dotted previous period).<br>• Switches have the switch role, a name and on / off state, and Space flips them once without scrolling the page.<br>• Radio groups: one Tab stop; arrow keys, Home and End move and choose.<br>• Settings page: one `<h1>`, section headings, every switch named by its visible label and usable from the keyboard, named loading indicator, "Try again" on errors.<br>• Notifications page: filter radio group; action buttons are not inside the card's button.<br>• Shortcuts and focus: Ctrl+K goes to search; after Ctrl+number or Alt+← focus moves to the new page; Ctrl+S leaves focus alone; "?" can be turned off but F1 always works; held keys run once. | 1.1.1, 1.3.1, 1.4.1, 2.1.1, 2.1.4, 2.4.3, 2.4.6, 2.5.3, 4.1.2 |
+| `a11yNames-test.tsx` **(new)** | 53 | Opens all 26 screens (21 signed in, 3 signed out, plus onboarding, connecting a bank and the transaction, bill and spending-category pages) in **both** the phone and the desktop layout, with real data. Walks the rendered tree and fails if any button, link, switch, radio, tab, text field, image, progress bar, tab list, radio group, table, dialog or region has no accessible name. The name can come from a label or from visible text; icon-font glyphs don't count as text. A self-test checks that the walk catches an unnamed icon button and an unlabelled field. | 1.1.1, 1.3.1, 2.4.6, 3.3.2, 4.1.2 |
+| `a11yWidgets-test.tsx` **(new)** | 45 | In a real DOM (jsdom with react-native-web, as in the Electron app):<br>• Charts are named images that state their numbers. Bars are named with their values. The chosen bar is `aria-pressed`. Axis labels are hidden so they aren't read twice. Patterns or dashes are drawn, not only colour (colorblind hatching, dashed projection, dotted previous period).<br>• Switches have the switch role, a name and on / off state, and Space flips them once without scrolling the page.<br>• Radio groups: one Tab stop; arrow keys, Home and End move and choose.<br>• Settings page: one `<h1>`, section headings, every switch named by its visible label and usable from the keyboard, named loading indicator, "Try again" on errors.<br>• Notifications page: filter radio group; action buttons are not inside the card's button.<br>• Every tab list is named. Every SVG drawing (charts, progress bars) is hidden, and the element around it carries the name.<br>• Shortcuts and focus: Ctrl+K goes to search; after Ctrl+number or Alt+← focus moves to the new page; Ctrl+S leaves focus alone; "?" can be turned off but F1 always works; held keys run once. | 1.1.1, 1.3.1, 1.4.1, 2.1.1, 2.1.4, 2.4.3, 2.4.6, 2.5.3, 4.1.2 |
 | `a11yDom-test.tsx` | 13 | Fixes from the axe scan: names from visible text, `<h1>` titles, progress bars, radio checked state, dialog backdrop, ARIA data tables | 1.3.1, 2.4.6, 4.1.2 |
 | `keyboardDom-test.tsx` | 27 | Arrow-key groups, Space and Enter, Tab kept inside dialogs, focus returning after a dialog, the focus ring, forced-colours rule, shortcuts while typing, mouse Back / Forward, Electron menu | 2.1.1, 2.1.2, 2.4.3, 2.4.7, 1.4.11 |
 | `notice-test.tsx` | 4 | Status messages announced politely, a close button, paused while focused, kept on screen if the user chooses | 2.2.1, 4.1.3 |
@@ -76,11 +77,16 @@ Several other suites also check accessibility along the way. `keyboard-test.ts` 
 
 ## Defects the new tests found (fixed)
 
-The new tests found three real accessibility defects that the axe scan had missed. Each test failed before its fix and passes after it.
+The new tests and audits found four real accessibility defects that the axe scan had missed. Each test failed before its fix and passes after it.
 
 1. **Danger text in colorblind mode was below AA.** Orange `#B34700` on its pale-orange badge was 4.45:1. It is now `#A64200`, which is 5.00:1 on the badge and 5.91:1 on the page. Fixed in `src/ui/theme.ts` (SC 1.4.3). axe did not catch it because the scan ran with colorblind mode off.
 2. **Notification action buttons were inside the card's button.** On a notification with "Mark paid" / "View bill", those buttons sat inside the card's button. That is invalid HTML and an axe `nested-interactive` failure, and screen readers merge them into one control. The card's button now holds only the message, with the actions next to it. Fixed in `src/views/screens/desktop/AccountPagesDesktop.tsx` (SC 4.1.2). The scanned account had no notifications with actions, so axe never saw one.
 3. **Bar chart state and labels on desktop.** react-native-web ignores `accessibilityState` and `importantForAccessibility`. As a result, the chosen bar's state never reached screen readers, and each axis label was read a second time after its bar. The chosen bar now has `aria-pressed`, and the axis row has `aria-hidden`. A bar that can't be pressed is now a named image (a plain element may not have an `aria-label`). Fixed in `src/ui/charts.tsx` (SC 1.3.1, 4.1.2). The shared-components snapshot was updated for this change.
+4. **Unnamed SVG images and tab lists.** The accessible-name audit of the running app (evidence E14) found 25 elements with no name.
+   - **24 SVG drawings:** each one inside a progress bar or chart that already had a name. Every `<Svg>` is now `aria-hidden`.
+   - **One tab list:** the Customize panel's. Every tab list now requires a name.
+
+   `a11yNames-test.tsx` and `a11yWidgets-test.tsx` keep both fixes in place (SC 1.1.1, 4.1.2).
 
 ## Not covered by automated tests
 

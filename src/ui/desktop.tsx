@@ -627,10 +627,10 @@ export function Segmented({ labels, selected, onChange, label }: { labels: strin
 }
 
 /** Tabs with an underline under the chosen one (Data | Visual). */
-export function Tabs({ tabs, selected, onChange }: { tabs: { label: string; icon?: IconName }[]; selected: number; onChange: (i: number) => void }) {
+export function Tabs({ tabs, selected, onChange, label }: { tabs: { label: string; icon?: IconName }[]; selected: number; onChange: (i: number) => void; label: string }) {
   const { colors: c } = useDisplay();
   return (
-    <KeyGroup role="tablist" style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: c.line }}>
+    <KeyGroup role="tablist" label={label} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: c.line }}>
       {tabs.map((t, i) => {
         const on = i === selected;
         return (

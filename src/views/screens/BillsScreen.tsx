@@ -24,7 +24,7 @@ function BillsPhone({ controller }: { controller: BillsController }) {
         </Tap>
       </View>
       <View style={{ paddingHorizontal: 20, paddingVertical: 12 }}>
-        <SegTabs labels={['Upcoming', 'Recurring']} selected={tab} onChange={selectTab} />
+        <SegTabs label="Bills view" labels={['Upcoming', 'Recurring']} selected={tab} onChange={selectTab} />
       </View>
       <AsyncView state={state} onRetry={reload}>
         {(data) => (tab === 0 ? <Upcoming data={data.upcoming} controller={controller} /> : <Recurring data={data.recurring} controller={controller} />)}
