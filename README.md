@@ -35,14 +35,14 @@ npm run desktop        # build the web bundle and open Pace in Electron
 | React Navigation | Expo Router's `Stack` and `Tabs` are React Navigation navigators (`src/views/routes/_layout.tsx`, `(tabs)/_layout.tsx`). Sign-in guards use `Stack.Protected`. |
 | State management | React Context: `ServicesContext`, `SessionContext`, `PreferencesContext`, `NoticeContext`, `DialogContext` (`src/state/`) |
 | Phone and tablet layouts | `src/ui/responsive.ts` (`useResponsive`): from 768 dp wide, screens are centered at a readable width and the dashboard switches to two columns. The app rotates freely, and `ios.supportsTablet` is on. |
-| Accessibility | Every touch target has an `accessibilityRole` plus a label (its text or `accessibilityLabel`). Other props: `accessibilityState` (selected/checked/disabled), headings marked `header`, charts read out as text, decorative icons hidden, 48×48 minimum targets, high contrast and colorblind modes. |
+| Accessibility | Every touch target has an `accessibilityRole` plus a label (its text or `accessibilityLabel`). Other props: `accessibilityState` (selected/checked/disabled), headings marked `header`, charts read out as text, decorative icons hidden, 48×48 minimum targets, high contrast and colorblind modes, and **Settings → Turn off animations** (dialogs and screens appear without fading or sliding; also off whenever the system asks for reduced motion). |
 | Built with Expo | Expo SDK 57, EAS Build profiles in `eas.json` |
 | File structure | screens `src/views/screens`, components `src/ui`, hooks `src/controllers` (one `useXController` hook per screen) and `src/ui/responsive.ts`, utils `src/utils` |
 | ESLint, no errors | `npm run lint` (Expo config, MVCS import rules, `eslint-plugin-security`) |
 | Type checking | TypeScript strict, `npm run typecheck` |
 | Security analysis | `npm run security`, see [Security analysis](#security-analysis) and [SECURITY.md](SECURITY.md) |
 | Android / iOS builds | `npm run build:android` / `npm run build:ios` (EAS), or a local APK with `npm run build:android:local` |
-| Jest + RNTL tests, 60%+ coverage | 254 tests in `__tests__/`, at about 88% statement and 78% branch coverage (75% is enforced). `npm run test:coverage` writes the HTML report to `coverage/lcov-report/index.html`. |
+| Jest + RNTL tests, 60%+ coverage | 517 tests in `__tests__/`, at about 90% statement and 81% branch coverage (75% is enforced). `npm run test:coverage` writes the HTML report to `coverage/lcov-report/index.html`; the summary is in [docs/test-coverage-report.md](docs/test-coverage-report.md). |
 | Framework comparison | [`docs/framework-comparison.md`](docs/framework-comparison.md) (export it to PDF/Word to submit) |
 
 ## First-time setup
@@ -144,7 +144,7 @@ The renderer is sandboxed, with no Node access, context isolation and a strict c
 | `fetch` to Plaid | Sent from the main process (Plaid blocks browser requests). Only `https://sandbox.plaid.com/` is allowed |
 | System date picker | The browser's date input (`src/ui/DatePicker.web.tsx`) |
 
-**Keyboard.** Everything works from the keyboard. Press `?` (or the keyboard button in the top bar, or **Help → Keyboard Shortcuts**) for the full list. Ctrl is ⌘ on a Mac, where Ctrl also works.
+**Keyboard.** Everything works from the keyboard. Press `?`, Ctrl + / or F1 (or use the keyboard button in the top bar, or **Help → Keyboard Shortcuts**) for the full list. `?` is the only single-key shortcut, and **Settings → Single-key shortcuts** turns it off. Ctrl is ⌘ on a Mac, where Ctrl also works.
 
 | Keys | What they do |
 | --- | --- |
@@ -157,7 +157,11 @@ The renderer is sandboxed, with no Node access, context isolation and a strict c
 | Tab, then Enter | "Skip to main content", the first Tab stop |
 | ← → ↑ ↓ | Move between tabs, options and choices in a picker (one Tab stop per group) |
 | Space | Tick checkboxes and switches |
+| Tab to a message, then Enter | Close the message at the top of the screen (**Settings → Keep messages on screen** keeps them until closed) |
 | Esc | Close a dialog, the Customize panel or search; focus goes back where it was |
+| Date fields: Enter, then type or ↑ ↓ | Edit the date (Enter sets it, Esc cancels). Clicked open, the calendar pop-up opens instead |
+
+The Ctrl shortcuts also work while typing in a field (Ctrl + S saves the form you're typing in). Back and Forward also work on the sign-in and sign-up pages. The keyboard-only test results are in [docs/keyboard-testing-checklist.md](docs/keyboard-testing-checklist.md). The full accessibility conformance report (VPAT® 2.5 INT: WCAG 2.2 A–AAA, Section 508, EN 301 549) is [docs/accessibility-conformance-report.md](docs/accessibility-conformance-report.md).
 
 Dialogs and panels keep focus inside while open, and shortcuts don't reach the page behind them. After a shortcut opens a page, focus moves to that page. The sidebar has three labelled navigation landmarks (Primary, Tools, Account), next to the top bar (banner) and the page (main). The shortcuts are defined in `src/models/shortcuts.ts`, the key handling is in `src/ui/keyboard.tsx`, and pages offer their Save / New / Print actions with `usePageShortcut` (`src/state/ShortcutsContext.tsx`). The menu bar lists the same shortcuts.
 
@@ -182,13 +186,21 @@ npm run test:coverage    # plus coverage: text summary, and HTML in coverage/lco
 | `settingsAndTools-test.tsx` | RNTL + navigation | settings toggles and reminders, profile, accounts, notifications, goals, cash flow, spending, statements |
 | `layoutAndSnapshots-test.tsx` | unit + RNTL + snapshot | phone/tablet layouts, snapshots of shared components and screens |
 | `keyboard-test.ts` | unit | keyboard shortcuts (keys per platform, menu commands, the shortcuts list), search destinations, page Save / New / Print actions |
-| `keyboardDom-test.tsx` | DOM (jsdom + react-native-web) | desktop keyboard support in a real DOM: arrow keys in tab lists / radio groups / list boxes, Space, focus helpers, the shortcut listener, mouse Back / Forward, Electron menu commands |
+| `keyboardDom-test.tsx` | DOM (jsdom + react-native-web) | desktop keyboard support in a real DOM: arrow keys in tab lists / radio groups / list boxes, Space, Enter on links, Tab going round a dialog, focus returning after a dialog, the focus ring, the shortcut listener (also while typing in a field), mouse Back / Forward, Electron menu commands |
+| `desktopDatePicker-test.tsx` | DOM (jsdom) | the desktop date field by keyboard: typing or ↑ ↓ edits, Enter sets, Esc cancels, no calendar pop-up when opened from the keyboard |
+| `journeyController-test.tsx` | DOM (jsdom) | Back and Forward on the sign-in and sign-up pages |
+| `asyncData-test.tsx` | DOM (jsdom) | a page keeps its content (and the focused control) while its own controls load other data |
+| `notice-test.tsx` | DOM (jsdom + react-native-web) | messages at the top of the screen: read out politely, closed with their button, the time paused while focused, kept until closed with "Keep messages on screen" |
+| `a11yDom-test.tsx` | DOM (jsdom + react-native-web) | the desktop accessibility fixes from an axe scan: controls named by their visible text, page titles as `<h1>`, progress bars, radios' checked state, dialog backdrops, data tables as ARIA tables (column and row headers, cells, a row's button in its row header and its actions in a cell of their own) |
+| `a11yContrast-test.ts` | unit | WCAG contrast ratios for every text / background pair, borders, switch tracks, chart lines and the focus ring, in all four palettes (standard, high contrast, each in colorblind mode) |
+| `a11yNames-test.tsx` | RNTL + navigation | every screen (26 routes), in the phone and the desktop layout: each control, text field, image, group, table and region has an accessible name |
+| `a11yWidgets-test.tsx` | DOM (jsdom + react-native-web) | charts' text alternatives and patterns, bar state, switches and radio groups by keyboard, the Settings and Notifications pages' names, roles and states, and focus after keyboard shortcuts |
 | `comparison-test.ts` | unit | Monthly Comparison: months, totals, CSV / PDF export following the Customize choices, saved choices per user, category rules |
 | `desktop-test.ts` | unit | the Electron desktop repositories and bridge |
 | `desktopScreens-test.tsx` | RNTL + navigation | every page in the desktop layout; transactions, budgets, bills, notifications; Monthly Comparison rows, periods, downloads and the Customize panel |
 | `desktopShell-test.tsx` | RNTL + navigation | the desktop frame: sidebar, breadcrumb, top-bar search box, notifications, profile, the shortcuts list, and each keyboard command |
 
-Coverage at the time of writing: **about 88% statements, 78% branches, 86% functions, 90% lines**. `npm run test:coverage` fails if any of the four drops below **75%** (`coverageThreshold` in `package.json`).
+Coverage at the time of writing: **89.6% statements, 80.7% branches, 87.7% functions, 92.1% lines** (517 tests in 23 suites; details in [docs/test-coverage-report.md](docs/test-coverage-report.md)). `npm run test:coverage` fails if any of the four drops below **75%** (`coverageThreshold` in `package.json`).
 
 Tests run the real services on an in-memory SQLite database (sql.js), with Plaid replayed from responses recorded from the sandbox (`__tests__/fixtures/plaid_sandbox`). "Today" is fixed to the recording date, 12 October 2026. Screen tests open the actual routes (`src/views/routes`) with Expo Router's `renderRouter`. Nothing in the tests calls Plaid.
 

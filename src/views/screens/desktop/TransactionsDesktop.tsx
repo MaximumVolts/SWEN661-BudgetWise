@@ -4,10 +4,11 @@ import type { TransactionsController } from '../../../controllers/transactionsCo
 import { BUDGET_STATUS_LABEL, progress, remaining } from '../../../models/budget';
 import type { FilterKind, TransactionDetailBundle } from '../../../models/transaction';
 import { useDisplay } from '../../../state/PreferencesContext';
-import { AsyncView, ProgressBar, Tap } from '../../../ui/components';
+import { AsyncView, InputBox, ProgressBar, Tap } from '../../../ui/components';
 import { Badge, Col, DButton, DChip, DesktopPage, DTable, DText, InfoRow, Panel, Row } from '../../../ui/desktop';
 import { Fmt } from '../../../ui/format';
 import { Icon, iconFor } from '../../../ui/icons';
+import { bareInput } from '../../../ui/keyboard';
 
 /** 06 - Transactions on desktop: search, filters, and a table (date, merchant, category, account, status, amount). */
 export function TransactionsDesktop({ controller }: { controller: TransactionsController }) {
@@ -21,7 +22,7 @@ export function TransactionsDesktop({ controller }: { controller: TransactionsCo
   const trimmed = query.search.trim();
   return (
     <DesktopPage title="Transactions">
-      <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: c.outline, borderRadius: 6, backgroundColor: c.surface, paddingLeft: 16, minHeight: 60 }}>
+      <InputBox style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 6, backgroundColor: c.surface, paddingLeft: 16, minHeight: 60 }}>
         <View style={{ flex: 1, paddingVertical: 8 }}>
           <Text style={{ fontSize: 12, color: c.ink }}>Search transactions</Text>
           <TextInput
@@ -31,7 +32,7 @@ export function TransactionsDesktop({ controller }: { controller: TransactionsCo
             value={searchText}
             onChangeText={search}
             returnKeyType="search"
-            style={{ fontSize: 16, color: c.ink, paddingVertical: 2 }}
+            style={[{ fontSize: 16, color: c.ink, paddingVertical: 2 }, bareInput]}
           />
         </View>
         {searchText.length > 0 && (
@@ -39,7 +40,7 @@ export function TransactionsDesktop({ controller }: { controller: TransactionsCo
             <Icon name="close" color={c.ink} />
           </Tap>
         )}
-      </View>
+      </InputBox>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
         {filter('date', 'Any date')}
         {filter('account', 'Account')}
@@ -54,7 +55,7 @@ export function TransactionsDesktop({ controller }: { controller: TransactionsCo
               <Text style={[DText.small, { color: c.muted }]}>
                 {items.length} transaction{items.length === 1 ? '' : 's'} · {Fmt.money(spent)} spent
               </Text>
-              <DTable
+              <DTable label="Transactions"
                 columns={[
                   { label: 'Date', flex: 0.9 },
                   { label: 'Merchant', flex: 1.6 },

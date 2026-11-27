@@ -1,5 +1,5 @@
 import { Children, Fragment, type ReactNode } from 'react';
-import { Switch, Text, View } from 'react-native';
+import { Platform, Switch, Text, View } from 'react-native';
 import type { SettingsController } from '../../controllers/settingsController';
 import type { BudgetStatus } from '../../models/budget';
 import { BUDGET_STATUS_LABEL } from '../../models/budget';
@@ -66,6 +66,30 @@ function SettingsBody({ data, controller: ctl }: { data: SettingsData; controlle
           <ColorblindPreview />
         </View>
         <Row icon="bar-chart" title="Show values on charts" toggle={data.showChartValues} onToggle={(v) => toggle('showChartValues', v)} />
+        <Row
+          icon="timer"
+          title="Keep messages on screen"
+          sub="Messages at the top stay until you close them"
+          toggle={data.keepNotices}
+          onToggle={(v) => toggle('keepNotices', v)}
+        />
+        <Row
+          icon="motion-photos-off"
+          title="Turn off animations"
+          sub="Screens and dialogs appear without sliding or fading. Also off when your system asks for reduced motion"
+          toggle={data.reduceMotion}
+          onToggle={(v) => toggle('reduceMotion', v)}
+        />
+        {/* Keyboard shortcuts exist only on desktop (this layout is also the desktop app's, zoomed in). */}
+        {Platform.OS === 'web' && (
+          <Row
+            icon="keyboard"
+            title="Single-key shortcuts"
+            sub="Press ? for the list of shortcuts. Ctrl+/ and F1 always work"
+            toggle={data.singleKeyShortcuts}
+            onToggle={(v) => toggle('singleKeyShortcuts', v)}
+          />
+        )}
       </Group>
       <Group title="Notifications">
         <Row icon="notifications-none" title="Bill reminders" value={data.billReminder.label} onPress={ctl.pickReminder} />

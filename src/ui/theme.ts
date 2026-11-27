@@ -36,7 +36,7 @@ export const STANDARD: Palette = {
   chip: '#EBEAE4',
   line: '#D3D1C9',
   outline: '#8C8A84',
-  previous: '#C9C7BF',
+  previous: '#8C8A84',
   panel: '#F3F2EC',
   surface: '#FFFFFF',
 };
@@ -69,7 +69,7 @@ export const HIGH_CONTRAST: Palette = {
  */
 export function colorblindSafe(p: Palette): Palette {
   const hc = p === HIGH_CONTRAST;
-  return { ...p, olive: hc ? '#003F7D' : '#0B5FA5', red: hc ? '#8A3300' : '#B34700', redBg: '#FBE3D0' };
+  return { ...p, olive: hc ? '#003F7D' : '#0B5FA5', red: hc ? '#8A3300' : '#A64200', redBg: '#FBE3D0' };
 }
 
 /** The palette for the user's display preferences. */

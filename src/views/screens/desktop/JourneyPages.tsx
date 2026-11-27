@@ -40,7 +40,7 @@ export function SignInDesktop({ controller }: { controller: SignInController }) 
   const { colors: c } = useDisplay();
   return (
     <JourneyPage>
-      <Heading style={[DText.title, { fontSize: 36, lineHeight: 44, color: c.ink }]}>Your money, at your pace.</Heading>
+      <Heading level={1} style={[DText.title, { fontSize: 36, lineHeight: 44, color: c.ink }]}>Your money, at your pace.</Heading>
       <Text style={[DText.body, { color: c.muted, marginTop: -8 }]}>Connect your accounts once, and Pace automatically keeps track of your spending, budgets, and bills.</Text>
       <View>
         <Field
@@ -53,7 +53,7 @@ export function SignInDesktop({ controller }: { controller: SignInController }) 
           autoComplete="username"
           error={fieldErrors.username}
         />
-        <Field inset label="Password" value={password} onChangeText={setPassword} secure autoComplete="password" error={fieldErrors.password} onSubmitEditing={signIn} />
+        <Field inset label="Password" value={password} onChangeText={setPassword} secure autoComplete="current-password" error={fieldErrors.password} onSubmitEditing={signIn} />
         <View style={{ marginTop: -8 }}>
           <DButton label="Forgot password?" kind="text" align="end" onPress={forgotPassword} />
         </View>
@@ -78,7 +78,7 @@ export function OnboardingDesktop({ controller }: { controller: OnboardingContro
   const { colors: c } = useDisplay();
   return (
     <JourneyPage header={<StepHeader step={2} onBack={back} onSkip={skip} />}>
-      <Heading style={[DText.title, { color: c.ink }]}>What should Pace help you with?</Heading>
+      <Heading level={1} style={[DText.title, { color: c.ink }]}>What should Pace help you with?</Heading>
       <Text style={[DText.body, { color: c.muted, marginTop: -8 }]}>Pick as many as you like. You can change these anytime in Settings.</Text>
       <AsyncView state={state} onRetry={reload}>
         {(options) => (
@@ -119,7 +119,7 @@ export function ConnectBankDesktop({ controller }: { controller: ConnectBankCont
   const { colors: c } = useDisplay();
   return (
     <JourneyPage header={<StepHeader step={3} onBack={connecting ? undefined : back} onSkip={connecting ? undefined : notNow} />}>
-      <Heading style={[DText.title, { color: c.ink }]}>Connect your bank with Plaid</Heading>
+      <Heading level={1} style={[DText.title, { color: c.ink }]}>Connect your bank with Plaid</Heading>
       <Text style={[DText.body, { color: c.muted, marginTop: -8 }]}>
         Pace uses Plaid to link checking, savings and credit accounts. Transactions import automatically, so you never have to type them in.
       </Text>
@@ -150,7 +150,7 @@ function Point({ icon, title, body }: { icon: IconName; title: string; body: str
   return (
     <Panel style={{ flexBasis: 360, flexGrow: 1 }}>
       <Icon name={icon} color={c.ink} />
-      <Text style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>{title}</Text>
+      <Heading style={{ fontSize: 16, fontWeight: '500', color: c.ink }}>{title}</Heading>
       <Text style={[DText.body, { color: c.muted }]}>{body}</Text>
     </Panel>
   );

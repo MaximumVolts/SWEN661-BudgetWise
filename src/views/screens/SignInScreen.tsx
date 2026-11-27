@@ -40,7 +40,7 @@ function SignInPhone({ controller }: { controller: SignInController }) {
           value={password}
           onChangeText={setPassword}
           secure
-          autoComplete="password"
+          autoComplete="current-password"
           error={fieldErrors.password}
           onSubmitEditing={signIn}
         />

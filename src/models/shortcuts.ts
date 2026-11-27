@@ -30,9 +30,13 @@ export interface KeyPress {
 
 /**
  * The command for [press], if any. [mac]: ⌘ is the modifier (Ctrl also works); [typing]: focus is
- * in a text field, where only modifier shortcuts apply (so typing "?" types a question mark).
+ * in a text field, where only modifier shortcuts apply (so typing "?" types a question mark);
+ * [singleKey]: whether single-key shortcuts (?) apply at all (the user can turn them off, WCAG 2.1.4).
  */
-export function matchShortcut(press: KeyPress, { mac, typing }: { mac: boolean; typing: boolean }): ShortcutCommand | undefined {
+export function matchShortcut(
+  press: KeyPress,
+  { mac, typing, singleKey = true }: { mac: boolean; typing: boolean; singleKey?: boolean },
+): ShortcutCommand | undefined {
   const mod = press.ctrlKey || (mac && press.metaKey);
   const key = press.key.length === 1 ? press.key.toLowerCase() : press.key;
   if (mod && !press.altKey) {
@@ -64,7 +68,7 @@ export function matchShortcut(press: KeyPress, { mac, typing }: { mac: boolean; 
     if (key === 'ArrowLeft') return { kind: 'back' };
     if (key === 'ArrowRight') return { kind: 'forward' };
   }
-  if (!mod && !press.altKey && !typing && key === '?') return { kind: 'help' };
+  if (singleKey && !mod && !press.altKey && !typing && key === '?') return { kind: 'help' };
   if (!mod && !press.altKey && key === 'F1') return { kind: 'help' };
   return undefined;
 }

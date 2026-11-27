@@ -4,7 +4,7 @@ import type { AddAccountController } from '../../controllers/addAccountControlle
 import { useDisplay } from '../../state/PreferencesContext';
 import { AsyncView, Card, ConnectingNotice, Gap, HairLine, IconBadge, PillButton, Screen, Scroll, TestModeBanner, TopBar } from '../../ui/components';
 import { Icon } from '../../ui/icons';
-import { FocusPressable, KeyGroup } from '../../ui/keyboard';
+import { FocusPressable, KeyGroup, phoneLabel } from '../../ui/keyboard';
 
 /**
  * Accounts → Add an account: choose one of Plaid's sandbox test banks to link. Banks already
@@ -43,7 +43,7 @@ export function AddAccountScreen({ controller }: { controller: AddAccountControl
                           <FocusPressable
                             ringColor={c.ink}
                             accessibilityRole="radio"
-                            accessibilityLabel={bank.isLinked ? `${bank.name}, already connected` : bank.name}
+                            accessibilityLabel={phoneLabel(bank.isLinked ? `${bank.name}, already connected` : bank.name)}
                             accessibilityState={{ checked: on, disabled: bank.isLinked }}
                             disabled={bank.isLinked}
                             onPress={() => choose(bank.id)}

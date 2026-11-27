@@ -8,6 +8,7 @@ import { useDisplay } from '../../../state/PreferencesContext';
 import { AsyncView, Tap } from '../../../ui/components';
 import { ChipGroup, Col, DButton, DesktopPage, DText, Panel, Row, SwitchLine } from '../../../ui/desktop';
 import { Icon, type IconName } from '../../../ui/icons';
+import { phoneLabel } from '../../../ui/keyboard';
 
 /** 14 - Notifications on desktop: the alerts with their actions, and a way to tune them. */
 export function NotificationsDesktop({ controller }: { controller: NotificationsController }) {
@@ -54,25 +55,27 @@ function NotificationCard({ n, onOpen, onPrimary }: { n: NotificationItem; onOpe
     reminder: ['notifications-none', c.olive],
   };
   const [icon, tint] = looks[n.kind];
+  // The card's own button holds only the message; its action buttons sit beside it, not inside it
+  // (a button inside a button is invalid, and screen readers would flatten the two into one).
   return (
-    <Tap onPress={onOpen} style={{ alignItems: 'stretch' }} label={`${n.isNew ? 'New. ' : ''}${n.metaLabel}. ${n.title}. ${n.body}`}>
-      <Panel>
+    <Panel>
+      <Tap onPress={onOpen} style={{ alignItems: 'stretch' }} label={phoneLabel(`${n.isNew ? 'New. ' : ''}${n.metaLabel}. ${n.title}. ${n.body}`)}>
         <View style={{ flexDirection: 'row', gap: 16 }}>
           <Icon name={icon} color={tint} />
           <View style={{ flex: 1, gap: 4 }}>
             <Text style={[DText.small, { color: c.muted }]}>{`${n.isNew ? 'New · ' : ''}${n.metaLabel}`}</Text>
             <Text style={{ fontSize: 16, fontWeight: n.isNew ? '600' : '500', color: c.ink }}>{n.title}</Text>
             <Text style={[DText.body, { color: c.muted }]}>{n.body}</Text>
-            {(n.primaryActionLabel || n.secondaryActionLabel) && (
-              <View style={{ flexDirection: 'row', gap: 12, marginTop: 12 }}>
-                {n.primaryActionLabel && <DButton label={n.primaryActionLabel} kind="primary" onPress={onPrimary} />}
-                {n.secondaryActionLabel && <DButton label={n.secondaryActionLabel} onPress={onOpen} />}
-              </View>
-            )}
           </View>
         </View>
-      </Panel>
-    </Tap>
+      </Tap>
+      {(n.primaryActionLabel || n.secondaryActionLabel) && (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4, marginLeft: 40 }}>
+          {n.primaryActionLabel && <DButton label={n.primaryActionLabel} kind="primary" onPress={onPrimary} />}
+          {n.secondaryActionLabel && <DButton label={n.secondaryActionLabel} onPress={onOpen} />}
+        </View>
+      )}
+    </Panel>
   );
 }
 
@@ -133,6 +136,24 @@ function SettingsBody({ data, controller: ctl }: { data: SettingsData; controlle
                 onChange={(v) => ctl.toggle('colorblindMode', v)}
               />
               <SwitchLine title="Show values on charts" value={data.showChartValues} onChange={(v) => ctl.toggle('showChartValues', v)} />
+              <SwitchLine
+                title="Keep messages on screen"
+                caption="Messages at the top stay until you close them"
+                value={data.keepNotices}
+                onChange={(v) => ctl.toggle('keepNotices', v)}
+              />
+              <SwitchLine
+                title="Turn off animations"
+                caption="Dialogs and pages appear without fading or sliding. Also off when your system asks for reduced motion"
+                value={data.reduceMotion}
+                onChange={(v) => ctl.toggle('reduceMotion', v)}
+              />
+              <SwitchLine
+                title="Single-key shortcuts"
+                caption="Press ? for the list of shortcuts. Ctrl+/ and F1 always work"
+                value={data.singleKeyShortcuts}
+                onChange={(v) => ctl.toggle('singleKeyShortcuts', v)}
+              />
             </View>
           </Panel>
           <Panel title="Notifications">

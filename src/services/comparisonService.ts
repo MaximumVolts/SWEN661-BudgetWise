@@ -294,7 +294,7 @@ export function comparisonHtml(data: ComparisonData, o: ComparisonOptions): stri
   const total = totalsOf(rows);
   const change = changeBetween(total.a, total.b);
   const tr = (name: string, a: number, b: number, cls = '') =>
-    `<tr class="${cls}"><td>${html(name)}</td>${cols
+    `<tr class="${cls}"><th scope="row">${html(name)}</th>${cols
       .map((c) => `<td class="${['n', c.classes?.(a, b) ?? ''].filter(Boolean).join(' ')}">${html(c.value(a, b))}</td>`)
       .join('')}</tr>`;
   const body = rows
@@ -310,7 +310,7 @@ export function comparisonHtml(data: ComparisonData, o: ComparisonOptions): stri
       )}${card('Change', formatChangeAmount(change.amount, o), `<div>${html(changeText(change, o, true))}</div>`, `${tint}${o.summaryPatterns ? ' pattern' : ''}`)}</div>`
     : '';
   const pad = o.density === 'compact' ? '5px 8px' : '10px';
-  return `<!doctype html><html><head><meta charset="utf-8"><title>Pace · Monthly Comparison</title>
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Pace · Monthly Comparison</title>
 <style>
 body{font-family:Roboto,Arial,sans-serif;color:#1a1a1a;margin:40px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 h1{font-size:24px;font-weight:500;margin:0 0 4px}.muted{color:#5b5a55;font-size:13px}
@@ -319,7 +319,8 @@ h1{font-size:24px;font-weight:500;margin:0 0 4px}.muted{color:#5b5a55;font-size:
 .card.pattern{border-style:dashed;background-image:repeating-linear-gradient(45deg,rgba(26,26,26,.07) 0 6px,transparent 6px 12px)}
 table{width:100%;border-collapse:collapse;margin-top:24px;font-size:13px}
 th{text-align:left;background:#ebeae4;padding:${pad};font-size:12px;letter-spacing:.4px;text-transform:uppercase}
-td{padding:${pad};border-bottom:1px solid #d3d1c9}.n{text-align:right}th:not(:first-child){text-align:right}
+td,tbody th{padding:${pad};border-bottom:1px solid #d3d1c9;text-align:left}.n{text-align:right}thead th:not(:first-child){text-align:right}
+tbody th{background:none;font-size:13px;letter-spacing:0;text-transform:none}
 td.up{color:#b3261e}td.down{color:#5a6b1f}td.hl{font-weight:700;background:#f3f2ec}td.hl.up{background:#fbe9e7}td.hl.down{background:#f1f6d8}
 tr.cat td{font-weight:600}tr.sub td{font-weight:400}tr.sub td:first-child{padding-left:28px;color:#5b5a55}
 tr.total td{font-weight:700;background:#f3f2ec;border-top:2px solid #1a1a1a}
@@ -327,7 +328,7 @@ tr.total td{font-weight:700;background:#f3f2ec;border-top:2px solid #1a1a1a}
 ${o.showTitle ? '<h1>Spending by Category</h1>' : ''}
 ${o.showPeriod ? `<div class="muted">${html(data.periodA.label)} vs ${html(data.periodB.label)}</div>` : ''}
 ${summary}
-<table><thead><tr><th>Spending category</th>${cols.map((c) => `<th>${html(c.label)}</th>`).join('')}</tr></thead>
+<table><thead><tr><th scope="col">Spending category</th>${cols.map((c) => `<th scope="col">${html(c.label)}</th>`).join('')}</tr></thead>
 <tbody>${body}${tr('Total spending', total.a, total.b, 'total')}</tbody></table>
 </body></html>`;
 }

@@ -11,5 +11,9 @@ export interface SettingsData {
   colorblindMode: boolean;
   showChartValues: boolean;
   budgetAlerts: boolean;
+  keepNotices: boolean;
+  singleKeyShortcuts: boolean;
+  /** Animations off (Settings: "Turn off animations"). */
+  reduceMotion: boolean;
   footerLabel: string;
 }

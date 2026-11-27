@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 import Svg, { Circle, Line, Path, Text as SvgText } from 'react-native-svg';
 import type { CashFlowChartData } from '../models/cashFlow';
 import type { SpendChartData } from '../models/dashboard';
@@ -59,7 +59,7 @@ export function SpendAreaChart({ data, height = 150 }: { data: SpendChartData; h
   return (
     <View onLayout={onLayout} accessible accessibilityRole="image" accessibilityLabel={parts.join(' ')} style={{ height }}>
       {width > 0 && (
-        <Svg width={width} height={height}>
+        <Svg width={width} height={height} aria-hidden>
           {content}
         </Svg>
       )}
@@ -91,8 +91,11 @@ export function BarChart({
           return (
             <Pressable
               key={i}
-              accessibilityRole={onBarPress ? 'button' : undefined}
+              // A bar that does nothing on a press is a named image (a plain element may not have a name).
+              accessibilityRole={onBarPress ? 'button' : 'image'}
               accessibilityState={{ selected }}
+              // react-native-web ignores accessibilityState: on desktop the chosen bar is a pressed button.
+              {...(Platform.OS === 'web' && onBarPress ? { 'aria-pressed': selected } : {})}
               accessibilityLabel={`${b.semanticLabel ?? (b.label || `Bar ${i + 1}`)}: ${Fmt.money(b.value)}`}
               onPress={onBarPress ? () => onBarPress(i) : undefined}
               style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-end', height }}
@@ -111,7 +114,7 @@ export function BarChart({
               >
                 {/* Colorblind mode: the selected bar is hatched, not only a different color. */}
                 {selected && colorblind && (
-                  <Svg width="100%" height={h}>
+                  <Svg width="100%" height={h} aria-hidden>
                     {Array.from({ length: 30 }, (_, k) => -h + k * 6).map((x) => (
                       <Line key={x} x1={x} y1={h} x2={x + h} y2={0} stroke={c.olive} strokeWidth={1.5} />
                     ))}
@@ -122,7 +125,8 @@ export function BarChart({
           );
         })}
       </View>
-      <View style={{ flexDirection: 'row', marginTop: 10 }} importantForAccessibility="no-hide-descendants">
+      {/* The axis labels repeat the bars' names, so screen readers skip them (aria-hidden on the web). */}
+      <View style={{ flexDirection: 'row', marginTop: 10 }} aria-hidden importantForAccessibility="no-hide-descendants">
         {bars.map((b, i) => (
           <Text key={i} style={{ flex: 1, textAlign: 'center', fontSize: 12, color: c.muted }}>
             {b.label}
@@ -188,7 +192,7 @@ export function CashFlowChart({ data, height = 170 }: { data: CashFlowChartData;
     <View accessible accessibilityRole="image" accessibilityLabel={summary}>
       <View onLayout={onLayout} style={{ height }}>
         {width > 0 && (
-          <Svg width={width} height={height}>
+          <Svg width={width} height={height} aria-hidden>
             {content}
           </Svg>
         )}

@@ -1,6 +1,7 @@
 import type { ShortcutCommand } from '../models/shortcuts';
 import { useAppNavigator } from '../navigation/appNavigator';
 import { useNotice } from '../state/NoticeContext';
+import { useDisplay } from '../state/PreferencesContext';
 import { usePageShortcuts, useShortcutsHelp } from '../state/ShortcutsContext';
 
 /**
@@ -12,6 +13,7 @@ export function useKeyboardController() {
   const notify = useNotice();
   const page = usePageShortcuts();
   const [helpOpen, setHelpOpen] = useShortcutsHelp();
+  const { preferences } = useDisplay();
 
   const run = (command: ShortcutCommand) => {
     switch (command.kind) {
@@ -41,6 +43,8 @@ export function useKeyboardController() {
 
   return {
     run,
+    /** Whether single-key shortcuts (?) are on (Settings). */
+    singleKeyShortcuts: preferences.singleKeyShortcuts,
     helpOpen,
     closeHelp: () => setHelpOpen(false),
   };

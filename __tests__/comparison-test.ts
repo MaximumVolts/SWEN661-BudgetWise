@@ -90,7 +90,12 @@ describe('Monthly Comparison (ComparisonService)', () => {
     expect(file.fileName).toBe('pace-comparison-2026-09-vs-2026-10.pdf');
     expect(file.content).toContain('<h1>Spending by Category</h1>');
     expect(file.content).toContain('September 2026 vs October 2026');
-    expect(file.content).not.toMatch(/<td>[^<]*&(?!amp;|lt;|gt;|quot;)/);
+    expect(file.content).not.toMatch(/<th scope="row">[^<]*&(?!amp;|lt;|gt;|quot;)/);
+    // Tagged PDF: a language, and each value tied to its column and row headers.
+    expect(file.content).toContain('<html lang="en">');
+    expect(file.content).toContain('<th scope="col">Spending category</th>');
+    expect(file.content).toContain('<th scope="row">Total spending</th>');
+    expect(file.content).not.toContain('<th>');
   });
 
   test('a cancelled save returns nothing', async () => {

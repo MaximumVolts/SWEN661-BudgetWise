@@ -52,6 +52,14 @@ describe('keyboard shortcuts (matchShortcut)', () => {
     expect(matchShortcut(press('F1'), win)).toEqual({ kind: 'help' });
   });
 
+  test('single-key shortcuts can be turned off (WCAG 2.1.4): ? then does nothing, Ctrl/⌘ + / and F1 still work', () => {
+    const off = { ...win, singleKey: false };
+    expect(matchShortcut(press('?', { shiftKey: true }), off)).toBeUndefined();
+    expect(matchShortcut(press('/', { ctrlKey: true }), off)).toEqual({ kind: 'help' });
+    expect(matchShortcut(press('F1'), off)).toEqual({ kind: 'help' });
+    expect(matchShortcut(press('k', { ctrlKey: true }), off)).toEqual({ kind: 'search' });
+  });
+
   test('other keys, and browser keys like Ctrl + F or Ctrl + Shift + N, are left alone', () => {
     for (const p of [press('f', { ctrlKey: true }), press('n', { ctrlKey: true, shiftKey: true }), press('k'), press('ArrowLeft'), press('Escape'), press('k', { ctrlKey: true, altKey: true })]) {
       expect(matchShortcut(p, win)).toBeUndefined();

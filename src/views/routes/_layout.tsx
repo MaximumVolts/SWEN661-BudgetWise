@@ -5,6 +5,8 @@ import { useDisplay } from '../../state/PreferencesContext';
 import { appServices } from '../../state/ServicesContext';
 import { useSession } from '../../state/SessionContext';
 import { Platform } from 'react-native';
+import { FocusRingStyle } from '../../ui/keyboard';
+import { ReducedMotionStyle } from '../../ui/motion';
 import { useDesktop } from '../../ui/responsive';
 import { AppFrameView, type FrameMode } from '../AppFrameView';
 import { KeyboardShortcutsView } from '../KeyboardShortcutsView';
@@ -15,10 +17,10 @@ import { KeyboardShortcutsView } from '../KeyboardShortcutsView';
  */
 function RootStack() {
   const { stage } = useSession();
-  const { colors } = useDisplay();
+  const { colors, motion } = useDisplay();
   const desktop = useDesktop();
   const stack = (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg }, animation: desktop ? 'none' : undefined }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg }, animation: desktop ? 'none' : motion.screen }}>
       <Stack.Protected guard={stage === 'signedOut'}>
         <Stack.Screen name="sign-in" />
         <Stack.Screen name="create-account" />
@@ -58,6 +60,10 @@ function RootStack() {
   return (
     <>
       <StatusBar style="dark" />
+      {/* Desktop: the app's focus ring (in the theme's ink) on everything, not the browser's thin one. */}
+      {Platform.OS === 'web' && <FocusRingStyle color={colors.ink} />}
+      {/* Desktop: no CSS transitions or animations while animations are off. */}
+      {Platform.OS === 'web' && <ReducedMotionStyle animate={motion.animate} />}
       {Platform.OS === 'web' ? <AppFrameView mode={mode}>{stack}</AppFrameView> : stack}
       {/* Desktop keyboard shortcuts, once signed in (any window width). */}
       {Platform.OS === 'web' && stage === 'app' && <KeyboardShortcutsView />}

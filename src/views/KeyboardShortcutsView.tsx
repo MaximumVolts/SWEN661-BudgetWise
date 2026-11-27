@@ -14,6 +14,6 @@ export function KeyboardShortcutsView() {
     ctl.run(command);
     // After going to another page from the keyboard, focus moves to it, so Tab carries on there.
     if (command.kind === 'section' || command.kind === 'back' || command.kind === 'forward') focusPageSoon();
-  });
+  }, { singleKey: ctl.singleKeyShortcuts });
   return <ShortcutsHelpScreen controller={ctl} />;
 }

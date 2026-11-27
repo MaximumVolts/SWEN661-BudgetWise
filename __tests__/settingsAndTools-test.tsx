@@ -1,5 +1,5 @@
 import { fireEvent } from 'expo-router/testing-library';
-import { StyleSheet } from 'react-native';
+import { AccessibilityInfo, StyleSheet } from 'react-native';
 import { Reminder } from '@/models/userPreferences';
 import { HIGH_CONTRAST, STANDARD } from '@/ui/theme';
 import { openApp, pathname, press, pressButton, pressLabel, screen, settle, type } from './support/app';
@@ -9,6 +9,16 @@ let app: SandboxApp | undefined;
 afterEach(() => app?.bankData.stopRetrying());
 
 const colorOf = (text: string) => StyleSheet.flatten(screen.getByText(text).props.style).color;
+
+/** The open dialog's animation (fade, or none with animations off), read from the rendered Modal. */
+function modalAnimation(): unknown {
+  type Node = { type: unknown; props: Record<string, unknown>; children: (Node | string)[] };
+  const find = (n: Node): unknown =>
+    typeof n.type === 'string' && n.props.animationType !== undefined
+      ? n.props.animationType
+      : n.children.map((c) => (typeof c === 'string' ? undefined : find(c))).find((a) => a !== undefined);
+  return find(screen.root as unknown as Node);
+}
 
 describe('Settings', () => {
   test('high contrast and colorblind mode restyle the whole app at once, and are saved', async () => {
@@ -66,6 +76,39 @@ describe('Settings', () => {
     app = await openApp('/settings');
     await press('Sign out');
     expect(pathname()).toBe('/sign-in');
+  });
+
+  test('turning off animations: dialogs and screens stop fading and sliding, and the choice is saved', async () => {
+    app = await openApp('/settings');
+    await press('Bill reminders');
+    expect(modalAnimation()).toBe('fade');
+    await press('1 week before');
+
+    await fireEvent(screen.getByLabelText('Turn off animations'), 'valueChange', true);
+    await settle();
+    expect((await app.services.settings.preferences()).reduceMotion).toBe(true);
+    await press('Bill reminders');
+    expect(modalAnimation()).toBe('none');
+    await press('1 day before');
+
+    await fireEvent(screen.getByLabelText('Turn off animations'), 'valueChange', false);
+    await settle();
+    await press('Bill reminders');
+    expect(modalAnimation()).toBe('fade');
+  });
+
+  test("the system's reduce-motion setting turns animations off too, with the app's switch left off", async () => {
+    // Swapped in and back (not mockRestore, which would drop the test setup's own stand-in).
+    const systemSetting = AccessibilityInfo.isReduceMotionEnabled;
+    AccessibilityInfo.isReduceMotionEnabled = () => Promise.resolve(true);
+    try {
+      app = await openApp('/settings');
+      expect(screen.getByLabelText('Turn off animations').props.value).toBe(false);
+      await press('Bill reminders');
+      expect(modalAnimation()).toBe('none');
+    } finally {
+      AccessibilityInfo.isReduceMotionEnabled = systemSetting;
+    }
   });
 
   test('delete account asks first, then removes it and signs out', async () => {

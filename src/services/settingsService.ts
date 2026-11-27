@@ -5,6 +5,35 @@ import type { LinkedBankRepository } from '../repositories/linkedBankRepository'
 import type { PreferencesRepository } from '../repositories/preferencesRepository';
 import type { ProfileService } from './profileService';
 
+/**
+ * How long a message stays at the top of the screen when the user hasn't chosen to keep messages
+ * (Settings: "Keep messages on screen", WCAG 2.2.1). The time doesn't run while the mouse or focus is on it.
+ */
+export const NOTICE_SHOW_MS = 10_000;
+
+/** How long a message stays on screen for [preferences]: undefined = until the user closes it. */
+export const noticeTimeout = (preferences: Pick<UserPreferences, 'keepNotices'>): number | undefined =>
+  preferences.keepNotices ? undefined : NOTICE_SHOW_MS;
+
+/** How things move on screen: the modal fade, and the screen-to-screen slide (undefined = the platform's). */
+export interface Motion {
+  /** Whether anything animates. */
+  animate: boolean;
+  modal: 'fade' | 'none';
+  screen: 'none' | undefined;
+}
+
+/**
+ * Whether the app animates. BUSINESS RULE: animations are off when the user turns them off in
+ * Settings *or* the operating system asks for reduced motion (Windows "Animation effects" off,
+ * iOS / Android "Reduce motion"); either is enough (WCAG 2.3.3). [screensSlide]: whether screens
+ * slide in at all on this layout (the desktop frame never does).
+ */
+export function motionFor(preferences: Pick<UserPreferences, 'reduceMotion'>, systemReducesMotion: boolean, screensSlide = true): Motion {
+  const animate = !preferences.reduceMotion && !systemReducesMotion;
+  return { animate, modal: animate ? 'fade' : 'none', screen: animate && screensSlide ? undefined : 'none' };
+}
+
 export interface SettingsService {
   load(): Promise<SettingsData>;
   setHighContrast(value: boolean): Promise<void>;
@@ -13,6 +42,12 @@ export interface SettingsService {
   setBudgetAlerts(value: boolean): Promise<void>;
   /** When bill reminders come (in-app and push notifications), or Reminder.off. */
   setBillReminder(reminder: BillReminder): Promise<void>;
+  /** Messages on screen stay until closed (on) or go after NOTICE_SHOW_MS (off). */
+  setKeepNotices(value: boolean): Promise<void>;
+  /** Whether single-key shortcuts (?) work; Ctrl/⌘ shortcuts always do. */
+  setSingleKeyShortcuts(value: boolean): Promise<void>;
+  /** Animations off (on) or as the system allows (off). */
+  setReduceMotion(value: boolean): Promise<void>;
   /** Emits when data shown on Settings changed elsewhere (e.g. the profile was edited). */
   readonly changes: Subscribable;
   /** The preferences in effect now: the signed-in user's, or the defaults when signed out. */
@@ -72,6 +107,9 @@ export class RepositorySettingsService implements SettingsService {
       colorblindMode: prefs.colorblindMode,
       showChartValues: prefs.showChartValues,
       budgetAlerts: prefs.budgetAlerts,
+      keepNotices: prefs.keepNotices,
+      singleKeyShortcuts: prefs.singleKeyShortcuts,
+      reduceMotion: prefs.reduceMotion,
       footerLabel: 'PROTOTYPE · PLAID SANDBOX DATA',
     };
   }
@@ -89,4 +127,7 @@ export class RepositorySettingsService implements SettingsService {
   setShowChartValues = (showChartValues: boolean) => this.update({ showChartValues });
   setBudgetAlerts = (budgetAlerts: boolean) => this.update({ budgetAlerts });
   setBillReminder = (billReminder: BillReminder) => this.update({ billReminder });
+  setKeepNotices = (keepNotices: boolean) => this.update({ keepNotices });
+  setSingleKeyShortcuts = (singleKeyShortcuts: boolean) => this.update({ singleKeyShortcuts });
+  setReduceMotion = (reduceMotion: boolean) => this.update({ reduceMotion });
 }

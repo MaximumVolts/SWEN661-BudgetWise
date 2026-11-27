@@ -30,7 +30,7 @@ export function AccountsDesktop({ controller }: { controller: AccountsController
             )}
             {data.groups.map((g) => (
               <Panel key={g.title} title={`${g.title} · ${g.institution}`}>
-                <DTable
+                <DTable label={`${g.title} accounts`}
                   columns={[{ label: 'Account', flex: 1.4 }, { label: 'Type' }, { label: 'Connection', flex: 1.6 }, { label: 'Balance', align: 'right' }]}
                   rows={g.accounts.map((a) => ({
                     key: a.id,

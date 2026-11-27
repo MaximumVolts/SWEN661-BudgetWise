@@ -20,7 +20,7 @@ const REMINDER_NOTICE: Record<Exclude<ReminderChoiceResult, 'unchanged'>, (r: Bi
 };
 
 /** A setting with an on / off switch. */
-export type SettingToggle = 'highContrast' | 'colorblindMode' | 'showChartValues' | 'budgetAlerts';
+export type SettingToggle = 'highContrast' | 'colorblindMode' | 'showChartValues' | 'budgetAlerts' | 'keepNotices' | 'singleKeyShortcuts' | 'reduceMotion';
 
 /** 15 - Settings: profile, accounts & data, display, notifications (bill reminders), sign out. */
 export function useSettingsController() {
@@ -44,6 +44,9 @@ export function useSettingsController() {
       colorblindMode: () => settings.setColorblindMode(value),
       showChartValues: () => settings.setShowChartValues(value),
       budgetAlerts: () => settings.setBudgetAlerts(value),
+      keepNotices: () => settings.setKeepNotices(value),
+      singleKeyShortcuts: () => settings.setSingleKeyShortcuts(value),
+      reduceMotion: () => settings.setReduceMotion(value),
     }[key];
     if (!(await perform(save))) return setData(before);
     if (key === 'colorblindMode') {

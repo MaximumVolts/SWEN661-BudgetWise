@@ -18,8 +18,17 @@ export interface AsyncData<T> {
  * A screen's data from a service: loading / error / ready, reloaded when [deps] change and in
  * the background whenever one of [refreshOn] emits (e.g. new bank data). A failed background
  * refresh keeps the content and shows a notice.
+ *
+ * [keepOnChange]: when [deps] change (a control on the page chose other data), keep the content on
+ * screen while the new data loads instead of swapping it for the loading state. The control being
+ * used stays put, so keyboard focus stays on it.
  */
-export function useAsyncData<T>(load: () => Promise<T>, deps: DependencyList, refreshOn: Subscribable<unknown>[] = []): AsyncData<T> {
+export function useAsyncData<T>(
+  load: () => Promise<T>,
+  deps: DependencyList,
+  refreshOn: Subscribable<unknown>[] = [],
+  { keepOnChange = false }: { keepOnChange?: boolean } = {},
+): AsyncData<T> {
   const [state, setState] = useState<AsyncState<T>>({ status: 'loading' });
   const notify = useNotice();
   const loadRef = useRef(load);
@@ -56,7 +65,7 @@ export function useAsyncData<T>(load: () => Promise<T>, deps: DependencyList, re
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => void run(false), deps);
+  useEffect(() => void run(keepOnChange), deps);
 
   useEffect(() => {
     const offs = refreshOn.map((s) => s.subscribe(() => void run(true)));

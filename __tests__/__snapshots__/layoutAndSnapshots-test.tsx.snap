@@ -754,6 +754,7 @@ exports[`Snapshots settings screen 1`] = `
                 >
                   <Text
                     accessibilityRole="header"
+                    aria-level={2}
                     style={
                       {
                         "color": "#1A1A1A",
@@ -2168,6 +2169,212 @@ exports[`Snapshots settings screen 1`] = `
                             value={true}
                           />
                         </View>
+                        <View
+                          style={
+                            {
+                              "backgroundColor": "#D3D1C9",
+                              "height": 1,
+                              "marginLeft": 0,
+                            }
+                          }
+                        />
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "flexDirection": "row",
+                              "minHeight": 60,
+                              "paddingHorizontal": 14,
+                              "paddingVertical": 12,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              {
+                                "alignItems": "center",
+                                "backgroundColor": "#EBEAE4",
+                                "borderRadius": 8,
+                                "height": 38,
+                                "justifyContent": "center",
+                                "width": 38,
+                              }
+                            }
+                          >
+                            <Text
+                              accessibilityElementsHidden={true}
+                              allowFontScaling={false}
+                              importantForAccessibility="no-hide-descendants"
+                              selectable={false}
+                              style={
+                                [
+                                  {
+                                    "color": "#1A1A1A",
+                                    "fontSize": 18.24,
+                                  },
+                                  undefined,
+                                  {
+                                    "fontFamily": "material",
+                                    "fontStyle": "normal",
+                                    "fontWeight": "normal",
+                                  },
+                                  {},
+                                ]
+                              }
+                            >
+                              
+                            </Text>
+                          </View>
+                          <View
+                            style={
+                              {
+                                "flex": 1,
+                                "marginLeft": 14,
+                              }
+                            }
+                          >
+                            <Text
+                              style={
+                                {
+                                  "color": "#1A1A1A",
+                                  "fontSize": 16,
+                                  "fontWeight": "400",
+                                }
+                              }
+                            >
+                              Keep messages on screen
+                            </Text>
+                            <Text
+                              style={
+                                {
+                                  "color": "#5B5A55",
+                                  "fontSize": 12,
+                                }
+                              }
+                            >
+                              Messages at the top stay until you close them
+                            </Text>
+                          </View>
+                          <RCTSwitch
+                            accessibilityLabel="Keep messages on screen"
+                            accessibilityRole="switch"
+                            onChange={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
+                            onTintColor="#1A1A1A"
+                            style={
+                              {
+                                "alignSelf": "flex-start",
+                              }
+                            }
+                            thumbTintColor="#FFFFFF"
+                            tintColor="#8C8A84"
+                            value={false}
+                          />
+                        </View>
+                        <View
+                          style={
+                            {
+                              "backgroundColor": "#D3D1C9",
+                              "height": 1,
+                              "marginLeft": 0,
+                            }
+                          }
+                        />
+                        <View
+                          style={
+                            {
+                              "alignItems": "center",
+                              "flexDirection": "row",
+                              "minHeight": 60,
+                              "paddingHorizontal": 14,
+                              "paddingVertical": 12,
+                            }
+                          }
+                        >
+                          <View
+                            style={
+                              {
+                                "alignItems": "center",
+                                "backgroundColor": "#EBEAE4",
+                                "borderRadius": 8,
+                                "height": 38,
+                                "justifyContent": "center",
+                                "width": 38,
+                              }
+                            }
+                          >
+                            <Text
+                              accessibilityElementsHidden={true}
+                              allowFontScaling={false}
+                              importantForAccessibility="no-hide-descendants"
+                              selectable={false}
+                              style={
+                                [
+                                  {
+                                    "color": "#1A1A1A",
+                                    "fontSize": 18.24,
+                                  },
+                                  undefined,
+                                  {
+                                    "fontFamily": "material",
+                                    "fontStyle": "normal",
+                                    "fontWeight": "normal",
+                                  },
+                                  {},
+                                ]
+                              }
+                            >
+                              
+                            </Text>
+                          </View>
+                          <View
+                            style={
+                              {
+                                "flex": 1,
+                                "marginLeft": 14,
+                              }
+                            }
+                          >
+                            <Text
+                              style={
+                                {
+                                  "color": "#1A1A1A",
+                                  "fontSize": 16,
+                                  "fontWeight": "400",
+                                }
+                              }
+                            >
+                              Turn off animations
+                            </Text>
+                            <Text
+                              style={
+                                {
+                                  "color": "#5B5A55",
+                                  "fontSize": 12,
+                                }
+                              }
+                            >
+                              Screens and dialogs appear without sliding or fading. Also off when your system asks for reduced motion
+                            </Text>
+                          </View>
+                          <RCTSwitch
+                            accessibilityLabel="Turn off animations"
+                            accessibilityRole="switch"
+                            onChange={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
+                            onTintColor="#1A1A1A"
+                            style={
+                              {
+                                "alignSelf": "flex-start",
+                              }
+                            }
+                            thumbTintColor="#FFFFFF"
+                            tintColor="#8C8A84"
+                            value={false}
+                          />
+                        </View>
                       </View>
                     </View>
                     <View>
@@ -3025,6 +3232,7 @@ exports[`Snapshots shared components 1`] = `
         >
           <Text
             accessibilityRole="header"
+            aria-level={2}
             style={
               [
                 {
@@ -3102,12 +3310,12 @@ exports[`Snapshots shared components 1`] = `
         </View>
         <View
           accessibilityLabel="October budget used"
-          accessibilityValue={
-            {
-              "text": "42 percent",
-            }
-          }
+          accessibilityRole="progressbar"
           accessible={true}
+          aria-valuemax={100}
+          aria-valuemin={0}
+          aria-valuenow={42}
+          aria-valuetext="42 percent"
           importantForAccessibility="yes"
           onLayout={[Function]}
           style={
@@ -3333,12 +3541,12 @@ exports[`Snapshots shared components 1`] = `
             >
               <View
                 accessibilityLabel="Food & drink budget used"
-                accessibilityValue={
-                  {
-                    "text": "72 percent",
-                  }
-                }
+                accessibilityRole="progressbar"
                 accessible={true}
+                aria-valuemax={100}
+                aria-valuemin={0}
+                aria-valuenow={72}
+                aria-valuetext="72 percent"
                 importantForAccessibility="yes"
                 onLayout={[Function]}
                 style={
@@ -3409,6 +3617,7 @@ exports[`Snapshots shared components 1`] = `
           >
             <View
               accessibilityLabel="Aug: $1,200.00"
+              accessibilityRole="image"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -3464,6 +3673,7 @@ exports[`Snapshots shared components 1`] = `
             </View>
             <View
               accessibilityLabel="Sep: $950.00"
+              accessibilityRole="image"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -3519,6 +3729,7 @@ exports[`Snapshots shared components 1`] = `
             </View>
             <View
               accessibilityLabel="Oct: $400.00"
+              accessibilityRole="image"
               accessibilityState={
                 {
                   "busy": undefined,
@@ -3574,6 +3785,7 @@ exports[`Snapshots shared components 1`] = `
             </View>
           </View>
           <View
+            aria-hidden={true}
             importantForAccessibility="no-hide-descendants"
             style={
               {
@@ -3939,12 +4151,14 @@ exports[`Snapshots sign in screen 1`] = `
                               "backgroundColor": "#FFFFFF",
                               "borderColor": "#8C8A84",
                               "borderWidth": 1,
+                              "margin": 1,
                             },
                           ]
                         }
                       >
                         <TextInput
                           accessibilityLabel="Username"
+                          aria-invalid={false}
                           autoCapitalize="none"
                           autoComplete="username"
                           autoCorrect={false}
@@ -3953,12 +4167,15 @@ exports[`Snapshots sign in screen 1`] = `
                           onFocus={[Function]}
                           placeholderTextColor="#5B5A55"
                           style={
-                            {
-                              "color": "#1A1A1A",
-                              "flex": 1,
-                              "fontSize": 18,
-                              "paddingVertical": 14,
-                            }
+                            [
+                              {
+                                "color": "#1A1A1A",
+                                "flex": 1,
+                                "fontSize": 18,
+                                "paddingVertical": 14,
+                              },
+                              {},
+                            ]
                           }
                           value=""
                         />
@@ -4001,13 +4218,15 @@ exports[`Snapshots sign in screen 1`] = `
                               "backgroundColor": "#FFFFFF",
                               "borderColor": "#8C8A84",
                               "borderWidth": 1,
+                              "margin": 1,
                             },
                           ]
                         }
                       >
                         <TextInput
                           accessibilityLabel="Password"
-                          autoComplete="password"
+                          aria-invalid={false}
+                          autoComplete="current-password"
                           onBlur={[Function]}
                           onChangeText={[Function]}
                           onFocus={[Function]}
@@ -4015,12 +4234,15 @@ exports[`Snapshots sign in screen 1`] = `
                           placeholderTextColor="#5B5A55"
                           secureTextEntry={true}
                           style={
-                            {
-                              "color": "#1A1A1A",
-                              "flex": 1,
-                              "fontSize": 18,
-                              "paddingVertical": 14,
-                            }
+                            [
+                              {
+                                "color": "#1A1A1A",
+                                "flex": 1,
+                                "fontSize": 18,
+                                "paddingVertical": 14,
+                              },
+                              {},
+                            ]
                           }
                           value=""
                         />

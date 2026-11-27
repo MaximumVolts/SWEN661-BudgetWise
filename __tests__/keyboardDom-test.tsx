@@ -3,19 +3,26 @@
  */
 // The desktop (web) keyboard support in a real DOM: React Native renders through react-native-web,
 // as it does in the desktop app, so focus, roles and key events are the browser's.
-import { act, type ReactNode } from 'react';
-import { Text } from 'react-native';
+import { act, type ReactNode, useRef } from 'react';
+import { Text, TextInput, View } from 'react-native';
 import type { ShortcutCommand } from '@/models/shortcuts';
 import {
   FocusPressable,
+  FocusRingStyle,
+  FORCED_COLORS_RULE,
+  focusRingRule,
   focusById,
   focusPageSoon,
   focusRing,
   isMac,
   KeyGroup,
   MAIN_CONTENT_ID,
-  spaceKeyProps,
+  pressKeyProps,
+  rememberFocus,
+  tabCycleProps,
+  useRevealFirstError,
   useShortcutListener,
+  usingKeyboard,
 } from '@/ui/keyboard';
 
 // Hoisted above the imports by Jest: 'react-native' here is react-native-web.
@@ -98,10 +105,10 @@ describe('platform and focus helpers', () => {
 describe('Space', () => {
   test('presses checkboxes, switches, tabs and options, not buttons', () => {
     const onPress = jest.fn();
-    expect(spaceKeyProps('button', onPress)).toEqual({});
-    expect(spaceKeyProps('checkbox', undefined)).toEqual({});
-    expect(spaceKeyProps(undefined, onPress)).toEqual({});
-    const { onKeyDown } = spaceKeyProps('checkbox', onPress) as { onKeyDown: (e: { key: string; preventDefault(): void }) => void };
+    expect(pressKeyProps('button', onPress)).toEqual({});
+    expect(pressKeyProps('checkbox', undefined)).toEqual({});
+    expect(pressKeyProps(undefined, onPress)).toEqual({});
+    const { onKeyDown } = pressKeyProps('checkbox', onPress) as { onKeyDown: (e: { key: string; preventDefault(): void }) => void };
     const preventDefault = jest.fn();
     onKeyDown({ key: 'Enter', preventDefault });
     expect(onPress).not.toHaveBeenCalled();
@@ -124,6 +131,159 @@ describe('Space', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
     act(() => box.blur());
     expect(box.style.outlineStyle === '' || box.style.outlineStyle === 'none').toBe(true);
+  });
+});
+
+describe('Tab inside a dialog', () => {
+  function Panel() {
+    return (
+      <View {...tabCycleProps} testID="panel">
+        <FocusPressable ringColor="#000" accessibilityRole="button" accessibilityLabel="First" onPress={() => {}}>
+          <Text>First</Text>
+        </FocusPressable>
+        {/* A scroll area: focusable by script, but not a Tab stop. */}
+        <View {...({ tabIndex: -1 } as object)} testID="scroller">
+          <FocusPressable ringColor="#000" accessibilityRole="button" accessibilityLabel="Second" onPress={() => {}}>
+            <Text>Second</Text>
+          </FocusPressable>
+        </View>
+        <FocusPressable ringColor="#000" accessibilityRole="button" accessibilityLabel="Last" onPress={() => {}}>
+          <Text>Last</Text>
+        </FocusPressable>
+      </View>
+    );
+  }
+  const named = (name: string) => host.querySelector<HTMLElement>(`[aria-label="${name}"]`)!;
+
+  test('Tab and Shift+Tab go round its Tab stops and wrap, never onto what is only focusable by script', () => {
+    render(<Panel />);
+    [...host.querySelectorAll('*')].forEach((el) => onScreen(el));
+    act(() => named('Last').focus());
+    const tab = press('Tab', {}, named('Last'));
+    expect(tab.defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(named('First'));
+    press('Tab', { shiftKey: true }, named('First'));
+    expect(document.activeElement).toBe(named('Last'));
+    press('Tab', { shiftKey: true }, named('Last'));
+    expect(document.activeElement).toBe(named('Second'));
+    // From the scroll area (not a Tab stop) Tab goes on to the next stop after it.
+    const scroller = host.querySelector<HTMLElement>('[data-testid="scroller"]')!;
+    act(() => scroller.focus());
+    press('Tab', {}, scroller);
+    expect(document.activeElement).toBe(named('Second'));
+    act(() => scroller.focus());
+    press('Tab', { shiftKey: true }, scroller);
+    expect(document.activeElement).toBe(named('First'));
+  });
+
+  test('other keys are left alone', () => {
+    render(<Panel />);
+    [...host.querySelectorAll('*')].forEach((el) => onScreen(el));
+    act(() => named('First').focus());
+    expect(press('ArrowDown', {}, named('First')).defaultPrevented).toBe(false);
+  });
+});
+
+describe('the focus ring everywhere', () => {
+  test('replaces the browser’s default ring, in the theme’s colour, except on text fields and script-only focus', () => {
+    const rule = focusRingRule('#123456');
+    expect(rule).toContain('outline: 3px solid #123456');
+    expect(rule).toContain(':not(input)');
+    expect(rule).toContain(':not([tabindex="-1"])');
+    render(<FocusRingStyle color="#123456" />);
+    const styles = () => [...document.head.querySelectorAll('style')].map((s) => s.textContent).filter((t) => t?.includes(':focus-visible'));
+    expect(styles()).toEqual([`${rule}
+${FORCED_COLORS_RULE}`]);
+    // A new theme colour replaces the rule; leaving takes it away.
+    act(() => root!.render(<FocusRingStyle color="#000000" />));
+    expect(styles()).toEqual([`${focusRingRule('#000000')}
+${FORCED_COLORS_RULE}`]);
+    act(() => root!.unmount());
+    root = undefined;
+    expect(styles()).toEqual([]);
+  });
+
+  test('Windows High Contrast: the current page and chosen tab or option get the system selection colours', () => {
+    expect(FORCED_COLORS_RULE).toContain('@media (forced-colors: active)');
+    for (const selector of ['[aria-current="page"]', '[role="tab"][aria-selected="true"]', '[role="radio"][aria-checked="true"]']) expect(FORCED_COLORS_RULE).toContain(selector);
+    expect(FORCED_COLORS_RULE).toContain('background-color: Highlight');
+    expect(FORCED_COLORS_RULE).toContain('color: HighlightText');
+  });
+});
+
+describe('keyboard or pointer', () => {
+  test('follows the last input: a key press, then a click', () => {
+    press('Enter', {}, document.body);
+    expect(usingKeyboard()).toBe(true);
+    act(() => void document.body.dispatchEvent(new Event('pointerdown', { bubbles: true })));
+    expect(usingKeyboard()).toBe(false);
+    press('Tab', {}, document.body);
+    expect(usingKeyboard()).toBe(true);
+  });
+});
+
+describe('focus after a dialog', () => {
+  test('goes back to where it was when it has been lost, and to the page when that is gone too', () => {
+    jest.useFakeTimers();
+    try {
+      const opener = document.createElement('button');
+      const field = document.createElement('input');
+      const main = onScreen(document.createElement('div'));
+      main.id = MAIN_CONTENT_ID;
+      main.tabIndex = -1;
+      document.body.append(opener, field, main);
+      opener.focus();
+      const restore = rememberFocus();
+      // The dialog's text field took focus, then the dialog closed and took the field with it.
+      field.focus();
+      field.remove();
+      restore();
+      jest.runAllTimers();
+      expect(document.activeElement).toBe(opener);
+
+      // Focus that wasn't lost is left alone.
+      const restore2 = rememberFocus();
+      main.focus();
+      restore2();
+      jest.runAllTimers();
+      expect(document.activeElement).toBe(main);
+
+      // The opener is gone too (the page re-rendered): the page takes focus.
+      opener.focus();
+      const restore3 = rememberFocus();
+      opener.remove();
+      restore3();
+      jest.runAllTimers();
+      expect(document.activeElement).toBe(main);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+});
+
+describe('Enter on links', () => {
+  test('a role="link" Pressable opens with Enter (react-native-web leaves Enter on links to the browser)', () => {
+    const onPress = jest.fn();
+    render(
+      <FocusPressable ringColor="#000" role="link" onPress={onPress}>
+        <Text>Budgets</Text>
+      </FocusPressable>,
+    );
+    const link = items('link')[0];
+    act(() => link.focus());
+    const enter = press('Enter', {}, link);
+    expect(onPress).toHaveBeenCalledTimes(1);
+    expect(enter.defaultPrevented).toBe(true);
+    // Held down: one press, not one per repeat.
+    press('Enter', { repeat: true }, link);
+    expect(onPress).toHaveBeenCalledTimes(1);
+    // Space scrolls the page on a link, as in a browser; it doesn't follow it.
+    press(' ', {}, link);
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  test('buttons keep react-native-web’s own Enter handling (no second press)', () => {
+    expect(pressKeyProps('button', jest.fn())).toEqual({});
   });
 });
 
@@ -256,6 +416,30 @@ describe('the shortcut listener', () => {
     expect(commands).toEqual([{ kind: 'help' }]);
   });
 
+  test('shortcuts work while typing in a text field, even one that keeps its key events to itself', () => {
+    // As react-native-web's TextInput does: key events stop at the field.
+    const input = document.createElement('input');
+    input.addEventListener('keydown', (e) => e.stopPropagation());
+    document.body.appendChild(input);
+    input.focus();
+    const save = press('s', { ctrlKey: true, code: 'KeyS' }, input);
+    expect(commands).toEqual([{ kind: 'save' }]);
+    expect(save.defaultPrevented).toBe(true);
+    press('ArrowLeft', { altKey: true }, input);
+    expect(commands.at(-1)).toEqual({ kind: 'back' });
+    // Plain typing is left alone.
+    expect(press('s', {}, input).defaultPrevented).toBe(false);
+    expect(commands).toHaveLength(2);
+  });
+
+  test('a field that lets key events bubble still gets each shortcut once', () => {
+    const input = document.createElement('input');
+    document.body.appendChild(input);
+    input.focus();
+    press('2', { ctrlKey: true, code: 'Digit2' }, input);
+    expect(commands).toEqual([{ kind: 'section', section: 'transactions' }]);
+  });
+
   test('while a dialog is open, shortcuts are left alone (Save and Print still kept from the browser)', () => {
     const dialog = document.createElement('div');
     dialog.setAttribute('aria-modal', 'true');
@@ -291,5 +475,33 @@ describe('the shortcut listener', () => {
     expect(unsubscribe).toHaveBeenCalled();
     press('k', { ctrlKey: true, code: 'KeyK' }, window);
     expect(commands).toEqual([]);
+  });
+});
+
+describe('a rejected form', () => {
+  function Input({ label, error }: { label: string; error?: string }) {
+    const ref = useRef<TextInput>(null);
+    useRevealFirstError(ref, error);
+    return <TextInput ref={ref} accessibilityLabel={label} {...({ 'aria-invalid': !!error } as object)} />;
+  }
+  const form = (errors: Record<string, string | undefined>) => (
+    <>
+      <Input label="Name" error={errors.name} />
+      <Input label="Username" error={errors.username} />
+      <Input label="Password" error={errors.password} />
+    </>
+  );
+
+  test('scrolls to the first field with an error and focuses it', () => {
+    jest.useFakeTimers();
+    const scrolled = jest.fn();
+    Element.prototype.scrollIntoView = scrolled;
+    render(form({}));
+    act(() => root!.render(form({ username: 'Taken', password: 'Too short' })));
+    act(() => void jest.advanceTimersByTime(10));
+    const username = host.querySelector<HTMLElement>('[aria-label="Username"]');
+    expect(document.activeElement).toBe(username);
+    expect(scrolled).toHaveBeenCalledTimes(1); // only the first one moves
+    jest.useRealTimers();
   });
 });

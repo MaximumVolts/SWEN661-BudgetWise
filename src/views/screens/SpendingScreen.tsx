@@ -27,7 +27,7 @@ function SpendingPhone({ controller }: { controller: SpendingController }) {
         </Tap>
       </View>
       <View style={{ paddingHorizontal: 20, paddingVertical: 12 }}>
-        <SegTabs labels={rangeLabels} selected={range} onChange={setRange} />
+        <SegTabs label="Spending period" labels={rangeLabels} selected={range} onChange={setRange} />
       </View>
       <AsyncView state={state} onRetry={reload}>
         {(data) => (

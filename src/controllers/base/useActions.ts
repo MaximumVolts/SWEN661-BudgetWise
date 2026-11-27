@@ -38,8 +38,13 @@ export function useFormSubmit() {
       try {
         return { ok: true, value: await action() };
       } catch (e) {
-        if (e instanceof FieldValidationException) setFieldErrors(e.fieldErrors);
-        else notify(messageFor(e));
+        if (e instanceof FieldValidationException) {
+          setFieldErrors(e.fieldErrors);
+          // The errors sit next to their fields, which may be scrolled out of sight (e.g. above the
+          // button just pressed): say so where it shows, so the form never seems to do nothing.
+          const count = Object.keys(e.fieldErrors).length;
+          notify(count === 1 ? 'Please fix the highlighted field.' : `Please fix the ${count} highlighted fields.`);
+        } else notify(messageFor(e));
         return { ok: false };
       } finally {
         busy.current = false;

@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import type { JourneyController } from '../../../controllers/journeyController';
 import { useDisplay } from '../../../state/PreferencesContext';
 import { Icon } from '../../../ui/icons';
+import { focusPageIfLost, focusPageSoon, useShortcutListener } from '../../../ui/keyboard';
 
 const STEPS = ['Your account', 'Your priorities', 'Connect your bank'];
 
@@ -14,8 +16,15 @@ export const JOURNEY_INSET = { left: 440, top: 0 };
  */
 export function JourneyShellScreen({ controller }: { controller: JourneyController }) {
   const { colors: c } = useDisplay();
+  // Alt + ← / → (and the mouse's Back / Forward buttons) here too; focus then goes to the page.
+  useShortcutListener((command) => {
+    if (controller.runShortcut(command)) focusPageSoon();
+  });
+  // Arriving here by signing out takes away the control that had focus: start from the page.
+  useEffect(() => focusPageIfLost(), []);
   return (
-    <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: JOURNEY_INSET.left, zIndex: 1, backgroundColor: c.panel, paddingHorizontal: 56, paddingTop: 56 }}>
+    // A landmark of its own (complementary): every part of the page sits in one.
+    <View role="complementary" accessibilityLabel="About Pace" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: JOURNEY_INSET.left, zIndex: 1, backgroundColor: c.panel, paddingHorizontal: 56, paddingTop: 56 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
           <View style={{ width: 44, height: 44, borderRadius: 13, backgroundColor: c.lime, alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="speed" color="#1A1A1A" />
@@ -34,6 +43,7 @@ export function JourneyShellScreen({ controller }: { controller: JourneyControll
             return (
               <View
                 key={label}
+                role="listitem"
                 accessible
                 accessibilityLabel={`${label}${current ? ', current step' : reached ? ', done' : ''}`}
                 style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}

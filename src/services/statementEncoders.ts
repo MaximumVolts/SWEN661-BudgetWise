@@ -34,14 +34,14 @@ export function encodePdfHtml(s: Statement): string {
   const rows = s.lines
     .map(
       (l) =>
-        `<tr><td>${isoDate(l.date)}</td><td>${escapeHtml(l.note ? `${l.description} (${l.note})` : l.description)}</td>` +
+        `<tr><td>${isoDate(l.date)}</td><th scope="row">${escapeHtml(l.note ? `${l.description} (${l.note})` : l.description)}</th>` +
         `<td>${escapeHtml(l.category)}</td><td class="amount">${escapeHtml(signedMoney(l.amount))}</td></tr>`,
     )
     .join('');
   const table = s.lines.length
-    ? `<table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th class="amount">Amount</th></tr></thead><tbody>${rows}</tbody></table>`
+    ? `<table><caption>Posted transactions</caption><thead><tr><th scope="col">Date</th><th scope="col">Description</th><th scope="col">Category</th><th scope="col" class="amount">Amount</th></tr></thead><tbody>${rows}</tbody></table>`
     : '<p class="muted">No posted transactions this month.</p>';
-  return `<!doctype html><html><head><meta charset="utf-8"><title>Pace statement · ${escapeHtml(s.accountLabel)} · ${escapeHtml(s.periodLabel)}</title>
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Pace statement · ${escapeHtml(s.accountLabel)} · ${escapeHtml(s.periodLabel)}</title>
 <style>
 @page { size: letter; margin: 40px; }
 body { font-family: Helvetica, Arial, sans-serif; color: #1A1A1A; }
@@ -55,7 +55,9 @@ h1 { font-size: 16px; margin: 16px 0 0; }
 .value { font-size: 14px; font-weight: bold; }
 table { width: 100%; border-collapse: collapse; font-size: 9px; }
 th { background: #EEEEEE; text-align: left; padding: 4px; }
-td { border-bottom: 0.5px solid #E0E0E0; padding: 4px; }
+td, tbody th { border-bottom: 0.5px solid #E0E0E0; padding: 4px; }
+tbody th { background: none; font-weight: normal; }
+caption { text-align: left; font-weight: bold; font-size: 11px; padding: 0 0 4px; }
 .amount { text-align: right; white-space: nowrap; }
 footer { margin-top: 24px; font-size: 8px; color: #5B5A55; }
 </style></head><body>

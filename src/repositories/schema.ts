@@ -145,4 +145,13 @@ export const MIGRATIONS: string[] = [
       PRIMARY KEY (user_id, report)
   );
   `,
+  // 3: accessibility settings: keep messages on screen until closed; single-key shortcuts on / off.
+  `
+  ALTER TABLE user_preferences ADD COLUMN keep_notices INTEGER NOT NULL DEFAULT 0 CHECK (keep_notices IN (0, 1));
+  ALTER TABLE user_preferences ADD COLUMN single_key_shortcuts INTEGER NOT NULL DEFAULT 1 CHECK (single_key_shortcuts IN (0, 1));
+  `,
+  // 4: accessibility setting: turn off animations.
+  `
+  ALTER TABLE user_preferences ADD COLUMN reduce_motion INTEGER NOT NULL DEFAULT 0 CHECK (reduce_motion IN (0, 1));
+  `,
 ];

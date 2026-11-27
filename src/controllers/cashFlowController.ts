@@ -14,10 +14,13 @@ export function useCashFlowController() {
   const perform = useAction();
   const [range, setRange] = useState(0);
   const [scenario, setScenario] = useState(1); // Expected
-  const { state, reload } = useAsyncData(() => cashFlow.getProjection(range, scenario), [cashFlow, range, scenario], [
-    cashFlow.changes,
-    bankLink.dataUpdates,
-  ]);
+  // Its range and scenario choices are on the page itself: keep it (and focus on them) while it reloads.
+  const { state, reload } = useAsyncData(
+    () => cashFlow.getProjection(range, scenario),
+    [cashFlow, range, scenario],
+    [cashFlow.changes, bankLink.dataUpdates],
+    { keepOnChange: true },
+  );
 
   /** Removes income the user added (after asking). */
   const removeIncome = async (line: BreakdownLine) => {

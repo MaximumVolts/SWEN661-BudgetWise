@@ -289,6 +289,14 @@ describe('Statements', () => {
     expect(html.match(/<tr>/g)).toHaveLength(s.lines.length + 1); // + the header row
   });
 
+  test('PDF: the page has a language and its table headers are tied to their cells (tagged PDF)', async () => {
+    const html = encodePdfHtml(await app.services.statements.statement('', '2026-09'));
+    expect(html).toContain('<html lang="en">');
+    expect(html).toContain('<caption>');
+    expect(html.match(/<th scope="col"/g)).toHaveLength(4);
+    expect(html).toContain('<th scope="row">');
+  });
+
   test('download: saved where the user picks, named after the month and account; cancelling saves nothing', async () => {
     const statements = app.services.statements;
     expect(await statements.download('', '2026-09', 'pdf')).toBe('pace-statement-2026-09-all-accounts.pdf');

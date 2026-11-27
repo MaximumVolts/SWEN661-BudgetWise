@@ -2,6 +2,7 @@ import { AppException } from '@/models/appException';
 import type { BillItem } from '@/models/bill';
 import { CHOOSABLE_FREQUENCIES, Frequency } from '@/models/recurring';
 import { DEFAULT_PREFERENCES, Reminder, type UserPreferences } from '@/models/userPreferences';
+import { motionFor, NOTICE_SHOW_MS, noticeTimeout } from '@/services/settingsService';
 import { InMemoryDeviceNotifications } from '@/repositories/deviceNotifications';
 import { InMemoryGoalRepository } from '@/repositories/goalRepository';
 import { BillReminderService } from '@/services/billReminderService';
@@ -365,6 +366,35 @@ describe('without a linked bank', () => {
     await auth.signIn('ada', 'secret123');
     await new Promise((r) => setTimeout(r, 0));
     expect(announced.at(-1)).toEqual(mine); // remembered
+  });
+
+  test('settings: messages can be kept on screen, and single-key shortcuts turned off', async () => {
+    const { settings } = app.services;
+    expect(noticeTimeout(await settings.preferences())).toBe(NOTICE_SHOW_MS);
+    await settings.setKeepNotices(true);
+    await settings.setSingleKeyShortcuts(false);
+    const p = await settings.preferences();
+    expect(p).toMatchObject({ keepNotices: true, singleKeyShortcuts: false });
+    expect(noticeTimeout(p)).toBeUndefined();
+    expect(await settings.load()).toMatchObject({ keepNotices: true, singleKeyShortcuts: false });
+  });
+
+  test('settings: animations can be turned off, and are saved', async () => {
+    const { settings } = app.services;
+    expect((await settings.preferences()).reduceMotion).toBe(false);
+    await settings.setReduceMotion(true);
+    expect((await settings.preferences()).reduceMotion).toBe(true);
+    expect((await settings.load()).reduceMotion).toBe(true);
+  });
+
+  test('motion: animations run only when neither the user nor the system turned them off', () => {
+    expect(motionFor({ reduceMotion: false }, false)).toEqual({ animate: true, modal: 'fade', screen: undefined });
+    // The user's setting, or the system's reduce-motion setting: either one is enough.
+    expect(motionFor({ reduceMotion: true }, false)).toEqual({ animate: false, modal: 'none', screen: 'none' });
+    expect(motionFor({ reduceMotion: false }, true)).toEqual({ animate: false, modal: 'none', screen: 'none' });
+    expect(motionFor({ reduceMotion: true }, true).animate).toBe(false);
+    // A layout whose screens never slide (the desktop frame) keeps the fade, but no slide.
+    expect(motionFor({ reduceMotion: false }, false, false)).toEqual({ animate: true, modal: 'fade', screen: 'none' });
   });
 
   test('settings: the bill reminder choice is kept', async () => {
